@@ -15,6 +15,14 @@ return new class extends Migration
     {
         Schema::create('lecturers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->enum('title', ['Prof.', 'Dr.', 'Rev.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']);
+            $table->string('first_name', 20);
+            $table->string('other_name')->nullable();
+            $table->string('last_name', 20);
+            $table->enum('gender', ['male', 'female']);
+            $table->string('phone1', 15)->nullable();
+            $table->text('picture')->nullable();
             $table->timestamps();
         });
     }
