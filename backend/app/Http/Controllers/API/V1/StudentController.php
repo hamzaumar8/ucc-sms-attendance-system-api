@@ -34,7 +34,7 @@ class StudentController extends Controller
     {
         $this->validate($request, [
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'index_number' => ['required', 'max:20', 'unique:students'],
+            'index_number' => ['required', 'max:20', 'unique:students,index_number'],
             'first_name' => ['required', 'string', 'max:20'],
             'other_name' => ['nullable', 'string',],
             'last_name' => ['required', 'string', 'max:20'],
@@ -43,8 +43,9 @@ class StudentController extends Controller
             'picture' => ['nullable'],
         ]);
 
+        $name = $request->other_name ? $request->first_name . ' ' . $request->other_name . ' ' . $request->last_name : $request->first_name . ' ' . $request->last_name;
         $user = User::create([
-            'name' => $request->name,
+            'name' => $name,
             'email' => $request->email,
             'password' => Hash::make(Str::random(8)),
         ]);
@@ -89,7 +90,7 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
         $this->validate($request, [
-            'index_number' => ['required', 'max:20', Rule::unique('students')->ignore($student->index_number())],
+            'index_number' => ['required', 'max:20', Rule::unique('students')->ignore($student->index_number(), 'index_number')],
             'first_name' => ['required', 'string', 'max:20'],
             'other_name' => ['nullable', 'string',],
             'last_name' => ['required', 'string', 'max:20'],
@@ -121,7 +122,7 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        $student->delete();
-        return response()->setStatusCode(204);
+        $student->user->delete();
+        return response()->json(null, 204);
     }
 }

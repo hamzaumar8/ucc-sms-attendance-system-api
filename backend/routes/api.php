@@ -31,4 +31,10 @@ Route::group([
 
     // Users
     Route::get('users/{user}', [UserController::class, 'show'])->name('users');
+
+    // User
+    // Route::get('/user', Usercontroller::class);
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
