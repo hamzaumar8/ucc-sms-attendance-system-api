@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\V1\LecturerController;
 use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
 use Illuminate\Http\Request;
@@ -28,6 +29,10 @@ Route::group([
 ], function () {
     // Students
     Route::apiResource('/students', StudentController::class);
+
+
+    // Lectures
+    Route::apiResource('/lecturers', LecturerController::class);
 
     // Users
     Route::get('users/{user}', [UserController::class, 'show'])->name('users');

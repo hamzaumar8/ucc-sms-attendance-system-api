@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Resources\V1\Student;
+namespace App\Http\Resources\V1\Lecturer;
 
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class StudentResource extends JsonResource
+class LecturerResource extends JsonResource
 {
-    // public static $wrap = 'students';
     /**
      * Transform the resource into an array.
      *
@@ -17,28 +16,28 @@ class StudentResource extends JsonResource
     public function toArray($request)
     {
         // return parent::toArray($request);
+        $picture_url = $this->picture ? asset('assets/img/lecturers/' . $this->picture) : asset('assets/img/lecturers/default.png');
         return [
-            'id' => $this->id(),
+            'id' => $this->id,
             'attributes' => [
-                'index_number' => $this->index_number(),
-                'full_name' => $this->full_name(),
-                'first_name' => $this->first_name(),
-                'last_name' => $this->last_name(),
-                'other_name' => $this->other_name(),
-                'gender' => $this->gender(),
-                'phone' => $this->phone(),
-                'picture' => $this->picture(),
+                'title' => $this->title,
+                'first_name' => $this->first_name,
+                'last_name' => $this->last_name,
+                'other_name' => $this->other_name,
+                'gender' => $this->gender,
+                'phone1' => $this->phone1,
+                'picture' => $this->picture,
+                'picture_url' => $picture_url,
                 'created_at' => $this->created_at,
             ],
             'relationships' => [
                 'user' => UserResource::make($this->user),
             ],
             'links' => [
-                'self' => route('students.show', $this->id()),
+                'self' => route('lecturers.show', $this->id),
             ]
         ];
     }
-
 
     public function with($request)
     {
