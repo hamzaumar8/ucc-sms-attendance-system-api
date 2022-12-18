@@ -14,6 +14,24 @@ class ModuleCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        // return parent::toArray($request);
+        return [
+            'data' => $this->collection,
+            'summary' => [
+                'count' => $this->collection->count(),
+            ]
+        ];
+    }
+
+    public function with($request)
+    {
+        return [
+            'status' => 'success',
+        ];
+    }
+
+    public function withResponse($request, $response)
+    {
+        $response->header('Accept', 'application/json');
     }
 }

@@ -19,18 +19,16 @@ class LecturerResource extends JsonResource
         $picture_url = $this->picture ? asset('assets/img/lecturers/' . $this->picture) : asset('assets/img/lecturers/default.png');
         return [
             'id' => $this->id,
-            'attributes' => [
-                'title' => $this->title,
-                'first_name' => $this->first_name,
-                'last_name' => $this->last_name,
-                'other_name' => $this->other_name,
-                'gender' => $this->gender,
-                'phone1' => $this->phone1,
-                'picture' => $this->picture,
-                'picture_url' => $picture_url,
-                'created_at' => $this->created_at,
-            ],
-            'relationships' => [
+            'title' => $this->title,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'other_name' => $this->other_name,
+            'gender' => $this->gender,
+            'phone1' => $this->phone1,
+            'picture' => $this->picture,
+            'picture_url' => $picture_url,
+            'created_at' => $this->created_at,
+            'rel' => [
                 'user' => UserResource::make($this->user),
             ],
             'links' => [

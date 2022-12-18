@@ -14,4 +14,14 @@ class Lecturer extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function cordinator_modules()
+    {
+        return $this->hasMany(Module::class, 'cordinator_id');
+    }
+
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class, 'lecturer_module',  'lecturer_id', 'module_id');
+    }
 }

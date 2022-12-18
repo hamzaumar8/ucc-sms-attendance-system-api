@@ -17,6 +17,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('lecturer_id')->constrained()->onDelete('cascade');
             $table->foreignId('module_id')->constrained()->onDelete('cascade');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->enum('status', ['active', 'upcoming', 'past'])->default('upcoming');
+            $table->unsignedBigInteger('course_rep_id')->nullable();
+            $table->foreign('course_rep_id')->references('id')->on('students')->onDelete('set null');
             $table->timestamps();
         });
     }

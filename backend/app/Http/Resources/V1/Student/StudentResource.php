@@ -16,21 +16,20 @@ class StudentResource extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
+        $picture_url = $this->picture ? asset('assets/img/student/' . $this->picture) : asset('assets/img/lecturers/default.png');
         return [
             'id' => $this->id(),
-            'attributes' => [
-                'index_number' => $this->index_number(),
-                'full_name' => $this->full_name(),
-                'first_name' => $this->first_name(),
-                'last_name' => $this->last_name(),
-                'other_name' => $this->other_name(),
-                'gender' => $this->gender(),
-                'phone' => $this->phone(),
-                'picture' => $this->picture(),
-                'created_at' => $this->created_at,
-            ],
-            'relationships' => [
+            'index_number' => $this->index_number,
+            'full_name' => $this->full_name(),
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'other_name' => $this->other_name,
+            'gender' => $this->gender,
+            'phone' => $this->phone,
+            'picture' => $this->picture,
+            'picture_url' => $picture_url,
+            'created_at' => $this->created_at,
+            'rel' => [
                 'user' => UserResource::make($this->user),
             ],
             'links' => [

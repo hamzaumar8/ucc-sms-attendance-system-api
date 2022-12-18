@@ -27,40 +27,6 @@ class Student extends Model
         return $this->id;
     }
 
-    public function index_number(): string
-    {
-        return $this->index_number;
-    }
-
-    public function first_name(): string
-    {
-        return $this->first_name;
-    }
-
-    public function other_name()
-    {
-        return $this->other_name;
-    }
-
-    public function last_name(): string
-    {
-        return $this->last_name;
-    }
-
-    public function gender(): string
-    {
-        return $this->gender;
-    }
-
-    public function phone()
-    {
-        return $this->phone;
-    }
-
-    public function picture()
-    {
-        return $this->picture;
-    }
 
     // optional zone close
 

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\API\V1\LecturerController;
+use App\Http\Controllers\API\V1\LecturerModuleController;
+use App\Http\Controllers\API\V1\ModuleController;
 use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
 use Illuminate\Http\Request;
@@ -33,6 +35,12 @@ Route::group([
 
     // Lectures
     Route::apiResource('/lecturers', LecturerController::class);
+
+    // Modules
+    Route::apiResource('/modules', ModuleController::class);
+
+    // LectureModule
+    Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');
 
     // Users
     Route::get('users/{user}', [UserController::class, 'show'])->name('users');

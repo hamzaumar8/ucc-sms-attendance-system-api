@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Resources\V1\Lecturer;
+namespace App\Http\Resources\V1\Module;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Http\Resources\V1\Lecturer\LecturerResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class LecturerCollection extends ResourceCollection
+class ModuleResource extends JsonResource
 {
     /**
-     * Transform the resource collection into an array.
+     * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
@@ -16,10 +17,13 @@ class LecturerCollection extends ResourceCollection
     {
         // return parent::toArray($request);
         return [
-            'data' => $this->collection,
-            'summary' => [
-                'count' => $this->collection->count(),
-            ]
+            'id' => $this->id,
+            'title' => $this->title,
+            'code' => $this->code,
+            'credit_hour' => $this->credit_hour,
+            'rel' => [
+                'cordinator' => LecturerResource::make($this->cordinator),
+            ],
         ];
     }
 
