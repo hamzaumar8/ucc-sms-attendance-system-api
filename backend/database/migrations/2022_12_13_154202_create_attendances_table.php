@@ -15,14 +15,12 @@ return new class extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('lecturer_id')->nullable();
-            $table->unsignedBigInteger('module_id')->nullable();
+            $table->unsignedBigInteger('lecturer_module_id')->nullable();
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
             $table->enum('status', ['present', 'absent'])->default('absent');
-            $table->foreign('lecturer_id')->references('id')->on('lecturers')->onDelete('set null');
-            $table->foreign('module_id')->references('id')->on('modules')->onDelete('set null');
+            $table->foreign('lecturer_module_id')->references('id')->on('lecturer_module')->onDelete('set null');
             $table->timestamps();
         });
     }

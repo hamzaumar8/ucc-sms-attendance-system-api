@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources\V1\LectureModule;
+namespace App\Http\Resources\V1\LecturerModule;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class LectureModuleCollection extends ResourceCollection
+class LecturerModuleCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.

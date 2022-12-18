@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LectureModule extends Model
+class LecturerModule extends Model
 {
     use HasFactory;
 
@@ -19,5 +19,10 @@ class LectureModule extends Model
     public function lecturer()
     {
         return $this->belongsTo(Lecturer::class, 'lecturer_id');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'lecturer_module_id');
     }
 }

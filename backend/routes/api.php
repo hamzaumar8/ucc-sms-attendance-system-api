@@ -39,7 +39,7 @@ Route::group([
     // Modules
     Route::apiResource('/modules', ModuleController::class);
 
-    // LectureModule
+    // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');
 
     // Users

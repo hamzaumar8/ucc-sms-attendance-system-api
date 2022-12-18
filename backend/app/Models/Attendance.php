@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Attendance extends Model
 {
     use HasFactory;
+
+    public function lecturerModel()
+    {
+        return $this->belongsTo(LecturerModule::class, 'lecturer_module_id');
+    }
+
+    public function presentLecturerModel()
+    {
+        return $this->lecturerModel->where('status', 'present')->count();
+    }
 }

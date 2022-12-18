@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\V1\LectureModule\LectureModuleCollection;
-use App\Models\LectureModule;
+use App\Http\Resources\V1\LecturerModule\LecturerModuleCollection;
+use App\Models\LecturerModule;
 use Illuminate\Http\Request;
 
 class LecturerModuleController extends Controller
@@ -16,6 +16,6 @@ class LecturerModuleController extends Controller
      */
     public function index()
     {
-        return  new LectureModuleCollection(LectureModule::all());
+        return new LecturerModuleCollection(LecturerModule::all());
     }
 }
