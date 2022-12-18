@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Resources\V1\Attendance;
+namespace App\Http\Resources\V1\AttendanceStudent;
 
-use App\Http\Resources\V1\AttendanceStudent\AttendanceStudentCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AttendanceResource extends JsonResource
+class AttendanceStudentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,13 +17,11 @@ class AttendanceResource extends JsonResource
         // return parent::toArray($request);
         return [
             "id" => $this->id,
-            "lecturer_module_id" => $this->lecturer_module_id,
-            "date" => $this->date,
-            "start_time" => $this->start_time,
-            "end_time" => $this->end_time,
+            "attendance_id" => $this->attendance_id,
+            "student_id" => $this->student_id,
             "status" => $this->status,
             "created_at" => $this->created_at,
-            "student_attendance" => AttendanceStudentCollection::make($this->attendance_student),
+            // "student_attendance" => $this->attendance_student,
         ];
     }
 

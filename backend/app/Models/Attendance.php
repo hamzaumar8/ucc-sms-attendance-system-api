@@ -18,4 +18,9 @@ class Attendance extends Model
     {
         return $this->lecturerModel->where('status', 'present')->count();
     }
+
+    public function attendance_student()
+    {
+        return $this->hasMany(AttendanceStudent::class, 'attendance_id');
+    }
 }
