@@ -23,13 +23,11 @@ class LecturerModuleResource extends JsonResource
         $toDate = Carbon::parse($this->start_date);
         $fromDate = Carbon::parse($this->end_date);
 
-        $days = $toDate->diffInDays($fromDate);
-        $days_remaining = now()->diffInDays($fromDate);
-        $days_covered = $toDate->diffInDays(now());
-        $weekdays = $toDate->diffInWeekdays($fromDate);
-        $months = $toDate->diffInMonths($fromDate);
-        $years = $toDate->diffInYears($fromDate);
+        $days = (int)($toDate->diffInDays($fromDate));
+        $days_covered = (int)($toDate->diffInDays(now() > $fromDate ? $fromDate : now()));
+        $days_remaining = (int)($days - $days_covered);
 
+        $covered_percentage = round((($days_covered / $days) * 100));
 
 
         return [
@@ -45,9 +43,10 @@ class LecturerModuleResource extends JsonResource
             'lecturer' => LecturerResource::make($this->lecturer),
             'attendance' => AttendanceCollection::make($this->attendances),
             'days' => [
-                'total' => (int)$days + 1,
-                'covered' => (int)$days_covered + 1,
-                'remains' => (int)$days_remaining + 1,
+                'total' => $days,
+                'covered' => $days_covered,
+                'remains' => $days_remaining,
+                'covered_percentage' => $covered_percentage,
             ]
         ];
     }
