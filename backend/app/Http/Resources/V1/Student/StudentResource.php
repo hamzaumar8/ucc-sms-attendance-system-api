@@ -32,9 +32,7 @@ class StudentResource extends JsonResource
             'created_at' => $this->created_at,
             'level' => $this->level,
             'modules' => $this->modules,
-            'rel' => [
-                'user' => UserResource::make($this->user),
-            ],
+            'user' => UserResource::make($this->user),
             'links' => [
                 'self' => route('students.show', $this->id()),
             ]

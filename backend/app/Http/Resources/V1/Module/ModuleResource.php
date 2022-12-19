@@ -22,9 +22,7 @@ class ModuleResource extends JsonResource
             'code' => $this->code,
             'credit_hour' => $this->credit_hour,
             'students' => $this->students,
-            'rel' => [
-                'cordinator' => LecturerResource::make($this->cordinator),
-            ],
+            'cordinator' => LecturerResource::make($this->cordinator),
         ];
     }
 

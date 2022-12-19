@@ -28,9 +28,7 @@ class LecturerResource extends JsonResource
             'picture' => $this->picture,
             'picture_url' => $picture_url,
             'created_at' => $this->created_at,
-            'rel' => [
-                'user' => UserResource::make($this->user),
-            ],
+            'user' => UserResource::make($this->user),
             'links' => [
                 'self' => route('lecturers.show', $this->id),
             ]
