@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Level extends Model
 {
     use HasFactory;
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'level_id');
+    }
 }

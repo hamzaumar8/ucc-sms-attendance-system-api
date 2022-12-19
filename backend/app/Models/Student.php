@@ -39,4 +39,15 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function level()
+    {
+        return $this->belongsTo(Level::class, 'level_id');
+    }
+
+
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class, 'module_student',  'student_id', 'module_id');
+    }
 }

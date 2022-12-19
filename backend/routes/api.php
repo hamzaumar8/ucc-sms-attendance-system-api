@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\V1\LecturerController;
 use App\Http\Controllers\API\V1\LecturerModuleController;
+use App\Http\Controllers\API\V1\LevelController;
 use App\Http\Controllers\API\V1\ModuleController;
 use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
@@ -38,6 +39,9 @@ Route::group([
 
     // Modules
     Route::apiResource('/modules', ModuleController::class);
+
+    // Levels
+    Route::apiResource('/levels', LevelController::class);
 
     // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');

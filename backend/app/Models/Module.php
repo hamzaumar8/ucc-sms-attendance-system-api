@@ -20,6 +20,12 @@ class Module extends Model
     }
 
 
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'module_student', 'module_id', 'student_id');
+    }
+
+
 
 
     // public function emergencycontact()

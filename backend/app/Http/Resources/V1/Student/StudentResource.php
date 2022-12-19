@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1\Student;
 
+use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -29,6 +30,8 @@ class StudentResource extends JsonResource
             'picture' => $this->picture,
             'picture_url' => $picture_url,
             'created_at' => $this->created_at,
+            'level' => $this->level,
+            'modules' => $this->modules,
             'rel' => [
                 'user' => UserResource::make($this->user),
             ],

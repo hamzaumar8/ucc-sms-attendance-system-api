@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\V1\Module;
+namespace App\Http\Resources\V1\Level;
 
-use App\Http\Resources\V1\Lecturer\LecturerResource;
+use App\Http\Resources\V1\Student\StudentCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ModuleResource extends JsonResource
+class LevelResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,13 +18,8 @@ class ModuleResource extends JsonResource
         // return parent::toArray($request);
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'code' => $this->code,
-            'credit_hour' => $this->credit_hour,
-            'students' => $this->students,
-            'rel' => [
-                'cordinator' => LecturerResource::make($this->cordinator),
-            ],
+            'name' => $this->name,
+            'students' => StudentCollection::make($this->students),
         ];
     }
 
