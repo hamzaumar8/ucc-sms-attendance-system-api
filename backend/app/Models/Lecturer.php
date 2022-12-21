@@ -24,4 +24,12 @@ class Lecturer extends Model
     {
         return $this->belongsToMany(Module::class, 'lecturer_module',  'lecturer_id', 'module_id');
     }
+
+
+
+    // public function emergencycontact()
+    // {
+    //     return $this->hasMany(EmergencyContact::class);
+    // }
+
 }
