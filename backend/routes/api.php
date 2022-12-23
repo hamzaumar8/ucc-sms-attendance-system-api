@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\V1\AttendanceController;
 use App\Http\Controllers\API\V1\LecturerController;
 use App\Http\Controllers\API\V1\LecturerModuleController;
 use App\Http\Controllers\API\V1\LevelController;
@@ -20,10 +21,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-});
-
+Route::get('v1/user', UserController::class)->middleware(['auth:sanctum']);
 
 
 Route::group([
@@ -43,6 +41,10 @@ Route::group([
     // Levels
     Route::apiResource('/levels', LevelController::class);
 
+    // Levels
+    Route::apiResource('/attendances', AttendanceController::class);
+    Route::get('/attandance/lecturer', [AttendanceController::class, 'lecturers_attendances']);
+
     // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');
 
@@ -51,7 +53,7 @@ Route::group([
 
     // User
     // Route::get('/user', Usercontroller::class);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
+    // Route::get('/user', function (Request $request) {
+    //     return $request->user();
+    // });
 });

@@ -9,6 +9,20 @@ class Attendance extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'lecturer_module_id',
+        'date',
+        'start_time',
+        'end_time',
+        'status',
+    ];
+
+    protected $casts = [
+        'date' => 'datetime',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+    ];
+
     public function lecturerModel()
     {
         return $this->belongsTo(LecturerModule::class, 'lecturer_module_id');

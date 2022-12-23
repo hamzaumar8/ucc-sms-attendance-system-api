@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\Attendance\AttendanceResource;
 use App\Models\Attendance;
+use App\Models\LecturerModule;
 use Illuminate\Http\Request;
 
-class AttendanceControllern extends Controller
+class AttendanceController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,7 +28,25 @@ class AttendanceControllern extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'lecturer_id' => 'required|exists:lecturers,id',
+            'module_id' => 'required|exists:modules,id',
+            'date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ]);
+
+        $lecturer_module = LecturerModule::where('lecturer_id', $request->lecturer_id)->where('module_id', $request->module_id)->first();
+        $attendance = Attendance::create([
+            'lecturer_module_id' => $lecturer_module->id,
+            'date' => $request->date,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'status' => 'present',
+        ]);
+
+        return response()->json(['status' => 'attendance-checked-in'])
+            ->setStatusCode(201);
     }
 
     /**
@@ -61,5 +81,12 @@ class AttendanceControllern extends Controller
     public function destroy(Attendance $attendance)
     {
         //
+    }
+
+    public function lecturers_attendances()
+    {
+        $lecturer_id = auth()->user()->lecturer->id;
+        $lecturrer_module = LecturerModule::where('lecturer_id', $lecturer_id)->get();
+        dd($lecturer_id);
     }
 }
