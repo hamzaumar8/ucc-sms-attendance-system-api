@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('modules', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cordinatorid')->nullable();
+            $table->unsignedBigInteger('cordinator_id')->nullable();
             $table->string('title')->unique();
-            $table->string('code', 10);
-            $table->unsignedTinyInteger('credit_hour');
-            $table->foreign('cordinatorid')->references('id')->on('lecturers')->onDelete('set null');
+            $table->string('code', 10)->unique();
+            $table->unsignedTinyInteger('credit_hour')->nullable();
+            $table->foreign('cordinator_id')->references('id')->on('lecturers')->onDelete('set null');
             $table->timestamps();
         });
     }

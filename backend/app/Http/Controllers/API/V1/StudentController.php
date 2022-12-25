@@ -125,4 +125,16 @@ class StudentController extends Controller
         $student->user->delete();
         return response()->json(null, 204);
     }
+
+
+    public function backend(Request $request)
+    {
+        $query = Student::query();
+
+        if ($s = $request->input('s')) {
+            $query->whereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("last_name Like '%" . $s . "%'")->orWhereRaw("index_number Like '%" . $s . "%'");
+        }
+
+        return $query->get();
+    }
 }

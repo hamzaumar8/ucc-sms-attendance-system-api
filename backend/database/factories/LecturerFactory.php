@@ -20,6 +20,7 @@ class LecturerFactory extends Factory
     {
         return [
             'user_id' => $attribute['user_id'] ?? User::factory(),
+            'staff_id' => $this->faker->uniqueGenerator(),
             'title' => 'Dr.',
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),

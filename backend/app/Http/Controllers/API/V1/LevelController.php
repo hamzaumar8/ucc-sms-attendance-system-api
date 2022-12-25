@@ -63,4 +63,15 @@ class LevelController extends Controller
     {
         //
     }
+
+    public function backend(Request $request)
+    {
+        $query = Level::query();
+
+        if ($s = $request->input('s')) {
+            $query->whereRaw("name Like '%" . $s . "%'");
+        }
+
+        return $query->get();
+    }
 }

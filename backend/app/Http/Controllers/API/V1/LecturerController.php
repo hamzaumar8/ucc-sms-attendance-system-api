@@ -17,6 +17,7 @@ class LecturerController extends Controller
      */
     public function index()
     {
+        // return Lecturer::all();
         return new LecturerCollection(Lecturer::all());
     }
 
@@ -65,5 +66,17 @@ class LecturerController extends Controller
     public function destroy(Lecturer $lecturer)
     {
         //
+    }
+
+
+    public function backend(Request $request)
+    {
+        $query = Lecturer::query();
+
+        if ($s = $request->input('s')) {
+            $query->whereRaw("title Like '%" . $s . "%'")->orWhereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("last_name Like '%" . $s . "%'")->orWhereRaw("staff_id Like '%" . $s . "%'");
+        }
+
+        return $query->get();
     }
 }

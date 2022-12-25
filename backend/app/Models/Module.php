@@ -9,6 +9,13 @@ class Module extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'cordinator_id',
+        'title',
+        'code',
+        'credit_hour',
+    ];
+
     public function cordinator()
     {
         return $this->belongsTo(Lecturer::class, 'cordinator_id');

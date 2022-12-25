@@ -23,7 +23,7 @@ class StudentFactory extends Factory
             'user_id' => $attribute['user_id'] ?? User::factory(),
             'index_number' => Str::random(10),
             'first_name' => $this->faker->firstName(),
-            'index_number' => $this->faker->lastName(),
+            'index_number' => $this->faker->uniqueGenerator(),
             'last_name' => $this->faker->lastName(),
             'gender' => 'male',
         ];

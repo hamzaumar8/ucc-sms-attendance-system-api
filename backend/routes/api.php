@@ -30,16 +30,19 @@ Route::group([
 ], function () {
     // Students
     Route::apiResource('/students', StudentController::class);
+    Route::get('/stud/backend', [StudentController::class, 'backend']);
 
 
     // Lectures
     Route::apiResource('/lecturers', LecturerController::class);
+    Route::get('/lect/backend', [LecturerController::class, 'backend']);
 
     // Modules
     Route::apiResource('/modules', ModuleController::class);
 
     // Levels
     Route::apiResource('/levels', LevelController::class);
+    Route::get('/lev/backend', [LevelController::class, 'backend']);
 
     // Levels
     Route::apiResource('/attendances', AttendanceController::class);
