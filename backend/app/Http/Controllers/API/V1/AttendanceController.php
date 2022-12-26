@@ -36,12 +36,12 @@ class AttendanceController extends Controller
             'end_time' => 'required',
         ]);
 
-        $lecturer_module = LecturerModule::where('lecturer_id', $request->lecturer_id)->where('module_id', $request->module_id)->first();
+        $lecturer_module = LecturerModule::where('lecturer_id', $request->input('lecturer_id'))->where('module_id', $request->input('module_id'))->first();
         $attendance = Attendance::create([
             'lecturer_module_id' => $lecturer_module->id,
-            'date' => $request->date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
+            'date' => $request->input('date'),
+            'start_time' => $request->input('start_time'),
+            'end_time' => $request->input('end_time'),
             'status' => 'present',
         ]);
 

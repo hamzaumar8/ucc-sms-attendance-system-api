@@ -20,7 +20,7 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        return new ModuleCollection(Module::all());
+        return new ModuleCollection(Module::orderBy('id', 'DESC')->get());
     }
 
     /**
@@ -43,22 +43,22 @@ class ModuleController extends Controller
             'course_rep' => 'required|exists:students,id',
         ]);
         try {
-            $lecturers = json_decode($request->lecturer);
-            $start_date = Carbon::parse($request->start_date);
-            $end_date = Carbon::parse($request->start_date)->addWeeks($request->duration);
+            $lecturers = json_decode($request->input('lecturer'));
+            $start_date = Carbon::parse($request->input('start_date'));
+            $end_date = Carbon::parse($request->input('start_date'))->addWeeks($request->input('duration'));
             $lects = Lecturer::find($lecturers);
-            $students = Level::find($request->level)->students;
+            $students = Level::find($request->input('level'))->students;
 
             $module = Module::create([
-                'cordinator_id' => $request->cordinator,
-                'title' => $request->title,
-                'code' => $request->code,
+                'cordinator_id' => $request->input('cordinator'),
+                'title' => $request->input('title'),
+                'code' => $request->input('code'),
             ]);
 
             $status = "upcoming";
             if ($start_date > now()) {
                 $status = "upcoming";
-            } elseif ($start_date <= now() || $end_date >= now()) {
+            } elseif (Carbon::now()->between($start_date, $end_date)) {
                 $status = 'active';
             } elseif (now() > $end_date) {
                 $status = "past";
@@ -69,7 +69,7 @@ class ModuleController extends Controller
                 'start_date' => $start_date,
                 'end_date' => $end_date,
                 'status' => $status,
-                'course_rep_id' => $request->course_rep,
+                'course_rep_id' => $request->input('course_rep'),
             ]);
 
             // module students attachment

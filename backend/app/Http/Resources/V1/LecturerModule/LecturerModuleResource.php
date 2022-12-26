@@ -38,8 +38,7 @@ class LecturerModuleResource extends JsonResource
             $this->status === 'upcoming' ? $this->status : $this->update(['status' => 'upcoming']);
         }
         $days_remaining = (int)($days - $days_covered);
-
-        $covered_percentage = round((($days_covered  / $days > 1 ? $days : 1) * 100));
+        $covered_percentage = round(($days_covered * 100) / $days);
 
 
         return [

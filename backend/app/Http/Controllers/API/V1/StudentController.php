@@ -7,6 +7,7 @@ use App\Http\Resources\V1\Student\StudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
 use App\Models\Student;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -21,7 +22,7 @@ class StudentController extends Controller
      */
     public function index()
     {
-        return new StudentCollection(Student::all());
+        return new StudentCollection(Student::orderBy('id', 'DESC')->get());
     }
 
     /**
@@ -33,38 +34,42 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'index_number' => ['required', 'max:20', 'unique:students,index_number'],
-            'first_name' => ['required', 'string', 'max:20'],
-            'other_name' => ['nullable', 'string',],
-            'last_name' => ['required', 'string', 'max:20'],
-            'gender' => ['required', 'string',],
-            'phone' => ['required', 'string', 'max:20'],
-            'picture' => ['nullable'],
+            'email' => 'required|string|email|max:255|unique:users',
+            'index_number' => 'required|max:20|unique:students,index_number',
+            'first_name' => 'required|string|max:20',
+            'other_name' => 'nullable|string',
+            'last_name' => 'required|string|max:20',
+            // 'gender' => 'required|string',
+            'phone' => 'nullable|string|max:20',
+            'picture' => 'nullable|string',
+            'level' => 'required|exists:levels,id',
         ]);
 
-        $name = $request->other_name ? $request->first_name . ' ' . $request->other_name . ' ' . $request->last_name : $request->first_name . ' ' . $request->last_name;
-        $user = User::create([
-            'name' => $name,
-            'email' => $request->email,
-            'password' => Hash::make(Str::random(8)),
-        ]);
+        try {
+            $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('last_name') : $request->input('first_name') . ' ' . $request->input('last_name');
+            $user = User::create([
+                'name' => $name,
+                'email' => $request->input('email'),
+                'password' => Hash::make(Str::random(8)),
+            ]);
 
-        $student = Student::create([
-            'user_id' => $user->id,
-            'index_number' => $request->input('index_number'),
-            'first_name' => $request->input('first_name'),
-            'other_name' => $request->input('other_name'),
-            'last_name' => $request->input('last_name'),
-            'gender' => $request->input('gender'),
-            'phone' => $request->input('phone'),
-            'picture' => $request->input('picture'),
-        ]);
+            $student = Student::create([
+                'user_id' => $user->id,
+                'index_number' => $request->input('index_number'),
+                'first_name' => $request->input('first_name'),
+                'other_name' => $request->input('other_name'),
+                'last_name' => $request->input('last_name'),
+                // 'gender' => $request->input('gender'),
+                'phone' => $request->input('phone'),
+                'picture' => $request->input('picture'),
+                'level_id' => $request->input('level'),
+            ]);
 
-        //TODO: send email (credentials) to student
-        return (new StudentResource($student))
-            ->response()
-            ->setStatusCode(201);
+            //TODO: send email (credentials) to student
+            return response()->json(['status' => 'student-added-succesffully'])->setStatusCode(201);
+        } catch (Exception $ex) {
+            return response()->json(['error' => 'Exception Message: ' . $ex->getMessage()])->setStatusCode(500);
+        }
     }
 
     /**
