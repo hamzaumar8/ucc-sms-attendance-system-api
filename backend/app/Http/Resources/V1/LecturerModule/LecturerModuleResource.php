@@ -20,14 +20,26 @@ class LecturerModuleResource extends JsonResource
      */
     public function toArray($request)
     {
-        $toDate = Carbon::parse($this->start_date);
-        $fromDate = Carbon::parse($this->end_date);
+        $startDate = Carbon::parse($this->start_date);
+        if ($startDate->isWeekday()) {
+            $startDate = $startDate->subDay();
+        }
+        $endDate = Carbon::parse($this->end_date);
 
-        $days = (int)($toDate->diffInDays($fromDate));
-        $days_covered = (int)($toDate->diffInDays(now() > $fromDate ? $fromDate : now()));
+        $days = (int)($endDate->diffInDays($startDate));
+        if (Carbon::now()->between($startDate, $endDate)) {
+            $days_covered = (int)($startDate->diffInDays(Carbon::now()));
+            $this->status === 'active' ? $this->status : $this->update(['status' => 'active']);
+        } elseif (Carbon::now()->gt($endDate)) {
+            $days_covered = $days;
+            $this->status === 'past' ? $this->status : $this->update(['status' => 'past']);
+        } else {
+            $days_covered = 0;
+            $this->status === 'upcoming' ? $this->status : $this->update(['status' => 'upcoming']);
+        }
         $days_remaining = (int)($days - $days_covered);
 
-        $covered_percentage = round((($days_covered / $days) * 100));
+        $covered_percentage = round((($days_covered  / $days > 1 ? $days : 1) * 100));
 
 
         return [
