@@ -18,7 +18,6 @@ class LevelSeeder extends Seeder
         Level::insert([
             ['name' => 'Level 200'],
             ['name' => 'GEM 250'],
-            ['name' => 'Level 200'],
             ['name' => 'GEM 300'],
             ['name' => 'Level 300'],
             ['name' => 'Level 400'],

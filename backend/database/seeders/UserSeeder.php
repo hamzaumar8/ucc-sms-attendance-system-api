@@ -20,9 +20,7 @@ class UserSeeder extends Seeder
             'email' => 'john@gmail.com',
             'password' => bcrypt('password'),
         ]);
-
-        $user->createToken('JohnDoe')->plainTextToken;
-
+        // $user->createToken('JohnDoe')->plainTextToken;
         User::factory()->count(5)->create();
     }
 }
