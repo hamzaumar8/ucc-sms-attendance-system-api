@@ -25,6 +25,7 @@ class AttendanceCollection extends ResourceCollection
                     'count' => $this->student_attendance_count($this->collection),
                     'present' => $this->student_attendance_present($this->collection),
                     'absent' => $this->student_attendance_absent($this->collection),
+                    'present_percentage' => $this->present_percentage($this->collection)
                 ],
             ],
         ];
@@ -56,6 +57,15 @@ class AttendanceCollection extends ResourceCollection
         }
 
         return $total;
+    }
+
+    public function present_percentage($collection)
+    {
+        $total_present = $this->student_attendance_present($collection);
+        $total_count = $this->student_attendance_count($collection);
+        $total_count = $total_count > 0 ? $total_count : 1;
+
+        return round(($total_present / $total_count) * 100);
     }
 
     public function with($request)
