@@ -16,7 +16,7 @@ class Lecturer extends Model
         'title',
         'first_name',
         'other_name',
-        'last_name',
+        'surname',
         'gender',
         'phone',
         'picture',
@@ -37,6 +37,10 @@ class Lecturer extends Model
         return $this->belongsToMany(Module::class, 'lecturer_module',  'lecturer_id', 'module_id');
     }
 
+    public function full_name()
+    {
+        return $this->other_name ? $this->title . ' ' . $this->first_name . ' ' . $this->other_name . ' ' . $this->surname : $this->first_name . ' ' . $this->surname;
+    }
 
 
     // public function emergencycontact()

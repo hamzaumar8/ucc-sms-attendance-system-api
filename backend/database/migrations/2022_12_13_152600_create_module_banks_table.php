@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('modules', function (Blueprint $table) {
+        Schema::create('module_banks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cordinator_id')->nullable();
             $table->string('title')->unique();
             $table->string('code', 10)->unique();
             $table->unsignedTinyInteger('credit_hour')->nullable();
-            $table->foreign('cordinator_id')->references('id')->on('lecturers')->onDelete('set null');
-            $table->timestamps();
         });
     }
 
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('modules');
+        Schema::dropIfExists('module_banks');
     }
 };

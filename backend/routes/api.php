@@ -50,6 +50,7 @@ Route::group([
 
     // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');
+    Route::get('/lecture/modules/{lecuturermodule}', [LecturerModuleController::class, 'show'])->name('lecture_module.show');
 
     // Users
     Route::get('users/{user}', [UserController::class, 'show'])->name('users');

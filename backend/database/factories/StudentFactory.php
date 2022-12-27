@@ -24,7 +24,7 @@ class StudentFactory extends Factory
             'index_number' => Str::random(10),
             'first_name' => $this->faker->firstName(),
             'index_number' => $this->faker->uniqueGenerator(),
-            'last_name' => $this->faker->lastName(),
+            'surname' => $this->faker->lastName(),
             'gender' => 'male',
         ];
     }

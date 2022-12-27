@@ -6,6 +6,7 @@ use App\Http\Resources\V1\Attendance\AttendanceCollection;
 use App\Http\Resources\V1\Attendance\AttendanceResource;
 use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Http\Resources\V1\Module\ModuleResource;
+use App\Http\Resources\V1\Student\StudentResource;
 use App\Models\Attendance;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -45,6 +46,7 @@ class LecturerModuleResource extends JsonResource
             "id" => $this->id,
             "lecturer_id" => $this->lecturer_id,
             "module_id" => $this->module_id,
+            "level_id" => $this->level_id,
             "start_date" => $this->start_date,
             "end_date" => $this->end_date,
             "status" => $this->status,
@@ -53,6 +55,8 @@ class LecturerModuleResource extends JsonResource
             'module' => ModuleResource::make($this->module),
             'lecturer' => LecturerResource::make($this->lecturer),
             'attendance' => AttendanceCollection::make($this->attendances),
+            'course_rep' => StudentResource::make($this->course_rep),
+            'level' => $this->level,
             'days' => [
                 'total' => $days,
                 'covered' => $days_covered,

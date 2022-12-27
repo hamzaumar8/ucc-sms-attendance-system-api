@@ -20,12 +20,14 @@ class LecturerResource extends JsonResource
         $picture_url = $this->picture ? asset('assets/img/lecturers/' . $this->picture) : asset('assets/img/lecturers/default.png');
         return [
             'id' => $this->id,
+            'staff_id' => $this->staff_id,
             'title' => $this->title,
             'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
+            'surname' => $this->surname,
             'other_name' => $this->other_name,
+            'full_name' => $this->full_name(),
             'gender' => $this->gender,
-            'phone1' => $this->phone1,
+            'phone' => $this->phone,
             'picture' => $this->picture,
             'picture_url' => $picture_url,
             'created_at' => $this->created_at,

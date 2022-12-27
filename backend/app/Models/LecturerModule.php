@@ -23,6 +23,15 @@ class LecturerModule extends Model
     {
         return $this->belongsTo(Module::class, 'module_id');
     }
+    public function course_rep()
+    {
+        return $this->belongsTo(Student::class, 'course_rep_id');
+    }
+
+    public function level()
+    {
+        return $this->belongsTo(Level::class, 'level_id');
+    }
 
     public function lecturer()
     {

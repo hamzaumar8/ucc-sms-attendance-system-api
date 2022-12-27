@@ -55,7 +55,6 @@ class AttendanceCollection extends ResourceCollection
         foreach ($collection as $col) {
             $total += $col->attendance_student->count();
         }
-
         return $total;
     }
 
@@ -63,9 +62,8 @@ class AttendanceCollection extends ResourceCollection
     {
         $total_present = $this->student_attendance_present($collection);
         $total_count = $this->student_attendance_count($collection);
-        $total_count = $total_count > 0 ? $total_count : 1;
 
-        return round(($total_present / $total_count) * 100);
+        return round(($total_present / ($total_count > 0 ? $total_count : 1)) * 100);
     }
 
     public function with($request)

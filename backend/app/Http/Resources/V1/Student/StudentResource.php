@@ -17,18 +17,18 @@ class StudentResource extends JsonResource
      */
     public function toArray($request)
     {
-        $picture_url = $this->picture ? asset('assets/img/student/' . $this->picture) : asset('assets/img/lecturers/default.png');
+
         return [
             'id' => $this->id(),
             'index_number' => $this->index_number,
             'full_name' => $this->full_name(),
             'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
+            'surname' => $this->surname,
             'other_name' => $this->other_name,
             'gender' => $this->gender,
             'phone' => $this->phone,
             'picture' => $this->picture,
-            'picture_url' => $picture_url,
+            'picture_url' => $this->picture_url(),
             'created_at' => $this->created_at,
             'level' => $this->level,
             'modules' => $this->modules,

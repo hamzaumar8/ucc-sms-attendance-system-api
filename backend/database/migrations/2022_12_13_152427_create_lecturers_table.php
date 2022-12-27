@@ -17,10 +17,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('staff_id', 20)->unique();
-            $table->enum('title', ['Prof.', 'Dr.', 'Rev.', 'Mr.', 'Mrs.', 'Miss', 'Ms.']);
+            $table->enum('title', ['Prof.', 'Dr.', 'Rev.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'])->nullable();
             $table->string('first_name', 20);
             $table->string('other_name')->nullable();
-            $table->string('last_name', 20);
+            $table->string('surname', 20);
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->string('phone', 15)->nullable();
             $table->text('picture')->nullable();

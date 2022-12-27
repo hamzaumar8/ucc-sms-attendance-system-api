@@ -41,14 +41,14 @@ class LecturerController extends Controller
             'title' => 'required|string',
             'first_name' => 'required|string|max:20',
             'other_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:20',
+            'surname' => 'required|string|max:20',
             // 'gender' => 'required|string',
             'phone' => 'nullable|string|max:15|unique:lecturers,phone',
             'picture' => 'nullable',
         ]);
 
 
-        $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('last_name') : $request->input('first_name') . ' ' . $request->input('last_name');
+        $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
 
         // Create user
         $user = User::create([
@@ -64,7 +64,7 @@ class LecturerController extends Controller
             'title' => $request->input('title'),
             'first_name' => $request->input('first_name'),
             'other_name' => $request->input('other_name'),
-            'last_name' => $request->input('last_name'),
+            'surname' => $request->input('surname'),
             // 'gender' => $request->input('gender'),
             'phone' => $request->input('phone'),
             // 'picture' => $request->input('picture'),
@@ -116,7 +116,7 @@ class LecturerController extends Controller
         $query = Lecturer::query();
 
         if ($s = $request->input('s')) {
-            $query->whereRaw("title Like '%" . $s . "%'")->orWhereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("last_name Like '%" . $s . "%'")->orWhereRaw("staff_id Like '%" . $s . "%'");
+            $query->whereRaw("title Like '%" . $s . "%'")->orWhereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("surname Like '%" . $s . "%'")->orWhereRaw("staff_id Like '%" . $s . "%'");
         }
 
         return $query->get();

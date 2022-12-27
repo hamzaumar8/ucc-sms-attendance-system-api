@@ -14,7 +14,7 @@ class Student extends Model
         'index_number',
         'first_name',
         'other_name',
-        'last_name',
+        'surname',
         'gender',
         'phone',
         'picture',
@@ -31,7 +31,12 @@ class Student extends Model
 
     public function full_name()
     {
-        return $this->other_name ? $this->first_name . ' ' . $this->other_name . ' ' . $this->last_name : $this->first_name . ' ' . $this->last_name;
+        return $this->other_name ? $this->first_name . ' ' . $this->other_name . ' ' . $this->surname : $this->first_name . ' ' . $this->surname;
+    }
+
+    public function picture_url()
+    {
+        return $this->picture ? asset('assets/img/student/' . $this->picture) : asset('assets/img/lecturers/default.png');
     }
 
     public function user()

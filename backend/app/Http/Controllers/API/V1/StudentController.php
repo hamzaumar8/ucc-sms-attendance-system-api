@@ -41,14 +41,14 @@ class StudentController extends Controller
             'index_number' => 'required|max:20|unique:students,index_number',
             'first_name' => 'required|string|max:20',
             'other_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:20',
+            'surname' => 'required|string|max:20',
             // 'gender' => 'required|string',
             'phone' => 'nullable|string|max:15',
             'picture' => 'nullable',
             'level' => 'required|exists:levels,id',
         ]);
 
-        $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('last_name') : $request->input('first_name') . ' ' . $request->input('last_name');
+        $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
 
         // if ($request->has('picture') && $request->picture) {
         //     $file = $request->file('picture');
@@ -71,7 +71,7 @@ class StudentController extends Controller
             'index_number' => $request->input('index_number'),
             'first_name' => $request->input('first_name'),
             'other_name' => $request->input('other_name'),
-            'last_name' => $request->input('last_name'),
+            'surname' => $request->input('surname'),
             // 'gender' => $request->input('gender'),
             'phone' => $request->input('phone'),
             // 'picture' => $picture_url,
@@ -105,10 +105,10 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
         $this->validate($request, [
-            'index_number' => ['required', 'max:20', Rule::unique('students')->ignore($student->index_number(), 'index_number')],
+            'index_number' => ['required', 'max:20', Rule::unique('students')->ignore($student->index_number, 'index_number')],
             'first_name' => ['required', 'string', 'max:20'],
             'other_name' => ['nullable', 'string',],
-            'last_name' => ['required', 'string', 'max:20'],
+            'surname' => ['required', 'string', 'max:20'],
             'gender' => ['required', 'string',],
             'phone' => ['required', 'string', 'max:20'],
             'picture' => ['nullable'],
@@ -118,7 +118,7 @@ class StudentController extends Controller
             'index_number' => $request->input('index_number'),
             'first_name' => $request->input('first_name'),
             'other_name' => $request->input('other_name'),
-            'last_name' => $request->input('last_name'),
+            'surname' => $request->input('surname'),
             'gender' => $request->input('gender'),
             'phone' => $request->input('phone'),
             'picture' => $request->input('picture'),
@@ -147,7 +147,7 @@ class StudentController extends Controller
         $query = Student::query();
 
         if ($s = $request->input('s')) {
-            $query->whereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("last_name Like '%" . $s . "%'")->orWhereRaw("index_number Like '%" . $s . "%'");
+            $query->whereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("surname Like '%" . $s . "%'")->orWhereRaw("index_number Like '%" . $s . "%'");
         }
 
         return $query->get();

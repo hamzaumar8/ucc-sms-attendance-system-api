@@ -19,10 +19,12 @@ return new class extends Migration
             $table->string('index_number', 20)->unique();
             $table->string('first_name', 20);
             $table->string('other_name')->nullable();
-            $table->string('last_name', 20);
+            $table->string('surname', 20);
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->string('phone', 15)->nullable();
             $table->text('picture')->nullable();
+            $table->unsignedBigInteger('level_id')->nullable();
+            $table->foreign('level_id')->references('id')->on('levels')->onDelete('set null');
             $table->timestamps();
         });
     }

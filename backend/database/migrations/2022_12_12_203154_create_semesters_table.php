@@ -13,10 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('lecturer_module', function (Blueprint $table) {
+        Schema::create('semesters', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('lecturer_id')->constrained()->onDelete('cascade');
-            $table->foreignId('module_id')->constrained()->onDelete('cascade');
+            $table->enum('semester', ['1', '2']);
+            $table->string('academic_year', 12);
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->enum('assessment_status', ['open', 'close'])->default('close');
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lecturer_module');
+        Schema::dropIfExists('semesters');
     }
 };

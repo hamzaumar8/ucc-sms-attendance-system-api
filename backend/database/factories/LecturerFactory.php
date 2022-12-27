@@ -23,7 +23,7 @@ class LecturerFactory extends Factory
             'staff_id' => $this->faker->uniqueGenerator(),
             'title' => 'Dr.',
             'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
+            'surname' => $this->faker->lastName(),
             'other_name' => $this->faker->lastName(),
             'gender' => 'male',
             // 'phone1' => $this->faker->phoneNumber(),
