@@ -7,9 +7,12 @@ use App\Http\Resources\V1\Student\StudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
 use App\Models\Student;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -37,39 +40,46 @@ class StudentController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'index_number' => 'required|max:20|unique:students,index_number',
             'first_name' => 'required|string|max:20',
-            'other_name' => 'nullable|string',
+            'other_name' => 'nullable|string|max:255',
             'last_name' => 'required|string|max:20',
             // 'gender' => 'required|string',
-            'phone' => 'nullable|string|max:20',
-            'picture' => 'nullable|string',
+            'phone' => 'nullable|string|max:15',
+            'picture' => 'nullable',
             'level' => 'required|exists:levels,id',
         ]);
 
-        try {
-            $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('last_name') : $request->input('first_name') . ' ' . $request->input('last_name');
-            $user = User::create([
-                'name' => $name,
-                'email' => $request->input('email'),
-                'password' => Hash::make(Str::random(8)),
-            ]);
+        $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('last_name') : $request->input('first_name') . ' ' . $request->input('last_name');
 
-            $student = Student::create([
-                'user_id' => $user->id,
-                'index_number' => $request->input('index_number'),
-                'first_name' => $request->input('first_name'),
-                'other_name' => $request->input('other_name'),
-                'last_name' => $request->input('last_name'),
-                // 'gender' => $request->input('gender'),
-                'phone' => $request->input('phone'),
-                'picture' => $request->input('picture'),
-                'level_id' => $request->input('level'),
-            ]);
+        // if ($request->has('picture') && $request->picture) {
+        //     $file = $request->file('picture');
+        //     Log::debug($file);
+        //     $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
+        //     $file->move(public_path('public/images'), $file_name);
+        //     $picture_url = URL::to('/') . 'public/images/' . $file_name;
+        // }
 
-            //TODO: send email (credentials) to student
-            return response()->json(['status' => 'student-added-succesffully'])->setStatusCode(201);
-        } catch (Exception $ex) {
-            return response()->json(['error' => 'Exception Message: ' . $ex->getMessage()])->setStatusCode(500);
-        }
+        // Create user
+        $user = User::create([
+            'name' => $name,
+            'email' => $request->input('email'),
+            'password' => Hash::make(Str::random(8)),
+        ]);
+
+
+        $student = Student::create([
+            'user_id' => $user->id,
+            'index_number' => $request->input('index_number'),
+            'first_name' => $request->input('first_name'),
+            'other_name' => $request->input('other_name'),
+            'last_name' => $request->input('last_name'),
+            // 'gender' => $request->input('gender'),
+            'phone' => $request->input('phone'),
+            // 'picture' => $picture_url,
+            'level_id' => $request->input('level'),
+        ]);
+
+        //TODO: send email (credentials) to student
+        return response()->json(['status' => 'student-added-succesffully'])->setStatusCode(201);
     }
 
     /**

@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('first_name', 20);
             $table->string('other_name')->nullable();
             $table->string('last_name', 20);
-            $table->enum('gender', ['male', 'female']);
-            $table->string('phone1', 15)->nullable();
+            $table->enum('gender', ['male', 'female'])->nullable();
+            $table->string('phone', 15)->nullable();
             $table->text('picture')->nullable();
             $table->timestamps();
         });

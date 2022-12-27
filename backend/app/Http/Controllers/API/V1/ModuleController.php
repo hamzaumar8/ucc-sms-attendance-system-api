@@ -52,7 +52,9 @@ class ModuleController extends Controller
             $module = Module::create([
                 'cordinator_id' => $request->input('cordinator'),
                 'title' => $request->input('title'),
-                'code' => $request->input('code'),
+                'code' => strtoupper(
+                    $request->input('code')
+                ),
             ]);
 
             $status = "upcoming";

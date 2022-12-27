@@ -10,6 +10,18 @@ class Lecturer extends Model
     use HasFactory;
 
 
+    protected $fillable = [
+        'user_id',
+        'staff_id',
+        'title',
+        'first_name',
+        'other_name',
+        'last_name',
+        'gender',
+        'phone',
+        'picture',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
