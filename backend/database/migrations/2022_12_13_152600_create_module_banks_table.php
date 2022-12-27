@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title')->unique();
             $table->string('code', 10)->unique();
             $table->unsignedTinyInteger('credit_hour')->nullable();
+            $table->timestamps();
         });
     }
 

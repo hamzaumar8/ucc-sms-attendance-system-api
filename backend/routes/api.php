@@ -4,6 +4,7 @@ use App\Http\Controllers\API\V1\AttendanceController;
 use App\Http\Controllers\API\V1\LecturerController;
 use App\Http\Controllers\API\V1\LecturerModuleController;
 use App\Http\Controllers\API\V1\LevelController;
+use App\Http\Controllers\API\V1\ModuleBankController;
 use App\Http\Controllers\API\V1\ModuleController;
 use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
@@ -36,6 +37,9 @@ Route::group([
     // Lectures
     Route::apiResource('/lecturers', LecturerController::class);
     Route::get('/lect/backend', [LecturerController::class, 'backend']);
+
+    // Modules Bank
+    Route::apiResource('/module/bank', ModuleBankController::class);
 
     // Modules
     Route::apiResource('/modules', ModuleController::class);
