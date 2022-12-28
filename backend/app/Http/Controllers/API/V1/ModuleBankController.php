@@ -62,13 +62,14 @@ class ModuleBankController extends Controller
      */
     public function update(Request $request, ModuleBank $moduleBank)
     {
+        // dd($moduleBank->id);
         $request->validate([
-            'title' => 'required|string|max:225|unique:module_banks.title' . $moduleBank->id,
-            'code' => 'required|string|max:10|unique:module_banks,code' . $moduleBank->id,
+            'title' => 'required|string|max:225|unique:module_banks,title,' . $request->input('id'),
+            'code' => 'required|string|max:10|unique:module_banks,code,' . $request->input('id'),
             'credit_hour' => 'required|numeric',
         ]);
 
-        $$moduleBank->update([
+        $moduleBank->update([
             'title' => $request->input('title'),
             'code' => strtoupper($request->input('code')),
             'credit_hour' => $request->input('credit_hour'),
