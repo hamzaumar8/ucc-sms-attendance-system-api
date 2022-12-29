@@ -104,6 +104,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
+        dd($student);
         $this->validate($request, [
             'index_number' => ['required', 'max:20', Rule::unique('students')->ignore($student->index_number, 'index_number')],
             'first_name' => ['required', 'string', 'max:20'],

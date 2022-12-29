@@ -39,7 +39,8 @@ Route::group([
     Route::get('/lect/backend', [LecturerController::class, 'backend']);
 
     // Modules Bank
-    Route::apiResource('/module/bank', ModuleBankController::class);
+    Route::apiResource('/module_banks', ModuleBankController::class);
+    Route::get('/mod_bank/backend', [ModuleBankController::class, 'backend']);
 
     // Modules
     Route::apiResource('/modules', ModuleController::class);

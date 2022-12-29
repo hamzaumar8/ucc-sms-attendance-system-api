@@ -10,16 +10,41 @@ class Module extends Model
     use HasFactory;
 
     protected $fillable = [
+        'semester_id',
+        'module_bank_id',
         'cordinator_id',
-        'title',
-        'code',
-        'credit_hour',
+        'course_rep_id',
+        'level_id',
+        'start_date',
+        'end_date',
+        'status',
     ];
 
     public function cordinator()
     {
         return $this->belongsTo(Lecturer::class, 'cordinator_id');
     }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class, 'semester_id');
+    }
+
+    public function module_bank()
+    {
+        return $this->belongsTo(ModuleBank::class, 'module_bank_id');
+    }
+
+    public function course_rep()
+    {
+        return $this->belongsTo(Student::class, 'course_rep_id');
+    }
+
+    public function level()
+    {
+        return $this->belongsTo(Level::class, 'level_id');
+    }
+
 
     public function lectures()
     {
@@ -33,10 +58,8 @@ class Module extends Model
     }
 
 
-
-
-    // public function emergencycontact()
-    // {
-    //     return $this->hasMany(EmergencyContact::class);
-    // }
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'module_id');
+    }
 }

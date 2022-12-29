@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Resources\V1\Lecturer;
+namespace App\Http\Resources\V1\Student;
 
-use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class LecturerResource extends JsonResource
+class StudentSingleResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,23 +16,16 @@ class LecturerResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'staff_id' => $this->staff_id,
-            'title' => $this->title,
+            'id' => $this->id(),
+            'index_number' => $this->index_number,
+            'full_name' => $this->full_name(),
             'first_name' => $this->first_name,
             'surname' => $this->surname,
             'other_name' => $this->other_name,
-            'full_name' => $this->full_name(),
             'gender' => $this->gender,
             'phone' => $this->phone,
             'picture' => $this->picture,
             'picture_url' => $this->picture_url(),
-            'created_at' => $this->created_at,
-            'user' => UserResource::make($this->user),
-            'modules' => $this->modules,
-            'links' => [
-                'self' => route('lecturers.show', $this->id),
-            ]
         ];
     }
 
@@ -47,6 +39,5 @@ class LecturerResource extends JsonResource
     public function withResponse($request, $response)
     {
         $response->header('Accept', 'application/json');
-        // $response->header('Version', '1.0.0');
     }
 }

@@ -42,6 +42,10 @@ class Lecturer extends Model
         return $this->other_name ? $this->title . ' ' . $this->first_name . ' ' . $this->other_name . ' ' . $this->surname : $this->first_name . ' ' . $this->surname;
     }
 
+    public function picture_url()
+    {
+        return $this->picture ? asset('assets/img/lecturers/' . $this->picture) : asset('assets/img/lecturers/default.png');
+    }
 
     // public function emergencycontact()
     // {

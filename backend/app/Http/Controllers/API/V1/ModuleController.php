@@ -8,6 +8,7 @@ use App\Models\Lecturer;
 use App\Models\LecturerModule;
 use App\Models\Level;
 use App\Models\Module;
+use App\Models\Semester;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,6 +16,23 @@ use Illuminate\Validation\Rule;
 
 class ModuleController extends Controller
 {
+    public function status($start_date, $end_date)
+    {
+        $status = "upcoming";
+        if ($start_date > Carbon::now()) {
+            $status = "upcoming";
+        } elseif (Carbon::now()->between($start_date, $end_date)) {
+            $status = 'active';
+        } elseif (Carbon::now() > $end_date) {
+            $status = "inactive";
+        }
+        return $status;
+    }
+
+    public function semester()
+    {
+        return Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -22,7 +40,7 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        return new ModuleCollection(Module::orderBy('id', 'DESC')->get());
+        return new ModuleCollection(Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->get());
     }
 
     /**
@@ -33,53 +51,43 @@ class ModuleController extends Controller
      */
     public function store(Request $request)
     {
+        // check if semester is set
+        if (!$this->semester()->id) {
+            return response()->json(['message' => "set-semester"])->setStatusCode(403);
+        }
+
         $request->validate([
-            'title' => 'required|string|max:225|unique:modules',
-            'code' => 'required|string|max:10|unique:modules',
+            'module' => 'required|exists:module_banks,id',
+            'cordinator' => 'required|exists:lecturers,id',
+            'course_rep' => 'required|exists:students,id',
             'level' => 'required|exists:levels,id',
             'start_date' => 'required|date',
             'duration' => 'required|numeric',
             'lecturer' => 'required',
-            'cordinator' => 'required|exists:lecturers,id',
-            'course_rep' => 'required|exists:students,id',
         ]);
-
-        $lecturers = json_decode($request->input('lecturer'));
         $start_date = Carbon::parse($request->input('start_date'));
         $end_date = Carbon::parse($request->input('start_date'))->addWeeks($request->input('duration'));
-        $lects = Lecturer::find($lecturers);
-        $students = Level::find($request->input('level'))->students;
 
+        // create module
         $module = Module::create([
+            'semester_id' => $this->semester()->id,
+            'module_bank_id' => $request->input('module'),
             'cordinator_id' => $request->input('cordinator'),
-            'title' => $request->input('title'),
-            'code' => strtoupper(
-                $request->input('code')
-            ),
-        ]);
-
-        $status = "upcoming";
-        if ($start_date > now()) {
-            $status = "upcoming";
-        } elseif (Carbon::now()->between($start_date, $end_date)) {
-            $status = 'active';
-        } elseif (now() > $end_date) {
-            $status = "past";
-        }
-
-        // lecturer module attachment
-        $module->lectures()->attach($lects, [
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'status' => $status,
             'course_rep_id' => $request->input('course_rep'),
             'level_id' => $request->input('level'),
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'status' => $this->status($start_date, $end_date),
         ]);
 
-        // module students attachment
-        $module->students()->attach($students);
+        // lecturer module attachment
+        $lecturers = Lecturer::find(json_decode($request->input('lecturer')));
+        $module->lectures()->attach($lecturers);
 
-        return response()->json(['status' => 'module-mounted-succesffully'])
+        // module students attachment
+        $module->students()->attach($module->level->students);
+
+        return response()->json(['status' => 'success'])
             ->setStatusCode(201);
     }
 
@@ -103,60 +111,47 @@ class ModuleController extends Controller
      */
     public function update(Request $request, Module $module)
     {
+        // check if semester is set
+        if (!$this->semester()->id) {
+            return response()->json(['message' => "set-semester"])->setStatusCode(403);
+        }
+
         $request->validate([
-            'title' => 'required|string|max:225|unique:modules,title,' . $module->id,
-            'code' => 'required|string|max:10|unique:modules,code,' . $module->id,
+            'module' => 'required|exists:module_banks,id',
+            'cordinator' => 'required|exists:lecturers,id',
+            'course_rep' => 'required|exists:students,id',
             'level' => 'required|exists:levels,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'lecturer' => 'required|exists:lecturers,id',
-            'cordinator' => 'required|exists:lecturers,id',
-            'course_rep' => 'required|exists:students,id',
+            'lecturer' => 'required',
         ]);
 
         $start_date = Carbon::parse($request->input('start_date'));
-        $end_date = Carbon::parse($request->input('end_date'));
-
-        $lects = Lecturer::find($request->input('lecturer'));
-        $students = Level::find($request->input('level'))->students;
+        $end_date = Carbon::parse($request->input('start_date'));
 
         // update module info
         $module->update([
+            'module_bank_id' => $request->input('module'),
             'cordinator_id' => $request->input('cordinator'),
-            'title' => $request->input('title'),
-            'code' => strtoupper(
-                $request->input('code')
-            ),
+            'course_rep_id' => $request->input('course_rep'),
+            'level_id' => $request->input('level'),
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'status' => $this->status($start_date, $end_date),
         ]);
-
-        $status = "upcoming";
-        if ($start_date > now()) {
-            $status = "upcoming";
-        } elseif (Carbon::now()->between($start_date, $end_date)) {
-            $status = 'active';
-        } elseif (now() > $end_date) {
-            $status = "past";
-        }
 
         $check = LecturerModule::where('module_id', $module->id)->where('lecturer_id')->first();
         if ($check) {
         }
-        // // lecturer module attachment
-        // $module->lectures()->attach($lects, [
-        //     'start_date' => $start_date,
-        //     'end_date' => $end_date,
-        //     'status' => $status,
-        //     'course_rep_id' => $request->input('course_rep'),
-        //     'level_id' => $request->input('level'),
-        // ]);
+        // lecturer module attachment
+        $lecturers = Lecturer::find(json_decode($request->input('lecturer')));
+        $module->lectures()->attach($lecturers);
 
-        // // module students attachment
-        // $module->students()->attach($students);
+        // module students attachment
+        $module->students()->attach($module->level->students);
 
-        //TODO: send course and lecture rep email
-        return response()->json(['status' => 'module-editted'])
+        return response()->json(['status' => 'success'])
             ->setStatusCode(201);
-        // "module-editted"
     }
 
     /**
