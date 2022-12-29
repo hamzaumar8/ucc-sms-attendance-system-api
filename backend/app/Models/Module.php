@@ -46,7 +46,7 @@ class Module extends Model
     }
 
 
-    public function lectures()
+    public function lecturers()
     {
         return $this->belongsToMany(Lecturer::class, 'lecturer_module', 'module_id', 'lecturer_id');
     }

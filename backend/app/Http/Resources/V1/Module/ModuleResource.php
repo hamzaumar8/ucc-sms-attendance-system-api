@@ -20,23 +20,30 @@ class ModuleResource extends JsonResource
     public function toArray($request)
     {
         $startDate = Carbon::parse($this->start_date);
-        if ($startDate->isWeekday()) {
-            $startDate = $startDate->subDay();
-        }
+        // if ($startDate->isWeekday()) {
+        //     $startDate = $startDate->subDay();
+        // }
         $endDate = Carbon::parse($this->end_date);
         $days = (int)($endDate->diffInDays($startDate));
         if (Carbon::now()->between(Carbon::parse($this->start_date), $endDate)) {
-            $days_covered = (int)(Carbon::parse($this->start_date)->diffInDays(Carbon::now()));
-            $this->status === 'active' ? $this->status : $this->update(['status' => 'active']);
+            $days_covered = (int)($startDate->diffInDays(Carbon::now()));
+            if ($this->status !== 'active') {
+                $this->update(['status' => 'active']);
+            }
         } elseif (Carbon::now()->gt($endDate)) {
             $days_covered = $days;
-            $this->status === 'inactive' ? $this->status : $this->update(['status' => 'inactive']);
+            if ($this->status !== 'inactive') {
+                $this->update(['status' => 'inactive']);
+            }
         } else {
             $days_covered = 0;
-            $this->status === 'upcoming' ? $this->status : $this->update(['status' => 'upcoming']);
+            if ($this->status !== 'upcoming') {
+                $this->update(['status' => 'upcoming']);
+            }
         }
         $days_remaining = (int)($days - $days_covered);
-        $covered_percentage = round(($days_covered * 100) / $days);
+        $day_s = $days > 0 ? $days : 1;
+        $covered_percentage = round(($days_covered / $day_s) * 100);
 
         return [
             'id' => $this->id,
@@ -44,7 +51,7 @@ class ModuleResource extends JsonResource
             'end_date' => $this->end_date,
             'status' => $this->status,
             // 'students' => $this->students,
-            'lecturers' => $this->lectures,
+            'lecturers' => $this->lecturers,
             'module' => $this->module_bank,
             'cordinator' => LecturerSingleResource::make($this->cordinator),
             'level' => $this->level,

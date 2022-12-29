@@ -34,7 +34,7 @@ Route::group([
     Route::get('/stud/backend', [StudentController::class, 'backend']);
 
 
-    // Lectures
+    // Lecturers
     Route::apiResource('/lecturers', LecturerController::class);
     Route::get('/lect/backend', [LecturerController::class, 'backend']);
 

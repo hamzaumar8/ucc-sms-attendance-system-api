@@ -52,7 +52,7 @@ class ModuleController extends Controller
     public function store(Request $request)
     {
         // check if semester is set
-        if (!$this->semester()->id) {
+        if (!$this->semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
 
@@ -63,7 +63,7 @@ class ModuleController extends Controller
             'level' => 'required|exists:levels,id',
             'start_date' => 'required|date',
             'duration' => 'required|numeric',
-            'lecturer' => 'required',
+            'lecturer' => 'required|array|min:1',
         ]);
         $start_date = Carbon::parse($request->input('start_date'));
         $end_date = Carbon::parse($request->input('start_date'))->addWeeks($request->input('duration'));
@@ -81,8 +81,8 @@ class ModuleController extends Controller
         ]);
 
         // lecturer module attachment
-        $lecturers = Lecturer::find(json_decode($request->input('lecturer')));
-        $module->lectures()->attach($lecturers);
+        $lecturers = Lecturer::find($request->input('lecturer'));
+        $module->lecturers()->attach($lecturers);
 
         // module students attachment
         $module->students()->attach($module->level->students);
@@ -112,9 +112,10 @@ class ModuleController extends Controller
     public function update(Request $request, Module $module)
     {
         // check if semester is set
-        if (!$this->semester()->id) {
+        if (!$this->semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
+        $prev_module = Module::find($request->id);
 
         $request->validate([
             'module' => 'required|exists:module_banks,id',
@@ -123,11 +124,11 @@ class ModuleController extends Controller
             'level' => 'required|exists:levels,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'lecturer' => 'required',
+            'lecturer' => 'required|array|min:1',
         ]);
 
         $start_date = Carbon::parse($request->input('start_date'));
-        $end_date = Carbon::parse($request->input('start_date'));
+        $end_date = Carbon::parse($request->input('end_date'));
 
         // update module info
         $module->update([
@@ -140,15 +141,18 @@ class ModuleController extends Controller
             'status' => $this->status($start_date, $end_date),
         ]);
 
-        $check = LecturerModule::where('module_id', $module->id)->where('lecturer_id')->first();
-        if ($check) {
-        }
         // lecturer module attachment
-        $lecturers = Lecturer::find(json_decode($request->input('lecturer')));
-        $module->lectures()->attach($lecturers);
+        if (array_diff($request->input('lecturer'), $prev_module->lecturers->pluck('id')->toArray())) {
+            $module->lecturers()->detach($prev_module->lecturers);
+            $lecturers = Lecturer::find($request->input('lecturer'));
+            $module->lecturers()->attach($lecturers);
+        }
 
         // module students attachment
-        $module->students()->attach($module->level->students);
+        if ($prev_module->level_id != $module->level_id) {
+            $module->students()->detach($prev_module->level->students);
+            $module->students()->attach($module->level->students);
+        }
 
         return response()->json(['status' => 'success'])
             ->setStatusCode(201);
