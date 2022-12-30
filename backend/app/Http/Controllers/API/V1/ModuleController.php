@@ -40,7 +40,7 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        $modules = Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->with(['lecturers']);
+        $modules = Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->with(['lecturers', 'level', 'cordinator', 'course_rep']);
         // dd($modules);
         return new ModuleCollection($modules->get());
     }
@@ -168,6 +168,11 @@ class ModuleController extends Controller
      */
     public function destroy(Module $module)
     {
-        //
+        // check if semester is set
+        if (!$this->semester()) {
+            return response()->json(['message' => "set-semester"])->setStatusCode(403);
+        }
+        $module->delete();
+        return response()->json(null, 204);
     }
 }

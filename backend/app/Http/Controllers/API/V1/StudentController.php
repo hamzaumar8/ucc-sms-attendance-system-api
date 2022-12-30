@@ -27,7 +27,7 @@ class StudentController extends Controller
     public function index()
     {
         $students = Student::orderByDesc('id')->with('level');
-        return new StudentCollection($students->paginate(20));
+        return new StudentCollection($students->get());
     }
 
     /**

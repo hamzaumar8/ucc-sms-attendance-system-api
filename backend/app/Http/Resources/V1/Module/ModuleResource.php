@@ -5,6 +5,7 @@ namespace App\Http\Resources\V1\Module;
 use App\Http\Resources\V1\Attendance\AttendanceCollection;
 use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Http\Resources\V1\Lecturer\LecturerSingleResource;
+use App\Http\Resources\V1\Level\LevelResource;
 use App\Http\Resources\V1\Student\StudentResource;
 use App\Http\Resources\V1\Student\StudentSingleResource;
 use App\Models\Lecturer;
@@ -53,11 +54,11 @@ class ModuleResource extends JsonResource
             'end_date' => $this->end_date,
             'status' => $this->status,
             // 'students' => $this->students,
-            'lecturers' => LecturerResource::collection($this->whenLoaded('lecturers')),
             'module' => $this->module_bank,
-            'cordinator' => LecturerResource::make($this->cordinator),
-            'level' => $this->level,
-            'course_rep' => StudentResource::make($this->course_rep),
+            'cordinator' => LecturerResource::make($this->whenLoaded('cordinator')),
+            'course_rep' => StudentResource::make($this->whenLoaded('course_rep')),
+            'level' => LevelResource::make($this->whenLoaded('level')),
+            'lecturers' => LecturerResource::collection($this->whenLoaded('lecturers')),
             'attendance' => AttendanceCollection::make($this->attendances),
             'days' => [
                 'total' => $days,
