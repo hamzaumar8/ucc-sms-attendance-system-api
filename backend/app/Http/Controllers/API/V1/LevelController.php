@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Level\LevelCollection;
+use App\Http\Resources\V1\Level\LevelResource;
 use App\Models\Level;
 use Illuminate\Http\Request;
 
@@ -38,7 +39,9 @@ class LevelController extends Controller
      */
     public function show(Level $level)
     {
-        //
+        return (new LevelResource(
+            $level->loadMissing(['students'])
+        ))->response()->setStatusCode(200);
     }
 
     /**

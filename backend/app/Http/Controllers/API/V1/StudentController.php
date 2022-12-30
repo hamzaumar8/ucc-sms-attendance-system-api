@@ -26,7 +26,8 @@ class StudentController extends Controller
      */
     public function index()
     {
-        return new StudentCollection(Student::orderByDesc('id')->paginate(2));
+        $students = Student::orderByDesc('id')->with('level');
+        return new StudentCollection($students->paginate(20));
     }
 
     /**
@@ -107,7 +108,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        dd($student);
+
         $this->validate($request, [
             'index_number' => ['required', 'max:20', Rule::unique('students')->ignore($student->index_number, 'index_number')],
             'first_name' => ['required', 'string', 'max:20'],

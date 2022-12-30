@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources\V1\Student;
 
+use App\Http\Resources\V1\Level\LevelResource;
 use App\Http\Resources\V1\Module\ModuleCollection;
+use App\Http\Resources\V1\Module\ModuleResource;
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,7 +21,7 @@ class StudentResource extends JsonResource
     {
 
         return [
-            'id' => $this->id(),
+            'id' => $this->id,
             'index_number' => $this->index_number,
             'full_name' => $this->full_name(),
             'first_name' => $this->first_name,
@@ -29,9 +31,12 @@ class StudentResource extends JsonResource
             'phone' => $this->phone,
             'picture' => $this->picture,
             'created_at' => $this->created_at,
-            'level' => $this->level,
-            'modules' => $this->modules,
-            'user' => UserResource::make($this->user),
+            // eager loading
+            'user' => UserResource::make($this->whenLoaded('user')),
+            'level' => LevelResource::make($this->whenLoaded('level')),
+            'modules' => ModuleResource::collection(
+                $this->whenLoaded('modules')
+            ),
         ];
     }
 

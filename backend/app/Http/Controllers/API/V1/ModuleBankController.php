@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\ModuleBank\ModuleBankCollection;
+use App\Http\Resources\V1\Student\StudentResource;
 use App\Models\ModuleBank;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,7 @@ class ModuleBankController extends Controller
      */
     public function index()
     {
-        return new ModuleBankCollection(ModuleBank::orderBy('id', 'DESC')->get());
+        return new ModuleBankCollection(ModuleBank::orderByDesc('id')->paginate(15));
     }
 
     /**
@@ -50,7 +51,7 @@ class ModuleBankController extends Controller
      */
     public function show(ModuleBank $moduleBank)
     {
-        //
+        return (new StudentResource($moduleBank))->response()->setStatusCode(200);
     }
 
     /**
@@ -85,7 +86,8 @@ class ModuleBankController extends Controller
      */
     public function destroy(ModuleBank $moduleBank)
     {
-        //
+        $moduleBank->delete();
+        return response()->json(null, 204);
     }
 
     public function backend(Request $request)

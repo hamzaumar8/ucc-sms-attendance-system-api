@@ -3,6 +3,7 @@
 namespace App\Http\Resources\V1\Level;
 
 use App\Http\Resources\V1\Student\StudentCollection;
+use App\Http\Resources\V1\Student\StudentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class LevelResource extends JsonResource
@@ -19,7 +20,7 @@ class LevelResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'students' => StudentCollection::make($this->students),
+            'students' => StudentResource::collection($this->whenLoaded('students')),
         ];
     }
 
