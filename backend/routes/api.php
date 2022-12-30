@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('v1/user', UserController::class)->middleware(['auth:sanctum']);
+Route::get('v1/user', UserController::class)->middleware(['auth:sanctum', 'check-status']);
 
 
 Route::group([

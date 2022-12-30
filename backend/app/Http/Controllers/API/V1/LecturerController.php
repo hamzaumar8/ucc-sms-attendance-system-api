@@ -8,11 +8,9 @@ use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Models\Lecturer;
 use App\Models\User;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 
 class LecturerController extends Controller
@@ -64,6 +62,7 @@ class LecturerController extends Controller
         $user = User::create([
             'name' => $name,
             'email' => $request->input('email'),
+            'email_verified_at' => now(),
             'password' => Hash::make(Str::random(8)),
         ]);
 
@@ -92,7 +91,7 @@ class LecturerController extends Controller
      */
     public function show(Lecturer $lecturer)
     {
-        return (new LecturerResource($lecturer))
+        return (new LecturerResource($lecturer->loadMissing(['modules'])))
             ->response()
             ->setStatusCode(200);
     }

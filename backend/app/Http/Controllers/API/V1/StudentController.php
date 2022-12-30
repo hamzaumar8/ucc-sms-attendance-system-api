@@ -65,6 +65,7 @@ class StudentController extends Controller
         $user = User::create([
             'name' => $name,
             'email' => $request->input('email'),
+            'email_verified_at' => now(),
             'password' => Hash::make(Str::random(8)),
         ]);
 

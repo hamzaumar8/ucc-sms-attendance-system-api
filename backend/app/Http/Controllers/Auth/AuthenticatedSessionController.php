@@ -33,16 +33,15 @@ class AuthenticatedSessionController extends Controller
          */
         else {
             // Use token authentication.
-
             $user = Auth::user();
             $token = $user->createToken('token')->plainTextToken;
             $cookie = cookie('jwt', $token, 60 * 24); // 1 day
             return response([
                 'success' => true,
-                // 'data' => [
-                //     'token' => $token,
-                //     'name' => $user->name,
-                // ],
+                'data' => [
+                    'token' => $token,
+                    'name' => $user->name,
+                ],
                 'message' => 'User logged in!',
             ])->withCookie($cookie);
         }
@@ -64,7 +63,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return response()->noContent();
-        // }
+
         $cookie = Cookie::forget('jwt');
         return response()->noContent()->withCookie($cookie);
     }
