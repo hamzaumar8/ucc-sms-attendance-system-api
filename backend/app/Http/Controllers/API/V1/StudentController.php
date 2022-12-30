@@ -39,7 +39,7 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users,email',
             'index_number' => 'required|max:20|unique:students,index_number',
             'first_name' => 'required|string|max:20',
             'other_name' => 'nullable|string|max:255',
@@ -55,7 +55,6 @@ class StudentController extends Controller
         $picture_url = null;
         if ($request->hasFile('picture')) {
             $file = $request->file('picture');
-            Log::debug($file);
             $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
             $file->move(public_path('assets/img/students'), $file_name);
             $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;

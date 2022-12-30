@@ -40,8 +40,7 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        $modules = Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->with(['lecturers', 'level', 'cordinator', 'course_rep']);
-        // dd($modules);
+        $modules = Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep']);
         return new ModuleCollection($modules->get());
     }
 
