@@ -28,14 +28,10 @@ class StudentResource extends JsonResource
             'gender' => $this->gender,
             'phone' => $this->phone,
             'picture' => $this->picture,
-            'picture_url' => $this->picture_url(),
             'created_at' => $this->created_at,
             'level' => $this->level,
             'modules' => $this->modules,
             'user' => UserResource::make($this->user),
-            'links' => [
-                'self' => route('students.show', $this->id()),
-            ]
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\V1\Lecturer;
 
 use App\Http\Resources\V1\Module\ModuleCollection;
+use App\Http\Resources\V1\Module\ModuleResource;
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -30,10 +31,7 @@ class LecturerResource extends JsonResource
             'picture_url' => $this->picture_url(),
             'created_at' => $this->created_at,
             'user' => UserResource::make($this->user),
-            'modules' => $this->modules,
-            'links' => [
-                'self' => route('lecturers.show', $this->id),
-            ]
+            'modules' => ModuleResource::collection($this->whenLoaded('modules')),
         ];
     }
 

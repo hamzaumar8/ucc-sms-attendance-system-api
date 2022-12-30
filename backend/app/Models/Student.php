@@ -18,6 +18,7 @@ class Student extends Model
         'gender',
         'phone',
         'picture',
+        'level_id',
     ];
 
     // Optional zone open
@@ -36,7 +37,7 @@ class Student extends Model
 
     public function picture_url()
     {
-        return $this->picture ? asset('assets/img/student/' . $this->picture) : asset('assets/img/lecturers/default.png');
+        return $this->picture ? asset('assets/img/students/' . $this->picture) : asset('assets/img/lecturers/default.png');
     }
 
     public function user()

@@ -25,7 +25,6 @@ class StudentSingleResource extends JsonResource
             'gender' => $this->gender,
             'phone' => $this->phone,
             'picture' => $this->picture,
-            'picture_url' => $this->picture_url(),
         ];
     }
 

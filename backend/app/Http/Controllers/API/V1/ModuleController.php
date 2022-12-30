@@ -40,7 +40,9 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        return new ModuleCollection(Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->get());
+        $modules = Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->with(['lecturers']);
+        // dd($modules);
+        return new ModuleCollection($modules->get());
     }
 
     /**
@@ -118,10 +120,10 @@ class ModuleController extends Controller
         $prev_module = Module::find($request->id);
 
         $request->validate([
-            'module' => 'required|exists:module_banks,id',
-            'cordinator' => 'required|exists:lecturers,id',
-            'course_rep' => 'required|exists:students,id',
-            'level' => 'required|exists:levels,id',
+            'module' => 'required|numeric|exists:module_banks,id',
+            'cordinator' => 'required|numeric|exists:lecturers,id',
+            'course_rep' => 'required|numeric|exists:students,id',
+            'level' => 'required|numeric|exists:levels,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'lecturer' => 'required|array|min:1',

@@ -21,10 +21,10 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
-            'lecturer' => $this->lecturer,
-            'links' => [
-                'self' => route('users', $this->id)
-            ],
+            // 'lecturer' => $this->lecturer,
+            // 'links' => [
+            //     'self' => route('users', $this->id)
+            // ],
         ];
     }
 }

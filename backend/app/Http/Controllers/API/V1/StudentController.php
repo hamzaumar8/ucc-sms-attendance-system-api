@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Student\StudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
+use App\Models\Level;
 use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
@@ -25,7 +26,7 @@ class StudentController extends Controller
      */
     public function index()
     {
-        return new StudentCollection(Student::orderBy('id', 'DESC')->get());
+        return new StudentCollection(Student::orderByDesc('id')->paginate(2));
     }
 
     /**
@@ -45,18 +46,20 @@ class StudentController extends Controller
             // 'gender' => 'required|string',
             'phone' => 'nullable|string|max:15',
             'picture' => 'nullable',
-            'level' => 'required|exists:levels,id',
+            'level' => 'required|numeric|exists:levels,id',
         ]);
 
         $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
 
-        // if ($request->has('picture') && $request->picture) {
-        //     $file = $request->file('picture');
-        //     Log::debug($file);
-        //     $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-        //     $file->move(public_path('public/images'), $file_name);
-        //     $picture_url = URL::to('/') . 'public/images/' . $file_name;
-        // }
+        $picture_url = null;
+        if ($request->hasFile('picture')) {
+            $file = $request->file('picture');
+            Log::debug($file);
+            $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/img/students'), $file_name);
+            $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;
+        }
+
 
         // Create user
         $user = User::create([
@@ -74,7 +77,7 @@ class StudentController extends Controller
             'surname' => $request->input('surname'),
             // 'gender' => $request->input('gender'),
             'phone' => $request->input('phone'),
-            // 'picture' => $picture_url,
+            'picture' => $picture_url,
             'level_id' => $request->input('level'),
         ]);
 

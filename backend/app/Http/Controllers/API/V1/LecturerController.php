@@ -23,7 +23,7 @@ class LecturerController extends Controller
     public function index()
     {
         // return Lecturer::all();
-        return new LecturerCollection(Lecturer::orderBy('id', 'DESC')->get());
+        return new LecturerCollection(Lecturer::orderBy('id', 'DESC')->with('modules')->get());
     }
 
     /**
