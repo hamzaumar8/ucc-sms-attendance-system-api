@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources\V1\Attendance;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceCollection extends ResourceCollection
 {
@@ -15,12 +17,18 @@ class AttendanceCollection extends ResourceCollection
     public function toArray($request)
     {
 
+        $total = $this->collection->count();
+        $present = $this->collection->where('status', 'present')->count();
+        $absent = $this->collection->where('status', 'absent')->count();
         return [
-            'data' => $this->collection,
+            // 'data' => $this->collection,
+            'weekly' => $this->weekly($this->collection),
             'total' => [
-                'count' => $this->collection->count(),
-                'present' => $this->collection->where('status', 'present')->count(),
-                'absent' => $this->collection->where('status', 'absent')->count(),
+                'count' => $total,
+                'present' => $present,
+                'absent' => $absent,
+                'present_percentage' => round(($present / ($total > 0 ? $total : 1)) * 100),
+                'absent_percentage' => round(($absent / ($total > 0 ? $total : 1)) * 100),
                 'student_attendance' => [
                     'count' => $this->student_attendance_count($this->collection),
                     'present' => $this->student_attendance_present($this->collection),
@@ -31,13 +39,34 @@ class AttendanceCollection extends ResourceCollection
         ];
     }
 
+
+    public function weekly($collection)
+    {
+        $groups = $collection->groupBy(function ($row) {
+            return
+                Carbon::parse($row->date)->format('W');
+        });
+
+        $groupwithcount = $groups->map(function ($group) {
+            $total = $group->count();
+            $present = $group->where('status', 'present')->count();
+            $absent = $group->where('status', 'absent')->count();
+            return [
+                'total' => $total,
+                'present' => $present,
+                'absent' => $absent,
+                'present_percentage' => round(($present / ($total > 0 ? $total : 1)) * 100),
+                'absent_percentage' => round(($absent / ($total > 0 ? $total : 1)) * 100),
+            ];
+        });
+        return $groupwithcount;
+    }
     public function student_attendance_present($collection)
     {
         $total = 0;
         foreach ($collection as $col) {
             $total += $col->attendance_student->where('status', 1)->count();
         }
-
         return $total;
     }
     public function student_attendance_absent($collection)

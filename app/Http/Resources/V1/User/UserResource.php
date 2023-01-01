@@ -22,9 +22,6 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'role' => $this->role,
             // 'lecturer' => $this->lecturer,
-            // 'links' => [
-            //     'self' => route('users', $this->id)
-            // ],
         ];
     }
 }

@@ -5,20 +5,22 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Student\StudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
-use App\Models\Level;
 use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:santum', ['only' => ['store', 'update']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -60,15 +62,13 @@ class StudentController extends Controller
             $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;
         }
 
-
         // Create user
         $user = User::create([
             'name' => $name,
             'email' => $request->input('email'),
             'email_verified_at' => now(),
-            'password' => Hash::make(Str::random(8)),
+            'password' => Hash::make(str_replace("/", "", $request->input('index_number'))),
         ]);
-
 
         $student = Student::create([
             'user_id' => $user->id,

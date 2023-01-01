@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\URL;
 
 class LecturerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'delete']]);
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -22,8 +28,8 @@ class LecturerController extends Controller
      */
     public function index()
     {
-        $lecturers = Lecturer::orderByDesc('id')->with('modules.module_bank');
-        return new LecturerCollection($lecturers->paginate(15));
+        $lecturers = Lecturer::orderByDesc('id')->with(['modules.module_bank', 'user']);
+        return new LecturerCollection($lecturers->paginate(20));
     }
 
     /**
@@ -63,9 +69,8 @@ class LecturerController extends Controller
             'name' => $name,
             'email' => $request->input('email'),
             'email_verified_at' => now(),
-            'password' => Hash::make(Str::random(8)),
+            'password' => Hash::make($request->input('staff_id')),
         ]);
-
 
         Lecturer::create([
             'user_id' => $user->id,
@@ -105,9 +110,10 @@ class LecturerController extends Controller
      */
     public function update(Request $request, Lecturer $lecturer)
     {
+
         $this->validate($request, [
-            'email' => 'required|string|email|max:255|unique:users,email,' . $request->input('id'),
-            'staff_id' => 'required|max:20|unique:lecturers,staff_id,' . $request->input('id'),
+            'email' => 'required|string|email|max:255|unique:users,email,' . $lecturer->id,
+            'staff_id' => 'required|max:20|unique:lecturers,staff_id,' . $lecturer->id,
             'title' => 'required|string',
             'first_name' => 'required|string|max:20',
             'other_name' => 'nullable|string|max:255',
@@ -136,6 +142,7 @@ class LecturerController extends Controller
             // 'gender' => $request->input('gender'),
             'phone' => $request->input('phone'),
         ]);
+
         //TODO: send email (credentials) to student
         return response()->json(['status' => 'success'])->setStatusCode(201);
     }

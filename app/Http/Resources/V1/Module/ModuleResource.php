@@ -3,12 +3,11 @@
 namespace App\Http\Resources\V1\Module;
 
 use App\Http\Resources\V1\Attendance\AttendanceCollection;
+use App\Http\Resources\V1\Attendance\AttendanceResource;
 use App\Http\Resources\V1\Lecturer\LecturerResource;
-use App\Http\Resources\V1\Lecturer\LecturerSingleResource;
 use App\Http\Resources\V1\Level\LevelResource;
 use App\Http\Resources\V1\ModuleBank\ModuleBankResource;
 use App\Http\Resources\V1\Student\StudentResource;
-use App\Http\Resources\V1\Student\StudentSingleResource;
 use App\Models\Lecturer;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -54,13 +53,13 @@ class ModuleResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'status' => $this->status,
-            // 'students' => $this->students,
             'module' => ModuleBankResource::make($this->whenLoaded('module_bank')),
             'cordinator' => LecturerResource::make($this->whenLoaded('cordinator')),
             'course_rep' => StudentResource::make($this->whenLoaded('course_rep')),
             'level' => LevelResource::make($this->whenLoaded('level')),
             'lecturers' => LecturerResource::collection($this->whenLoaded('lecturers')),
-            'attendance' => AttendanceCollection::make($this->attendances),
+            'attendance' => new AttendanceCollection($this->whenLoaded('attendances')),
+            'students' => StudentResource::collection($this->whenLoaded('students')),
             'days' => [
                 'total' => $days,
                 'covered' => $days_covered,

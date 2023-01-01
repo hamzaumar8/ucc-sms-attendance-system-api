@@ -17,11 +17,11 @@ class Attendance extends Model
         'status',
     ];
 
-    protected $casts = [
-        'date' => 'datetime',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
-    ];
+    // protected $casts = [
+    //     'date' => 'datetime',
+    //     'start_time' => 'datetime',
+    //     'end_time' => 'datetime',
+    // ];
 
     public function lecturerModel()
     {
@@ -36,5 +36,11 @@ class Attendance extends Model
     public function attendance_student()
     {
         return $this->hasMany(AttendanceStudent::class, 'attendance_id');
+    }
+
+
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'attendance_student', 'attendance_id', 'student_id');
     }
 }

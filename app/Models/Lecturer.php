@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,6 +34,16 @@ class Lecturer extends Model
     }
 
     public function modules()
+    {
+        $semester  = Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        $semester_id = null;
+        if ($semester) {
+            $semester_id = $semester->id;
+        }
+        return $this->belongsToMany(Module::class, 'lecturer_module',  'lecturer_id', 'module_id')->where('semester_id', $semester_id);
+    }
+
+    public function all_modules()
     {
         return $this->belongsToMany(Module::class, 'lecturer_module',  'lecturer_id', 'module_id');
     }

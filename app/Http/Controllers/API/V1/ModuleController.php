@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Module\ModuleCollection;
+use App\Http\Resources\V1\Module\ModuleResource;
 use App\Models\Lecturer;
 use App\Models\LecturerModule;
 use App\Models\Level;
@@ -16,6 +17,11 @@ use Illuminate\Validation\Rule;
 
 class ModuleController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'delete']]);
+    }
+
     public function status($start_date, $end_date)
     {
         $status = "upcoming";
@@ -40,7 +46,7 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        $modules = Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep']);
+        $modules = Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances']);
         return new ModuleCollection($modules->get());
     }
 
@@ -100,7 +106,9 @@ class ModuleController extends Controller
      */
     public function show(Module $module)
     {
-        //
+        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'cordinator', 'course_rep', 'attendances.students', 'students'])))
+            ->response()
+            ->setStatusCode(200);
     }
 
     /**

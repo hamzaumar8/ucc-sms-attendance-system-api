@@ -7,7 +7,6 @@ use App\Http\Controllers\API\V1\LevelController;
 use App\Http\Controllers\API\V1\ModuleBankController;
 use App\Http\Controllers\API\V1\ModuleController;
 use App\Http\Controllers\API\V1\StudentController;
-use App\Http\Controllers\API\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,17 +21,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('v1/user', UserController::class)->middleware(['auth:sanctum', 'check-status']);
+Route::middleware(['auth:sanctum'])->get('/v1/user', function (Request $request) {
+    return $request->user();
+});
 
 
-Route::group([
-    'prefix' => 'v1',
-    // 'middleware' => 'auth:sanctum'
-], function () {
+
+Route::group(['prefix' => 'v1'], function () {
     // Students
     Route::apiResource('/students', StudentController::class);
     Route::get('/stud/backend', [StudentController::class, 'backend']);
-
 
     // Lecturers
     Route::apiResource('/lecturers', LecturerController::class);
@@ -62,7 +60,5 @@ Route::group([
 
     // User
     // Route::get('/user', Usercontroller::class);
-    // Route::get('/user', function (Request $request) {
-    //     return $request->user();
-    // });
+
 });

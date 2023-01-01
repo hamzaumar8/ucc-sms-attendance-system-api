@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 
 class ModuleBankController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'delete']]);
+    }
+
     /**
      * Display a listing of the resource.
      *

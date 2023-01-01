@@ -3,6 +3,7 @@
 namespace App\Http\Resources\V1\Attendance;
 
 use App\Http\Resources\V1\AttendanceStudent\AttendanceStudentCollection;
+use App\Http\Resources\V1\Student\StudentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AttendanceResource extends JsonResource
@@ -18,13 +19,14 @@ class AttendanceResource extends JsonResource
         // return parent::toArray($request);
         return [
             "id" => $this->id,
-            "lecturer_module_id" => $this->lecturer_module_id,
+            "lecturer_id" => $this->lecturer_id,
+            "module_id" => $this->module_id,
             "date" => $this->date,
             "start_time" => $this->start_time,
             "end_time" => $this->end_time,
             "status" => $this->status,
             "created_at" => $this->created_at,
-            "student_attendance" => AttendanceStudentCollection::make($this->attendance_student),
+            // "students" => new AttendanceStudentCollection($this->whenLoaded('students')),
         ];
     }
 
