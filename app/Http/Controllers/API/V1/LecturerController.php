@@ -8,10 +8,8 @@ use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Models\Lecturer;
 use App\Models\User;
 use Carbon\Carbon;
-use Faker\Core\File as CoreFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 
@@ -151,6 +149,11 @@ class LecturerController extends Controller
             'phone' => $request->input('phone'),
             'picture' => $picture_url,
         ]);
+
+        $lecturer->user->update([
+            'email' => $request->input('email'),
+        ]);
+
         return response()->json(['status' => 'success'])->setStatusCode(201);
     }
 

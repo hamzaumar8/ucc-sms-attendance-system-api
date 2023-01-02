@@ -60,4 +60,9 @@ class Student extends Model
     {
         return $this->belongsToMany(Module::class, 'attendance_student',  'student_id', 'attendance_id');
     }
+
+    public function result()
+    {
+        return $this->belongsTo(Result::class, 'result_id');
+    }
 }

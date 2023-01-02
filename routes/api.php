@@ -6,9 +6,11 @@ use App\Http\Controllers\API\V1\LecturerModuleController;
 use App\Http\Controllers\API\V1\LevelController;
 use App\Http\Controllers\API\V1\ModuleBankController;
 use App\Http\Controllers\API\V1\ModuleController;
+use App\Http\Controllers\API\V1\ResultController;
 use App\Http\Controllers\API\V1\SemesterController;
 use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
+use App\Models\Assessment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +32,13 @@ Route::middleware(['auth:sanctum', 'check-semester'])->get('/v1/user', UserContr
 Route::group(['prefix' => 'v1'], function () {
     // Semester
     Route::apiResource('/semester', SemesterController::class);
+
+
+    // Result
+    Route::apiResource('/results', ResultController::class);
+
+    // // Assessment
+    // Route::apiResource('/semester', Assessment::class);
 
     // Students
     Route::apiResource('/students', StudentController::class);

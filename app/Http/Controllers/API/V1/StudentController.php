@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -118,7 +119,21 @@ class StudentController extends Controller
             'phone' => ['required', 'string', 'max:20'],
             'picture' => ['nullable'],
         ]);
-
+        $picture_url = null;
+        if ($request->hasFile('picture')) {
+            if ($student->picture) {
+                $studentpicture = explode("/", $student->picture);
+                $picture = end($studentpicture);
+                $exist = File::exists(public_path("assets/img/students/" . $picture));
+                if ($exist) {
+                    File::delete(public_path("assets/img/students/" . $picture));
+                }
+            }
+            $file = $request->file('picture');
+            $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/img/lecturers'), $file_name);
+            $picture_url = URL::to('/') . '/assets/img/lecturers/' . $file_name;
+        }
         $student->update([
             'index_number' => $request->input('index_number'),
             'first_name' => $request->input('first_name'),
@@ -129,9 +144,11 @@ class StudentController extends Controller
             'picture' => $request->input('picture'),
         ]);
 
-        return (new StudentResource($student))
-            ->response()
-            ->setStatusCode(200);
+        $student->user->update([
+            'email' => $request->input('email'),
+        ]);
+
+        return response()->json(['status' => 'success'])->setStatusCode(201);
     }
 
     /**
