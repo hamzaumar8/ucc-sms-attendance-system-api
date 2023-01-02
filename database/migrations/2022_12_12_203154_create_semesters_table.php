@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('semesters', function (Blueprint $table) {
             $table->id();
-            $table->enum('semester', ['1', '2']);
+            $table->enum('semester', ['first', 'second']);
             $table->string('academic_year', 12);
             $table->date('start_date');
             $table->date('end_date');

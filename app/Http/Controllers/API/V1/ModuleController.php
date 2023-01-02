@@ -37,7 +37,12 @@ class ModuleController extends Controller
 
     public function semester()
     {
-        return Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        $semester_id = null;
+        $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        if ($semester) {
+            $semester_id = $semester->id;
+        }
+        return  $semester_id;
     }
     /**
      * Display a listing of the resource.
@@ -46,7 +51,7 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        $modules = Module::where('semester_id', $this->semester()->id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances']);
+        $modules = Module::where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances']);
         return new ModuleCollection($modules->get());
     }
 
@@ -77,7 +82,7 @@ class ModuleController extends Controller
 
         // create module
         $module = Module::create([
-            'semester_id' => $this->semester()->id,
+            'semester_id' => $this->semester(),
             'module_bank_id' => $request->input('module'),
             'cordinator_id' => $request->input('cordinator'),
             'course_rep_id' => $request->input('course_rep'),

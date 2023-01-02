@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\V1\User;
 
+use App\Http\Resources\V1\Lecturer\LecturerResource;
+use App\Http\Resources\V1\Student\StudentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -21,7 +23,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'role' => $this->role,
-            // 'lecturer' => $this->lecturer,
+            'lecturer' => LecturerResource::make($this->whenLoaded('lecturer')),
+            'student' => StudentResource::make($this->whenLoaded('student')),
         ];
     }
 }

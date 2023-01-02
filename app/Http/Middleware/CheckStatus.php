@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Semester;
+use App\Models\User;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class CheckStatus
     public function handle(Request $request, Closure $next)
     {
         $semester  = Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
-        $user = auth()->user;
+        $user = User::find(auth()->user()->id);
         if ($semester) {
             if ($semester->id !== $user->semester_id) {
                 $user->update([

@@ -37,6 +37,7 @@ class StudentResource extends JsonResource
             'modules' => ModuleResource::collection(
                 $this->whenLoaded('modules')
             ),
+            // 'attstud' => $this->attendance,
         ];
     }
 

@@ -8,7 +8,9 @@ use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Models\Lecturer;
 use App\Models\User;
 use Carbon\Carbon;
+use Faker\Core\File as CoreFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
@@ -60,8 +62,8 @@ class LecturerController extends Controller
         if ($request->hasFile('picture')) {
             $file = $request->file('picture');
             $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-            $file->move(public_path('assets/img/lcturers'), $file_name);
-            $picture_url = URL::to('/') . '/assets/img/lcturers/' . $file_name;
+            $file->move(public_path('assets/img/lecturers'), $file_name);
+            $picture_url = URL::to('/') . '/assets/img/lecturers/' . $file_name;
         }
 
         // Create user
@@ -124,15 +126,21 @@ class LecturerController extends Controller
         ]);
 
 
-        $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
-
-        // $picture_url = null;
-        // if ($request->hasFile('picture')) {
-        //     $file = $request->file('picture');
-        //     $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-        //     $file->move(public_path('assets/img/lcturers'), $file_name);
-        //     $picture_url = URL::to('/') . '/assets/img/lcturers/' . $file_name;
-        // }
+        $picture_url = null;
+        if ($request->hasFile('picture')) {
+            if ($lecturer->picture) {
+                $lecturerpicture = explode("/", $lecturer->picture);
+                $picture = end($lecturerpicture);
+                $exist = File::exists(public_path("assets/img/lecturers/" . $picture));
+                if ($exist) {
+                    File::delete(public_path("assets/img/lecturers/" . $picture));
+                }
+            }
+            $file = $request->file('picture');
+            $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/img/lecturers'), $file_name);
+            $picture_url = URL::to('/') . '/assets/img/lecturers/' . $file_name;
+        }
         $lecturer->update([
             'staff_id' => $request->input('staff_id'),
             'title' => $request->input('title'),
@@ -141,9 +149,8 @@ class LecturerController extends Controller
             'surname' => $request->input('surname'),
             // 'gender' => $request->input('gender'),
             'phone' => $request->input('phone'),
+            'picture' => $picture_url,
         ]);
-
-        //TODO: send email (credentials) to student
         return response()->json(['status' => 'success'])->setStatusCode(201);
     }
 
@@ -155,7 +162,7 @@ class LecturerController extends Controller
      */
     public function destroy(Lecturer $lecturer)
     {
-        $lecturer->delete();
+        $lecturer->user->delete();
         return response()->json(null, 204);
     }
 

@@ -6,7 +6,9 @@ use App\Http\Controllers\API\V1\LecturerModuleController;
 use App\Http\Controllers\API\V1\LevelController;
 use App\Http\Controllers\API\V1\ModuleBankController;
 use App\Http\Controllers\API\V1\ModuleController;
+use App\Http\Controllers\API\V1\SemesterController;
 use App\Http\Controllers\API\V1\StudentController;
+use App\Http\Controllers\API\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,13 +23,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/v1/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware(['auth:sanctum', 'check-semester'])->get('/v1/user', UserController::class);
 
 
 
 Route::group(['prefix' => 'v1'], function () {
+    // Semester
+    Route::apiResource('/semester', SemesterController::class);
+
     // Students
     Route::apiResource('/students', StudentController::class);
     Route::get('/stud/backend', [StudentController::class, 'backend']);

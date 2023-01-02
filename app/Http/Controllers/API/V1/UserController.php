@@ -17,6 +17,11 @@ class UserController extends Controller
      */
     public function __invoke()
     {
-        return UserResource::make(auth()->user());
+        $user = User::find(auth()->user()->id);
+        if ($user->role === "USR") {
+            return (new UserResource($user->loadMissing('student')))->response()->setStatusCode(200);
+        } else {
+            return (new UserResource($user->loadMissing('lecturer')))->response()->setStatusCode(200);
+        }
     }
 }
