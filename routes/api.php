@@ -36,6 +36,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     // Result
     Route::apiResource('/results', ResultController::class);
+    Route::get('cordinating/modules', [ResultController::class, 'cordinating_module']);
 
     // // Assessment
     // Route::apiResource('/semester', Assessment::class);

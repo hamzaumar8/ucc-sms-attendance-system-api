@@ -53,6 +53,7 @@ class ModuleResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'status' => $this->status,
+            'cordinator_id' => $this->cordinator_id,
             'module' => ModuleBankResource::make($this->whenLoaded('module_bank')),
             'cordinator' => LecturerResource::make($this->whenLoaded('cordinator')),
             'course_rep' => StudentResource::make($this->whenLoaded('course_rep')),

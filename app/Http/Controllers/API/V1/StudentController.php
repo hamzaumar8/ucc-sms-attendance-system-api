@@ -12,14 +12,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:santum', ['only' => ['store', 'update']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update']]);
     }
 
     /**
@@ -29,7 +27,7 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::orderByDesc('id')->with('level');
+        $students = Student::orderByDesc('id')->with(['level', 'user']);
         return new StudentCollection($students->get());
     }
 
@@ -84,7 +82,7 @@ class StudentController extends Controller
         ]);
 
         //TODO: send email (credentials) to student
-        return response()->json(['status' => 'student-added-succesffully'])->setStatusCode(201);
+        return response()->json(['status' => 'success'])->setStatusCode(201);
     }
 
     /**
@@ -109,15 +107,16 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-
         $this->validate($request, [
-            'index_number' => ['required', 'max:20', Rule::unique('students')->ignore($student->index_number, 'index_number')],
-            'first_name' => ['required', 'string', 'max:20'],
-            'other_name' => ['nullable', 'string',],
-            'surname' => ['required', 'string', 'max:20'],
-            'gender' => ['required', 'string',],
-            'phone' => ['required', 'string', 'max:20'],
-            'picture' => ['nullable'],
+            'email' => 'required|string|email|max:255|unique:users,email,' . $student->user->id,
+            'index_number' => 'required|max:20|unique:students,index_number,' . $student->id,
+            'first_name' => 'required|string|max:20',
+            'other_name' => 'nullable|string|max:255',
+            'surname' => 'required|string|max:20',
+            // 'gender' => 'required|string',
+            'phone' => 'nullable|string|max:15',
+            'picture' => 'nullable',
+            'level' => 'required|numeric|exists:levels,id',
         ]);
         $picture_url = null;
         if ($request->hasFile('picture')) {
@@ -139,9 +138,10 @@ class StudentController extends Controller
             'first_name' => $request->input('first_name'),
             'other_name' => $request->input('other_name'),
             'surname' => $request->input('surname'),
-            'gender' => $request->input('gender'),
+            // 'gender' => $request->input('gender'),
             'phone' => $request->input('phone'),
-            'picture' => $request->input('picture'),
+            'picture' => $picture_url,
+            'level_id' => $request->input('level'),
         ]);
 
         $student->user->update([

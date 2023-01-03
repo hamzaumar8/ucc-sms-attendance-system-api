@@ -110,9 +110,8 @@ class LecturerController extends Controller
      */
     public function update(Request $request, Lecturer $lecturer)
     {
-
-        $this->validate($request, [
-            'email' => 'required|string|email|max:255|unique:users,email,' . $lecturer->id,
+        $request->validate([
+            'email' => 'required', 'string', 'email', 'max:255', 'unique:users,email,' . $lecturer->user->id,
             'staff_id' => 'required|max:20|unique:lecturers,staff_id,' . $lecturer->id,
             'title' => 'required|string',
             'first_name' => 'required|string|max:20',

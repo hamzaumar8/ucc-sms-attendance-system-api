@@ -84,4 +84,18 @@ class ResultController extends Controller
     {
         //
     }
+
+
+    /**
+     * Cordinating Module the specified resource from storage.
+     *
+     * @param  \App\Models\Module  $module
+     * @return \Illuminate\Http\Response
+     */
+    public function cordinating_module()
+    {
+        $lecturer_id = auth()->user()->lecturer->id;
+        $results = Result::where('semester_id', $this->semester())->where('cordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank']);
+        return new ResultCollection($results->get());
+    }
 }
