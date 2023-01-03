@@ -14,6 +14,7 @@ return array(
     'App\\Http\\Controllers\\API\\V1\\LevelController' => $baseDir . '/app/Http/Controllers/API/V1/LevelController.php',
     'App\\Http\\Controllers\\API\\V1\\ModuleBankController' => $baseDir . '/app/Http/Controllers/API/V1/ModuleBankController.php',
     'App\\Http\\Controllers\\API\\V1\\ModuleController' => $baseDir . '/app/Http/Controllers/API/V1/ModuleController.php',
+    'App\\Http\\Controllers\\API\\V1\\ResultController' => $baseDir . '/app/Http/Controllers/API/V1/ResultController.php',
     'App\\Http\\Controllers\\API\\V1\\SemesterController' => $baseDir . '/app/Http/Controllers/API/V1/SemesterController.php',
     'App\\Http\\Controllers\\API\\V1\\StudentController' => $baseDir . '/app/Http/Controllers/API/V1/StudentController.php',
     'App\\Http\\Controllers\\API\\V1\\UserController' => $baseDir . '/app/Http/Controllers/API/V1/UserController.php',

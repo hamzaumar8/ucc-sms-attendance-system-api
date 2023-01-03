@@ -62,6 +62,20 @@ class ResultController extends Controller
             ->setStatusCode(200);
     }
 
+
+    public function remarks($score){
+        $score = (int)$score;
+        if ($score === 0 || $score === 0.00) {
+            $remark = 'ic';
+        } elseif ($score >= 79.5) {
+            $remark = 'honour';
+        } elseif ($score >= 49.5) {
+            $remark = 'pass';
+        } else {
+            $remark = 'fail';
+        }
+        return $remark;
+    }
     /**
      * Update the specified resource in storage.
      *
@@ -71,7 +85,22 @@ class ResultController extends Controller
      */
     public function update(Request $request, Result $result)
     {
-        //
+         $this->validate($request, [
+            'assessments.*.score' => 'required|numeric|between:0,100',
+        ]);
+
+        $assessments = $result->assessments;
+        foreach ($assessments as $key => $assessment) {
+            $score = $request->assessments[$key]['score'];
+            $assessment->score = $score;
+            $assessment->remarks = $this->remarks($score);
+            $assessment->save();
+        }
+        $result->status = $request->status;
+        $result->save();
+
+        return response()->json(['status' => 'success'])
+            ->setStatusCode(201);
     }
 
     /**

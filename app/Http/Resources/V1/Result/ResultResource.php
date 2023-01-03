@@ -21,6 +21,7 @@ class ResultResource extends JsonResource
             'id' => $this->id,
             'semester_id' => $this->semester_id,
             'module_id' => $this->module_id,
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'module' => ModuleResource::make($this->whenLoaded('module')),
             // 'cordinator' => AssesmentResource::collection($this->whenLoaded('cordinator')),

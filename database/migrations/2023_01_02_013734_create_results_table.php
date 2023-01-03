@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('semester_id')->nullable();
             $table->unsignedBigInteger('module_id')->nullable();
             $table->unsignedBigInteger('cordinator_id')->nullable();
-
+            $table->enum('status', ['save', 'submit'])->default('save');
             $table->foreign('semester_id')->references('id')->on('semesters')->onDelete('set null');
             $table->foreign('module_id')->references('id')->on('modules')->onDelete('set null');
             $table->foreign('cordinator_id')->references('id')->on('lecturers')->onDelete('set null');
