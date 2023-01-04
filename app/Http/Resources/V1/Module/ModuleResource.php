@@ -9,7 +9,10 @@ use App\Http\Resources\V1\Level\LevelResource;
 use App\Http\Resources\V1\ModuleBank\ModuleBankResource;
 use App\Http\Resources\V1\Student\StudentResource;
 use App\Models\Lecturer;
+use App\Models\Result;
+use App\Models\Assessment;
 use Carbon\Carbon;
+use App\Models\Semester;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ModuleResource extends JsonResource
@@ -37,6 +40,20 @@ class ModuleResource extends JsonResource
             $days_covered = $days;
             if ($this->status !== 'inactive') {
                 $this->update(['status' => 'inactive']);
+
+                $result = Result::firstOrCreate([
+                    'semester_id' => $this->semester(),
+                    'module_id' => $this->id,
+                    'cordinator_id' => $this->cordinator_id,
+                ]);
+
+                foreach($this->students as $student){
+                    Assessment::firstOrCreate([
+                        'result_id' => $result->id,
+                        'student_id' => $student->id,
+                    ]);
+                }
+
             }
         } else {
             $days_covered = 0;
@@ -68,6 +85,16 @@ class ModuleResource extends JsonResource
                 'covered_percentage' => $covered_percentage,
             ]
         ];
+    }
+
+    public function semester()
+    {
+        $semester_id = null;
+        $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        if ($semester) {
+            $semester_id = $semester->id;
+        }
+        return  $semester_id;
     }
 
     public function with($request)
