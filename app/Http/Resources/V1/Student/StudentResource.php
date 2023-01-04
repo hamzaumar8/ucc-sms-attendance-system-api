@@ -29,6 +29,7 @@ class StudentResource extends JsonResource
             'other_name' => $this->other_name,
             'gender' => $this->gender,
             'phone' => $this->phone,
+            'group_no' => $this->group_no,
             'picture' => $this->picture,
             'created_at' => $this->created_at,
             // eager loading

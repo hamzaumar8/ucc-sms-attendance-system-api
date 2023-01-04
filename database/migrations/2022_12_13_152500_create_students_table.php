@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('phone', 15)->nullable();
             $table->text('picture')->nullable();
             $table->unsignedBigInteger('level_id')->nullable();
+            $table->unsignedTinyInteger('group_no')->nullable();
             $table->foreign('level_id')->references('id')->on('levels')->onDelete('set null');
             $table->timestamps();
         });

@@ -58,6 +58,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     // Levels
     Route::apiResource('/levels', LevelController::class);
+    Route::put('generate/level/{level}', [LevelController::class, 'generate_group']);
     Route::get('/lev/backend', [LevelController::class, 'backend']);
 
     // Levels

@@ -20,7 +20,9 @@ class LevelResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'groups' => $this->groups,
             'students' => StudentResource::collection($this->whenLoaded('students')),
+            'students_count' => $this->students->count(),
         ];
     }
 
