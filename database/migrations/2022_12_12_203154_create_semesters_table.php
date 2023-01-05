@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('academic_year', 12);
             $table->date('start_date');
             $table->date('end_date');
-            $table->enum('assessment_status', ['open', 'close'])->default('close');
+            $table->enum('promotion_status', ['open', 'close'])->default('close');
             $table->timestamps();
         });
     }

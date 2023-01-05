@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
+use App\Imports\V1\StudentsImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StudentController extends Controller
 {
@@ -173,5 +175,13 @@ class StudentController extends Controller
         }
 
         return $query->get();
+    }
+
+     public function import(Request $request){
+        $request->validate([
+            'file' => 'required|mimes:csv,txt',
+        ]);
+        Excel::import(new StudentsImport, request()->file('file'));
+        return response()->json(['status' => 'success'])->setStatusCode(201);
     }
 }

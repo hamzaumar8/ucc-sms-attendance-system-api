@@ -37,6 +37,7 @@ Route::group(['prefix' => 'v1'], function () {
     // Result
     Route::apiResource('/results', ResultController::class);
     Route::get('cordinating/modules', [ResultController::class, 'cordinating_module']);
+    Route::get('promotion/check', [ResultController::class, 'promotion_check']);
 
     // // Assessment
     // Route::apiResource('/semester', Assessment::class);
@@ -44,6 +45,7 @@ Route::group(['prefix' => 'v1'], function () {
     // Students
     Route::apiResource('/students', StudentController::class);
     Route::get('/stud/backend', [StudentController::class, 'backend']);
+    Route::post('/import/students', [StudentController::class, 'import']);
 
     // Lecturers
     Route::apiResource('/lecturers', LecturerController::class);
@@ -61,6 +63,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::apiResource('/levels', LevelController::class);
     Route::put('generate/level/{level}', [LevelController::class, 'generate_group']);
     Route::get('/lev/backend', [LevelController::class, 'backend']);
+    Route::put('student/level/promotion/{semester}', [LevelController::class, 'student_promotion']);
 
     // Levels
     Route::apiResource('/attendances', AttendanceController::class);

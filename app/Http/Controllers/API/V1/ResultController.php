@@ -127,4 +127,20 @@ class ResultController extends Controller
         $results = Result::where('semester_id', $this->semester())->where('cordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank']);
         return new ResultCollection($results->get());
     }
+
+    /**
+     * Cordinating Module the specified resource from storage.
+     *
+     * @param  \App\Models\Module  $module
+     * @return \Illuminate\Http\Response
+     */
+    public function promotion_check()
+    {
+        $results = Result::where('semester_id', $this->semester())->pluck('status')->toArray();
+        $data = "unset";
+        if(!in_array('save',$results)){
+            $data = "set";
+        }
+        return response()->json(['data' => $data])->setStatusCode(200);
+    }
 }

@@ -69,7 +69,26 @@ class SemesterController extends Controller
      */
     public function update(Request $request, Semester $semester)
     {
-        //
+        $request->validate([
+            'semester_name' => 'required|string',
+            'academic_year' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ]);
+
+        $start_date = Carbon::parse($request->input('start_date'));
+        $end_date = Carbon::parse($request->input('end_date'));
+
+        // create module
+        $semester->update([
+            'semester' => $request->input('semester_name'),
+            'academic_year' => $request->input('academic_year'),
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+        ]);
+
+        return response()->json(['status' => 'success'])
+            ->setStatusCode(201);
     }
 
     /**
