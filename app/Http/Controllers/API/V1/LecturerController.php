@@ -12,12 +12,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
+use App\Imports\V1\LecturerImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LecturerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'delete']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'delete', 'import']]);
     }
 
 
@@ -50,7 +52,7 @@ class LecturerController extends Controller
             'surname' => 'required|string|max:20',
             // 'gender' => 'required|string',
             'phone' => 'nullable|string|max:15',
-            'picture' => 'nullable',
+            'picture' => 'nullable|file',
         ]);
 
 
@@ -69,6 +71,7 @@ class LecturerController extends Controller
             'name' => $name,
             'email' => $request->input('email'),
             'email_verified_at' => now(),
+            'role' => 'STF',
             'password' => Hash::make($request->input('staff_id')),
         ]);
 
@@ -119,7 +122,7 @@ class LecturerController extends Controller
             'surname' => 'required|string|max:20',
             // 'gender' => 'required|string',
             'phone' => 'nullable|string|max:15',
-            'picture' => 'nullable',
+            'picture' => 'nullable|file',
         ]);
 
 
@@ -179,4 +182,14 @@ class LecturerController extends Controller
 
         return $query->get();
     }
+
+
+    public function import(Request $request){
+        $request->validate([
+            'file' => 'required|mimes:csv,txt',
+        ]);
+        Excel::import(new LecturerImport, request()->file('file'));
+        return response()->json(['status' => 'success'])->setStatusCode(201);
+    }
+
 }

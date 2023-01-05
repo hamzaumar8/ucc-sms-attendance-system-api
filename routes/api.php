@@ -48,6 +48,7 @@ Route::group(['prefix' => 'v1'], function () {
     // Lecturers
     Route::apiResource('/lecturers', LecturerController::class);
     Route::get('/lect/backend', [LecturerController::class, 'backend']);
+    Route::post('/import/lecturers', [LecturerController::class, 'import']);
 
     // Modules Bank
     Route::apiResource('/module_banks', ModuleBankController::class);

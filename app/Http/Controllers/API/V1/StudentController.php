@@ -47,7 +47,7 @@ class StudentController extends Controller
             'surname' => 'required|string|max:20',
             // 'gender' => 'required|string',
             'phone' => 'nullable|string|max:15',
-            'picture' => 'nullable',
+            'picture' => 'nullable|file',
             'level' => 'required|numeric|exists:levels,id',
         ]);
 
@@ -115,7 +115,7 @@ class StudentController extends Controller
             'surname' => 'required|string|max:20',
             // 'gender' => 'required|string',
             'phone' => 'nullable|string|max:15',
-            'picture' => 'nullable',
+            'picture' => 'nullable|file',
             'level' => 'required|numeric|exists:levels,id',
         ]);
         $picture_url = null;
