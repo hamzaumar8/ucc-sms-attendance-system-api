@@ -77,6 +77,16 @@ class ModuleController extends Controller
             'duration' => 'required|numeric',
             'lecturer' => 'required|array|min:1',
         ]);
+
+
+        $check = Module::where('semester_id',$this->semester())->where('module_bank_id',$request->input('module'))->where('level_id',$request->input('level'))->first();
+        if($check){
+            return response()->json([
+                'errors'=>[
+                    'msg' => "Module for level already exist!"
+                ]
+            ])->setStatusCode(422);
+        }
         $start_date = Carbon::parse($request->input('start_date'));
         $end_date = Carbon::parse($request->input('start_date'))->addWeeks($request->input('duration'));
 
