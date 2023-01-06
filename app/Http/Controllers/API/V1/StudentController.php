@@ -29,8 +29,8 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::orderByDesc('id')->with(['level', 'user']);
-        return new StudentCollection($students->get());
+        $students = Student::orderByDesc('id')->with(['level', 'user'])->get();
+        return new StudentCollection($students);
     }
 
     /**
