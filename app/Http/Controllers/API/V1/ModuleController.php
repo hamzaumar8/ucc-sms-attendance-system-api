@@ -213,8 +213,9 @@ class ModuleController extends Controller
         }
         try{
 
-            $module->delete();
-
+            if($module->status == 'upcoming'){
+                $module->delete();
+            }
             return response()->json(null, 204);
 
         }catch(\Exception $e){

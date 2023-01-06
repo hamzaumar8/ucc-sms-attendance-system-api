@@ -109,7 +109,9 @@ class ModuleBankController extends Controller
     public function destroy(ModuleBank $moduleBank)
     {
         try{
-            $moduleBank->delete();
+            if($moduleBank->modules->count() === 0){
+                $moduleBank->delete();
+            }
             return response()->json(null, 204);
 
         }catch(\Exception $e){
