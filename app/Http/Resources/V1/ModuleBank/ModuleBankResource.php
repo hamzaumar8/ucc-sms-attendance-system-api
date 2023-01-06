@@ -19,6 +19,7 @@ class ModuleBankResource extends JsonResource
             'title' => $this->title,
             'code' => $this->code,
             'credit_hour' => $this->credit_hour,
+            'modules' => $this->modules->count(),
         ];
     }
 

@@ -15,7 +15,7 @@ class ResultController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'delete']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'cordinating_module', 'promotion_check']]);
     }
 
     public function semester()
@@ -89,18 +89,26 @@ class ResultController extends Controller
             'assessments.*.score' => 'required|numeric|between:0,100',
         ]);
 
-        $assessments = $result->assessments;
-        foreach ($assessments as $key => $assessment) {
-            $score = $request->assessments[$key]['score'];
-            $assessment->score = $score;
-            $assessment->remarks = $this->remarks($score);
-            $assessment->save();
-        }
-        $result->status = $request->status;
-        $result->save();
+        try{
+            $assessments = $result->assessments;
+            foreach ($assessments as $key => $assessment) {
+                $score = $request->assessments[$key]['score'];
+                $assessment->score = $score;
+                $assessment->remarks = $this->remarks($score);
+                $assessment->save();
+            }
+            $result->status = $request->status;
+            $result->save();
 
-        return response()->json(['status' => 'success'])
-            ->setStatusCode(201);
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while updating a results!!'
+            ])->setStatusCode(500);
+        }
     }
 
     /**

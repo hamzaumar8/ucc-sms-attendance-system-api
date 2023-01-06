@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class SemesterController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -34,19 +39,27 @@ class SemesterController extends Controller
             'end_date' => 'required|date',
         ]);
 
-        $start_date = Carbon::parse($request->input('start_date'));
-        $end_date = Carbon::parse($request->input('end_date'));
+        try{
+            $start_date = Carbon::parse($request->input('start_date'));
+            $end_date = Carbon::parse($request->input('end_date'));
 
-        // create module
-        $semester = Semester::create([
-            'semester' => $request->input('semester_name'),
-            'academic_year' => $request->input('academic_year'),
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-        ]);
+            // create module
+            $semester = Semester::create([
+                'semester' => $request->input('semester_name'),
+                'academic_year' => $request->input('academic_year'),
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+            ]);
 
-        return response()->json(['status' => 'success'])
-            ->setStatusCode(201);
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while setting semester!!'
+            ])->setStatusCode(500);
+        }
     }
 
     /**
@@ -76,19 +89,28 @@ class SemesterController extends Controller
             'end_date' => 'required|date',
         ]);
 
-        $start_date = Carbon::parse($request->input('start_date'));
-        $end_date = Carbon::parse($request->input('end_date'));
+        try{
 
-        // create module
-        $semester->update([
-            'semester' => $request->input('semester_name'),
-            'academic_year' => $request->input('academic_year'),
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-        ]);
+            $start_date = Carbon::parse($request->input('start_date'));
+            $end_date = Carbon::parse($request->input('end_date'));
 
-        return response()->json(['status' => 'success'])
-            ->setStatusCode(201);
+            // create module
+            $semester->update([
+                'semester' => $request->input('semester_name'),
+                'academic_year' => $request->input('academic_year'),
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+            ]);
+
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while updation semester!!'
+            ])->setStatusCode(500);
+        }
+
     }
 
     /**

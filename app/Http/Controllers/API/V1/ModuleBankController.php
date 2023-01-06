@@ -12,7 +12,7 @@ class ModuleBankController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'delete']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy']]);
     }
 
     /**
@@ -39,13 +39,21 @@ class ModuleBankController extends Controller
             'credit_hour' => 'required|numeric',
         ]);
 
-        ModuleBank::create([
-            'title' => $request->input('title'),
-            'code' => strtoupper($request->input('code')),
-            'credit_hour' => $request->input('credit_hour'),
-        ]);
+        try{
+            ModuleBank::create([
+                'title' => $request->input('title'),
+                'code' => strtoupper($request->input('code')),
+                'credit_hour' => $request->input('credit_hour'),
+            ]);
 
-        return response()->json(['status' => 'success'])->setStatusCode(201);
+            return response()->json(['status' => 'success'])->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while adding a module!!'
+            ])->setStatusCode(500);
+        }
     }
 
     /**
@@ -74,6 +82,8 @@ class ModuleBankController extends Controller
             'credit_hour' => 'required|numeric',
         ]);
 
+        try{
+
         $moduleBank->update([
             'title' => $request->input('title'),
             'code' => strtoupper($request->input('code')),
@@ -81,6 +91,13 @@ class ModuleBankController extends Controller
         ]);
 
         return response()->json(['status' => 'success'])->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while updating module!!'
+            ])->setStatusCode(500);
+        }
     }
 
     /**
@@ -91,8 +108,16 @@ class ModuleBankController extends Controller
      */
     public function destroy(ModuleBank $moduleBank)
     {
-        $moduleBank->delete();
-        return response()->json(null, 204);
+        try{
+            $moduleBank->delete();
+            return response()->json(null, 204);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while deleting module!!'
+            ])->setStatusCode(500);
+        }
     }
 
     public function backend(Request $request)

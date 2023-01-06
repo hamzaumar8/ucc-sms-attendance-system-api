@@ -19,7 +19,7 @@ class StudentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import']]);
     }
 
     /**
@@ -53,38 +53,47 @@ class StudentController extends Controller
             'level' => 'required|numeric|exists:levels,id',
         ]);
 
-        $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
+        try{
 
-        $picture_url = null;
-        if ($request->hasFile('picture')) {
-            $file = $request->file('picture');
-            $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-            $file->move(public_path('assets/img/students'), $file_name);
-            $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;
+            $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
+
+            $picture_url = null;
+            if ($request->hasFile('picture')) {
+                $file = $request->file('picture');
+                $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
+                $file->move(public_path('assets/img/students'), $file_name);
+                $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;
+            }
+
+            // Create user
+            $user = User::create([
+                'name' => $name,
+                'email' => $request->input('email'),
+                'email_verified_at' => now(),
+                'password' => Hash::make(str_replace("/", "", $request->input('index_number'))),
+            ]);
+
+            $student = Student::create([
+                'user_id' => $user->id,
+                'index_number' => $request->input('index_number'),
+                'first_name' => $request->input('first_name'),
+                'other_name' => $request->input('other_name'),
+                'surname' => $request->input('surname'),
+                // 'gender' => $request->input('gender'),
+                'phone' => $request->input('phone'),
+                'picture' => $picture_url,
+                'level_id' => $request->input('level'),
+            ]);
+
+            //TODO: send email (credentials) to student
+            return response()->json(['status' => 'success'])->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while adding a student!!'
+            ])->setStatusCode(500);
         }
-
-        // Create user
-        $user = User::create([
-            'name' => $name,
-            'email' => $request->input('email'),
-            'email_verified_at' => now(),
-            'password' => Hash::make(str_replace("/", "", $request->input('index_number'))),
-        ]);
-
-        $student = Student::create([
-            'user_id' => $user->id,
-            'index_number' => $request->input('index_number'),
-            'first_name' => $request->input('first_name'),
-            'other_name' => $request->input('other_name'),
-            'surname' => $request->input('surname'),
-            // 'gender' => $request->input('gender'),
-            'phone' => $request->input('phone'),
-            'picture' => $picture_url,
-            'level_id' => $request->input('level'),
-        ]);
-
-        //TODO: send email (credentials) to student
-        return response()->json(['status' => 'success'])->setStatusCode(201);
     }
 
     /**
@@ -120,37 +129,48 @@ class StudentController extends Controller
             'picture' => 'nullable|file',
             'level' => 'required|numeric|exists:levels,id',
         ]);
-        $picture_url = null;
-        if ($request->hasFile('picture')) {
-            if ($student->picture) {
-                $studentpicture = explode("/", $student->picture);
-                $picture = end($studentpicture);
-                $exist = File::exists(public_path("assets/img/students/" . $picture));
-                if ($exist) {
-                    File::delete(public_path("assets/img/students/" . $picture));
+
+        try{
+
+            $picture_url = null;
+            if ($request->hasFile('picture')) {
+                if ($student->picture) {
+                    $studentpicture = explode("/", $student->picture);
+                    $picture = end($studentpicture);
+                    $exist = File::exists(public_path("assets/img/students/" . $picture));
+                    if ($exist) {
+                        File::delete(public_path("assets/img/students/" . $picture));
+                    }
                 }
+                $file = $request->file('picture');
+                $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
+                $file->move(public_path('assets/img/lecturers'), $file_name);
+                $picture_url = URL::to('/') . '/assets/img/lecturers/' . $file_name;
             }
-            $file = $request->file('picture');
-            $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-            $file->move(public_path('assets/img/lecturers'), $file_name);
-            $picture_url = URL::to('/') . '/assets/img/lecturers/' . $file_name;
+
+            $student->update([
+                'index_number' => $request->input('index_number'),
+                'first_name' => $request->input('first_name'),
+                'other_name' => $request->input('other_name'),
+                'surname' => $request->input('surname'),
+                // 'gender' => $request->input('gender'),
+                'phone' => $request->input('phone'),
+                'picture' => $picture_url,
+                'level_id' => $request->input('level'),
+            ]);
+
+            $student->user->update([
+                'email' => $request->input('email'),
+            ]);
+
+            return response()->json(['status' => 'success'])->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while updating a student details!!'
+            ])->setStatusCode(500);
         }
-        $student->update([
-            'index_number' => $request->input('index_number'),
-            'first_name' => $request->input('first_name'),
-            'other_name' => $request->input('other_name'),
-            'surname' => $request->input('surname'),
-            // 'gender' => $request->input('gender'),
-            'phone' => $request->input('phone'),
-            'picture' => $picture_url,
-            'level_id' => $request->input('level'),
-        ]);
-
-        $student->user->update([
-            'email' => $request->input('email'),
-        ]);
-
-        return response()->json(['status' => 'success'])->setStatusCode(201);
     }
 
     /**
@@ -161,8 +181,26 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        $student->user->delete();
-        return response()->json(null, 204);
+        try{
+            if ($student->picture) {
+                $studentpicture = explode("/", $student->picture);
+                $picture = end($studentpicture);
+                $exist = File::exists(public_path("assets/img/students/" . $picture));
+                if ($exist) {
+                    File::delete(public_path("assets/img/students/" . $picture));
+                }
+            }
+
+            $student->user->delete();
+
+            return response()->json(null, 204);
+
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while deleting student!!'
+            ])->setStatusCode(500);
+        }
     }
 
 
@@ -178,10 +216,20 @@ class StudentController extends Controller
     }
 
      public function import(Request $request){
+
         $request->validate([
             'file' => 'required|mimes:csv,txt',
         ]);
-        Excel::import(new StudentsImport, request()->file('file'));
-        return response()->json(['status' => 'success'])->setStatusCode(201);
+
+        try {
+
+            Excel::import(new StudentsImport, request()->file('file'));
+            return response()->json(['status' => 'success'])->setStatusCode(201);
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while importing data!!'
+            ])->setStatusCode(500);
+        }
     }
 }

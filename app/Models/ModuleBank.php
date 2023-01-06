@@ -14,4 +14,10 @@ class ModuleBank extends Model
         'code',
         'credit_hour',
     ];
+
+
+    public function modules()
+    {
+        return $this->hasMany(Module::class, 'module_bank_id');
+    }
 }
