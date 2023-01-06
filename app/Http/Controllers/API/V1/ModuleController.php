@@ -10,6 +10,8 @@ use App\Models\LecturerModule;
 use App\Models\Level;
 use App\Models\Module;
 use App\Models\Semester;
+use App\Models\Result;
+use App\Models\Assessment;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -19,7 +21,7 @@ class ModuleController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'end_module']]);
     }
 
     public function status($start_date, $end_date)
@@ -78,39 +80,45 @@ class ModuleController extends Controller
             'lecturer' => 'required|array|min:1',
         ]);
 
+        try{
+            $check = Module::where('semester_id',$this->semester())->where('module_bank_id',$request->input('module'))->where('level_id',$request->input('level'))->first();
+            if($check){
+                return response()->json([
+                    'errors'=>[
+                        'msg' => "Module for level already exist!"
+                    ]
+                ])->setStatusCode(422);
+            }
+            $start_date = Carbon::parse($request->input('start_date'));
+            $end_date = Carbon::parse($request->input('start_date'))->addWeeks($request->input('duration'));
 
-        $check = Module::where('semester_id',$this->semester())->where('module_bank_id',$request->input('module'))->where('level_id',$request->input('level'))->first();
-        if($check){
+            // create module
+            $module = Module::create([
+                'semester_id' => $this->semester(),
+                'module_bank_id' => $request->input('module'),
+                'cordinator_id' => $request->input('cordinator'),
+                'course_rep_id' => $request->input('course_rep'),
+                'level_id' => $request->input('level'),
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+                'status' => $this->status($start_date, $end_date),
+            ]);
+
+            // lecturer module attachment
+            $lecturers = Lecturer::find($request->input('lecturer'));
+            $module->lecturers()->attach($lecturers);
+
+            // module students attachment
+            $module->students()->attach($module->level->students);
+
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
             return response()->json([
-                'errors'=>[
-                    'msg' => "Module for level already exist!"
-                ]
-            ])->setStatusCode(422);
+                'message'=>'An error occured while mounting module!!'
+            ])->setStatusCode(500);
         }
-        $start_date = Carbon::parse($request->input('start_date'));
-        $end_date = Carbon::parse($request->input('start_date'))->addWeeks($request->input('duration'));
-
-        // create module
-        $module = Module::create([
-            'semester_id' => $this->semester(),
-            'module_bank_id' => $request->input('module'),
-            'cordinator_id' => $request->input('cordinator'),
-            'course_rep_id' => $request->input('course_rep'),
-            'level_id' => $request->input('level'),
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'status' => $this->status($start_date, $end_date),
-        ]);
-
-        // lecturer module attachment
-        $lecturers = Lecturer::find($request->input('lecturer'));
-        $module->lecturers()->attach($lecturers);
-
-        // module students attachment
-        $module->students()->attach($module->level->students);
-
-        return response()->json(['status' => 'success'])
-            ->setStatusCode(201);
     }
 
     /**
@@ -151,35 +159,44 @@ class ModuleController extends Controller
             'lecturer' => 'required|array|min:1',
         ]);
 
-        $start_date = Carbon::parse($request->input('start_date'));
-        $end_date = Carbon::parse($request->input('end_date'));
+        try{
 
-        // update module info
-        $module->update([
-            'module_bank_id' => $request->input('module'),
-            'cordinator_id' => $request->input('cordinator'),
-            'course_rep_id' => $request->input('course_rep'),
-            'level_id' => $request->input('level'),
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'status' => $this->status($start_date, $end_date),
-        ]);
+            $start_date = Carbon::parse($request->input('start_date'));
+            $end_date = Carbon::parse($request->input('end_date'));
 
-        // lecturer module attachment
-        if (array_diff($request->input('lecturer'), $prev_module->lecturers->pluck('id')->toArray())) {
-            $module->lecturers()->detach($prev_module->lecturers);
-            $lecturers = Lecturer::find($request->input('lecturer'));
-            $module->lecturers()->attach($lecturers);
+            // update module info
+            $module->update([
+                'module_bank_id' => $request->input('module'),
+                'cordinator_id' => $request->input('cordinator'),
+                'course_rep_id' => $request->input('course_rep'),
+                'level_id' => $request->input('level'),
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+                'status' => $this->status($start_date, $end_date),
+            ]);
+
+            // lecturer module attachment
+            if (array_diff($request->input('lecturer'), $prev_module->lecturers->pluck('id')->toArray())) {
+                $module->lecturers()->detach($prev_module->lecturers);
+                $lecturers = Lecturer::find($request->input('lecturer'));
+                $module->lecturers()->attach($lecturers);
+            }
+
+            // module students attachment
+            if ($prev_module->level_id != $module->level_id) {
+                $module->students()->detach($prev_module->level->students);
+                $module->students()->attach($module->level->students);
+            }
+
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while updating module!!'
+            ])->setStatusCode(500);
         }
-
-        // module students attachment
-        if ($prev_module->level_id != $module->level_id) {
-            $module->students()->detach($prev_module->level->students);
-            $module->students()->attach($module->level->students);
-        }
-
-        return response()->json(['status' => 'success'])
-            ->setStatusCode(201);
     }
 
     /**
@@ -194,7 +211,60 @@ class ModuleController extends Controller
         if (!$this->semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
-        $module->delete();
-        return response()->json(null, 204);
+        try{
+
+            $module->delete();
+
+            return response()->json(null, 204);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while deleting module!!'
+            ])->setStatusCode(500);
+        }
     }
+
+
+
+     public function end_module(Module $module)
+    {
+        // check if semester is set
+        if (!$this->semester()) {
+            return response()->json(['message' => "set-semester"])->setStatusCode(403);
+        }
+
+        try{
+            $end_date = Carbon::parse(now());
+
+            // update module info
+            $module->update([
+                'end_date' => $end_date,
+                // 'status' => "inactive",
+            ]);
+
+            // $result = Result::firstOrCreate([
+            //     'semester_id' => $this->semester(),
+            //     'module_id' => $module->id,
+            //     'cordinator_id' => $module->cordinator_id,
+            // ]);
+
+            // foreach($this->students as $student){
+            //     Assessment::firstOrCreate([
+            //         'result_id' => $result->id,
+            //         'student_id' => $student->id,
+            //     ]);
+            // }
+
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while ending module!!'
+            ])->setStatusCode(500);
+        }
+    }
+
 }
