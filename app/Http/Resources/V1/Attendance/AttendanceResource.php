@@ -25,6 +25,7 @@ class AttendanceResource extends JsonResource
             "start_time" => $this->start_time,
             "end_time" => $this->end_time,
             "status" => $this->status,
+            "semester_id" => $this->semester_id,
             "created_at" => $this->created_at,
             // "students" => new AttendanceStudentCollection($this->whenLoaded('students')),
         ];

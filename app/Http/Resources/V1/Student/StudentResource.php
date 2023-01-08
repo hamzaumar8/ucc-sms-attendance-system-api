@@ -5,6 +5,7 @@ namespace App\Http\Resources\V1\Student;
 use App\Http\Resources\V1\Level\LevelResource;
 use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Http\Resources\V1\Module\ModuleResource;
+use App\Http\Resources\V1\AttendanceStudent\AttendanceStudentResource;
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -30,7 +31,7 @@ class StudentResource extends JsonResource
             'gender' => $this->gender,
             'phone' => $this->phone,
             'group_no' => $this->group_no,
-            'picture' => $this->picture,
+            'picture' => $this->picture_url(),
             'created_at' => $this->created_at,
             // eager loading
             'user' => UserResource::make($this->whenLoaded('user')),
@@ -38,7 +39,15 @@ class StudentResource extends JsonResource
             'modules' => ModuleResource::collection(
                 $this->whenLoaded('modules')
             ),
-            // 'attstud' => $this->attendance,
+            'attendance' => AttendanceStudentResource::collection($this->whenLoaded('attendance')),
+            'attendance_stats'=> [
+                'total'=> $this->attendance_total(),
+                'present'=> $this->attendance_present(),
+                'absent'=> $this->attendance_absent(),
+                'present_percentage'=> $this->attendance_present_percentage(),
+                'absent_percentage'=> $this->attendance_absent_percentage(),
+            ]
+
         ];
     }
 

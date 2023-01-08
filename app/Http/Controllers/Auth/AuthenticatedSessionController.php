@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Illuminate\Support\Facades\Auth;
 
 class AuthenticatedSessionController extends Controller
@@ -18,10 +19,30 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request)
     {
         $request->authenticate();
+        /**
+         * We are authenticating a request from our frontend.
+         */
+        if (EnsureFrontendRequestsAreStateful::fromFrontend(request())) {
 
-        $request->session()->regenerate();
+            $request->session()->regenerate();
 
-        return response()->noContent();
+            return response()->noContent();
+        }
+        /**
+         * We are authenticating a request from a 3rd party.
+         */
+        else {
+            // Use token authentication.
+            $user = $user = auth()->user();
+            return response()->json([
+                // 'status'=>200,
+                'username' => $user->name,
+                'token' => $user->createToken($user->email.'_Token')->plainTextToken,
+                'token_type' => 'Bearer',
+                'message' => 'logined In successfully',
+            ])->setStatusCode(200);
+
+        }
     }
 
     /**

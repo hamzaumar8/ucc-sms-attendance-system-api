@@ -27,7 +27,7 @@ class LecturerResource extends JsonResource
             'full_name' => $this->full_name(),
             'gender' => $this->gender,
             'phone' => $this->phone,
-            'picture' => $this->picture,
+            'picture' => $this->picture_url(),
             'created_at' => $this->created_at,
             'user' => UserResource::make($this->whenLoaded('user')),
             'modules' => ModuleResource::collection($this->whenLoaded('modules')),

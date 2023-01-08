@@ -11,6 +11,7 @@ use App\Models\Level;
 use App\Models\Module;
 use App\Models\Semester;
 use App\Models\Result;
+use App\Models\Student;
 use App\Models\Assessment;
 use Carbon\Carbon;
 use Exception;
@@ -268,4 +269,32 @@ class ModuleController extends Controller
         }
     }
 
+
+    public function add_student(Request $request, Module $module)
+    {
+        // check if semester is set
+        if (!$this->semester()) {
+            return response()->json(['message' => "set-semester"])->setStatusCode(403);
+        }
+
+        $request->validate([
+            'id' => 'required|numeric|exists:module_banks,id',
+            'student' => 'required|array|min:1',
+        ]);
+
+        try{
+
+            $students = Student::find($request->input('student'));
+            $module->students()->attach($students);
+
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+
+        }catch(\Exception $e){
+            \Log::error($e->getMessage());
+            return response()->json([
+                'message'=>'An error occured while add student to module!!'
+            ])->setStatusCode(500);
+        }
+    }
 }

@@ -15,7 +15,7 @@ class ResultController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'cordinating_module', 'promotion_check']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'cordinating_module',]]);
     }
 
     public function semester()

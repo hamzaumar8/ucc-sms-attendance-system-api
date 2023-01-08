@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Semester;
+use App\Models\AttendanceStudent;
+use Carbon\Carbon;
 
 class Student extends Model
 {
@@ -37,7 +40,7 @@ class Student extends Model
 
     public function picture_url()
     {
-        return $this->picture ? asset('assets/img/students/' . $this->picture) : asset('assets/img/lecturers/default.png');
+        return $this->picture ? $this->picture : asset('assets/img/lecturers/default.png');
     }
 
     public function user()
@@ -58,8 +61,34 @@ class Student extends Model
 
     public function attendance()
     {
-        return $this->belongsToMany(Module::class, 'attendance_student',  'student_id', 'attendance_id');
+        $semester  = Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        $semester_id = null;
+        if ($semester) {
+            $semester_id = $semester->id;
+        }
+        return $this->hasMany(AttendanceStudent::class, 'student_id')->where('semester_id', $semester_id);
     }
+
+    public function attendance_present(){
+        return  $this->attendance->where('status', 1)->count();
+    }
+    public function attendance_absent(){
+        return  $this->attendance->where('status', 0)->count();
+    }
+    public function attendance_total(){
+        return  $this->attendance->count();
+    }
+    public function attendance_present_percentage(){
+        $count = $this->attendance->count();
+        $present =$this->attendance_present();
+        return round($present / ($count > 0 ? $count : 1) * 100);
+    }
+    public function attendance_absent_percentage(){
+       $count = $this->attendance->count();
+        $absent =$this->attendance_absent();
+        return round($absent / ($count > 0 ? $count : 1) * 100);
+    }
+
 
     public function result()
     {

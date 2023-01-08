@@ -59,6 +59,7 @@ Route::group(['prefix' => 'v1'], function () {
     // Modules
     Route::apiResource('/modules', ModuleController::class);
     Route::get('/end/module/{module}', [ModuleController::class, 'end_module']);
+    Route::post('/add/student/{module}', [ModuleController::class, 'add_student']);
 
     // Levels
     Route::apiResource('/levels', LevelController::class);

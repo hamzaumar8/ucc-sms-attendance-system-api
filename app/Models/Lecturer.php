@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Semester;
 
 class Lecturer extends Model
 {
@@ -55,7 +56,7 @@ class Lecturer extends Model
 
     public function picture_url()
     {
-        return $this->picture ? asset('assets/img/lecturers/' . $this->picture) : asset('assets/img/lecturers/default.png');
+        return $this->picture ? $this->picture : asset('assets/img/lecturers/default.png');
     }
 
     // public function emergencycontact()
