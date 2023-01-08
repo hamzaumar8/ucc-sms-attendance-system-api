@@ -22,7 +22,10 @@ class AttendanceCollection extends ResourceCollection
         $absent = $this->collection->where('status', 'absent')->count();
         return [
             // 'data' => $this->collection,
-            'weekly' => $this->weekly($this->collection),
+            'weekly' => [
+                'lecturer' => $this->weekly($this->collection),
+                'students' => $this->student_weekly($this->collection),
+            ],
             'total' => [
                 'count' => $total,
                 'present' => $present,
@@ -40,6 +43,32 @@ class AttendanceCollection extends ResourceCollection
     }
 
 
+    public function student_weekly($collection)
+    {
+        $groups = $collection->groupBy(function ($row) {
+            return
+                Carbon::parse($row->date)->format('W');
+        });
+
+        $groupwithcount = $groups->map(function ($group) {
+            $total = 0;
+            $present = 0;
+            $absent = 0;
+            foreach ($group as $col) {
+                $total += $col->attendance_student->count();
+                $present += $col->attendance_student->where('status', 1)->count();
+                $absent += $col->attendance_student->where('status', 0)->count();
+            }
+            return [
+                'total' => $total,
+                'present' => $present,
+                'absent' => $absent,
+                'present_percentage' => round(($present / ($total > 0 ? $total : 1)) * 100),
+                'absent_percentage' => round(($absent / ($total > 0 ? $total : 1)) * 100),
+            ];
+        });
+        return $groupwithcount;
+    }
     public function weekly($collection)
     {
         $groups = $collection->groupBy(function ($row) {
