@@ -106,7 +106,7 @@ class LecturerController extends Controller
      */
     public function show(Lecturer $lecturer)
     {
-        return (new LecturerResource($lecturer->loadMissing(['modules'])))
+        return (new LecturerResource($lecturer->loadMissing(['modules.module_bank'])))
             ->response()
             ->setStatusCode(200);
     }

@@ -6,6 +6,7 @@ use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Http\Resources\V1\Module\ModuleResource;
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class LecturerResource extends JsonResource
 {
@@ -28,7 +29,7 @@ class LecturerResource extends JsonResource
             'gender' => $this->gender,
             'phone' => $this->phone,
             'picture' => $this->picture_url(),
-            'created_at' => $this->created_at,
+            'created_at' => Carbon::parse($this->created_at),
             'user' => UserResource::make($this->whenLoaded('user')),
             'modules' => ModuleResource::collection($this->whenLoaded('modules')),
         ];

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\V1\AttendanceStudent;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class AttendanceStudentResource extends JsonResource
 {
@@ -19,7 +20,7 @@ class AttendanceStudentResource extends JsonResource
             "attendance_id" => $this->attendance_id,
             "student_id" => $this->student_id,
             "status" => $this->status,
-            "created_at" => $this->created_at,
+            "created_at" => Carbon::parse($this->created_at),
         ];
     }
 

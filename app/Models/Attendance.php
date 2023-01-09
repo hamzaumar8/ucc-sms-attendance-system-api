@@ -10,28 +10,15 @@ class Attendance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'lecturer_module_id',
+        'semester_id',
+        'lecturer_id',
+        'module_id',
         'date',
         'start_time',
         'end_time',
         'status',
     ];
 
-    // protected $casts = [
-    //     'date' => 'datetime',
-    //     'start_time' => 'datetime',
-    //     'end_time' => 'datetime',
-    // ];
-
-    public function lecturerModel()
-    {
-        return $this->belongsTo(LecturerModule::class, 'lecturer_module_id');
-    }
-
-    public function presentLecturerModel()
-    {
-        return $this->lecturerModel->where('status', 'present')->count();
-    }
 
     public function attendance_student()
     {

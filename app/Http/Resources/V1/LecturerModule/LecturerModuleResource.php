@@ -21,9 +21,6 @@ class LecturerModuleResource extends JsonResource
      */
     public function toArray($request)
     {
-
-
-
         return [
             "id" => $this->id,
             "lecturer_id" => $this->lecturer_id,
@@ -33,7 +30,7 @@ class LecturerModuleResource extends JsonResource
             "end_date" => $this->end_date,
             "status" => $this->status,
             "course_rep_id" => $this->course_rep_id,
-            "created_at" => $this->created_at,
+            "created_at" => Carbon::parse($this->created_at),
             'module' => ModuleResource::make($this->module),
             'lecturer' => LecturerResource::make($this->lecturer),
             'attendance' => AttendanceCollection::make($this->attendances),

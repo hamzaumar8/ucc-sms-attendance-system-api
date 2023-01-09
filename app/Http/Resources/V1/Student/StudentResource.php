@@ -8,6 +8,7 @@ use App\Http\Resources\V1\Module\ModuleResource;
 use App\Http\Resources\V1\AttendanceStudent\AttendanceStudentResource;
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class StudentResource extends JsonResource
 {
@@ -32,7 +33,7 @@ class StudentResource extends JsonResource
             'phone' => $this->phone,
             'group_no' => $this->group_no,
             'picture' => $this->picture_url(),
-            'created_at' => $this->created_at,
+            'created_at' => Carbon::parse($this->created_at),
             // eager loading
             'user' => UserResource::make($this->whenLoaded('user')),
             'level' => LevelResource::make($this->whenLoaded('level')),

@@ -5,6 +5,7 @@ namespace App\Http\Resources\V1\Attendance;
 use App\Http\Resources\V1\AttendanceStudent\AttendanceStudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class AttendanceResource extends JsonResource
 {
@@ -26,7 +27,7 @@ class AttendanceResource extends JsonResource
             "end_time" => $this->end_time,
             "status" => $this->status,
             "semester_id" => $this->semester_id,
-            "created_at" => $this->created_at,
+            "created_at" => Carbon::parse($this->created_at),
             // "students" => new AttendanceStudentCollection($this->whenLoaded('students')),
         ];
     }

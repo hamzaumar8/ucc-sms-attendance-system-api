@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use App\Http\Resources\V1\Attendance\AttendanceResource;
 use App\Models\Attendance;
+use App\Models\Semester;
 use App\Models\LecturerModule;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -14,6 +17,18 @@ class AttendanceController extends Controller
     {
         $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy']]);
     }
+
+
+    public function semester()
+    {
+        $semester_id = null;
+        $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        if ($semester) {
+            $semester_id = $semester->id;
+        }
+        return  $semester_id;
+    }
+
 
     /**
      * Display a listing of the resource.
@@ -33,6 +48,11 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
+        // check if semester is set
+        if (!$this->semester()) {
+            return response()->json(['message' => "set-semester"])->setStatusCode(403);
+        }
+
         $request->validate([
             'lecturer_id' => 'required|exists:lecturers,id',
             'module_id' => 'required|exists:modules,id',
@@ -41,17 +61,45 @@ class AttendanceController extends Controller
             'end_time' => 'required',
         ]);
 
-        $lecturer_module = LecturerModule::where('lecturer_id', $request->input('lecturer_id'))->where('module_id', $request->input('module_id'))->first();
-        $attendance = Attendance::create([
-            'lecturer_module_id' => $lecturer_module->id,
-            'date' => $request->input('date'),
-            'start_time' => $request->input('start_time'),
-            'end_time' => $request->input('end_time'),
-            'status' => 'present',
-        ]);
+        try{
+            DB::beginTransaction();
 
-        return response()->json(['status' => 'attendance-checked-in'])
-            ->setStatusCode(201);
+            $date = Carbon::parse($request->input('date'))->format('Y-m-d');
+
+
+            $check = Attendance::where('semester_id',$this->semester())->where('module_id',$request->input('module_id'))->where('lecturer_id',$request->input('lecturer_id'))->where('date',$date)->first();
+            if($check){
+                return response()->json([
+                    'errors'=>[
+                        'msg' => "Attendance for this module has already been taken!"
+                    ]
+                ])->setStatusCode(422);
+            }
+
+            $attendance = Attendance::create([
+                'lecturer_id' => $request->input('lecturer_id'),
+                'module_id' => $request->input('module_id'),
+                'semester_id' => $this->semester(),
+                'date' => $date,
+                'start_time' => $request->input('start_time'),
+                'end_time' => $request->input('end_time'),
+                'status' => 'present',
+            ]);
+
+
+            DB::commit();
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+
+        }catch(\Exception $e){
+            // Rollback & Return Error Message
+            DB::rollBack();
+            \Log::error($e->getMessage());
+            return response()->json([
+                'error'=>$e->getMessage(),
+                'message'=>'An error occured while checking in attendance!!'
+            ])->setStatusCode(500);
+        }
     }
 
     /**
@@ -91,7 +139,6 @@ class AttendanceController extends Controller
     public function lecturers_attendances()
     {
         $lecturer_id = auth()->user()->lecturer->id;
-        $lecturrer_module = LecturerModule::where('lecturer_id', $lecturer_id)->get();
-        dd($lecturer_id);
+
     }
 }

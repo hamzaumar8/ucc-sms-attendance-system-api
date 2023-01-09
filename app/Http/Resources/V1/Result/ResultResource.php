@@ -6,6 +6,7 @@ use App\Http\Controllers\API\V1\ResultController;
 use App\Http\Resources\V1\Assesment\AssesmentResource;
 use App\Http\Resources\V1\Module\ModuleResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class ResultResource extends JsonResource
 {
@@ -22,7 +23,7 @@ class ResultResource extends JsonResource
             'semester_id' => $this->semester_id,
             'module_id' => $this->module_id,
             'status' => $this->status,
-            'created_at' => $this->created_at,
+            'created_at' => Carbon::parse($this->created_at),
             'module' => ModuleResource::make($this->whenLoaded('module')),
             // 'cordinator' => AssesmentResource::collection($this->whenLoaded('cordinator')),
             // 'students' => $this->students,
