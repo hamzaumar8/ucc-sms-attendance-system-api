@@ -19,30 +19,11 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request)
     {
         $request->authenticate();
-        /**
-         * We are authenticating a request from our frontend.
-         */
-        if (EnsureFrontendRequestsAreStateful::fromFrontend(request())) {
 
-            $request->session()->regenerate();
+        $request->session()->regenerate();
 
-            return response()->noContent();
-        }
-        /**
-         * We are authenticating a request from a 3rd party.
-         */
-        else {
-            // Use token authentication.
-            $user = $user = auth()->user();
-            return response()->json([
-                // 'status'=>200,
-                'username' => $user->name,
-                'token' => $user->createToken($user->email.'_Token')->plainTextToken,
-                'token_type' => 'Bearer',
-                'message' => 'logined In successfully',
-            ])->setStatusCode(200);
+        return response()->noContent();
 
-        }
     }
 
     /**

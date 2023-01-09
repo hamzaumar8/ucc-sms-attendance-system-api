@@ -10,23 +10,16 @@ use App\Http\Controllers\API\V1\ResultController;
 use App\Http\Controllers\API\V1\SemesterController;
 use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
+use App\Http\Controllers\Auth\TokenAuthController;
 use App\Models\Assessment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
 
 Route::middleware(['auth:sanctum', 'check-semester'])->get('/v1/user', UserController::class);
 
+Route::post('/auth/token', [TokenAuthController::class, 'store']);
+Route::post('/auth/logout', [TokenAuthController::class, 'destroy']);
 
 
 Route::group(['prefix' => 'v1'], function () {
