@@ -139,6 +139,5 @@ class AttendanceController extends Controller
     public function lecturers_attendances()
     {
         $lecturer_id = auth()->user()->lecturer->id;
-
     }
 }

@@ -59,9 +59,5 @@ class Lecturer extends Model
         return $this->picture ? $this->picture : asset('assets/img/lecturers/default.png');
     }
 
-    // public function emergencycontact()
-    // {
-    //     return $this->hasMany(EmergencyContact::class);
-    // }
 
 }
