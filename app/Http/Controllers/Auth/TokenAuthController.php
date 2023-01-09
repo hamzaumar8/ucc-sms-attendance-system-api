@@ -48,7 +48,7 @@ class TokenAuthController extends Controller
      */
     public function destroy(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->noContent();
     }

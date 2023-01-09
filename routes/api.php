@@ -18,8 +18,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'check-semester'])->get('/v1/user', UserController::class);
 
+// Token Logout
 Route::post('/auth/token', [TokenAuthController::class, 'store']);
-Route::post('/auth/logout', [TokenAuthController::class, 'destroy']);
+Route::post('/auth/logout', [TokenAuthController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 Route::group(['prefix' => 'v1'], function () {
@@ -67,11 +68,5 @@ Route::group(['prefix' => 'v1'], function () {
     // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');
     Route::get('/lecture/modules/{lecuturermodule}', [LecturerModuleController::class, 'show'])->name('lecture_module.show');
-
-    // Users
-    Route::get('users/{user}', [UserController::class, 'show'])->name('users');
-
-    // User
-    // Route::get('/user', Usercontroller::class);
 
 });
