@@ -61,9 +61,9 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/lev/backend', [LevelController::class, 'backend']);
     Route::put('student/level/promotion/{semester}', [LevelController::class, 'student_promotion']);
 
-    // Levels
+    // Attendance
     Route::apiResource('/attendances', AttendanceController::class);
-    Route::get('/attandance/lecturer', [AttendanceController::class, 'lecturers_attendances']);
+    Route::get('/attendance/lecturer', [AttendanceController::class, 'lecturers_attendances']);
 
     // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');

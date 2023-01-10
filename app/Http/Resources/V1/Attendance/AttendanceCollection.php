@@ -4,7 +4,6 @@ namespace App\Http\Resources\V1\Attendance;
 
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Support\Facades\DB;
 
 class AttendanceCollection extends ResourceCollection
 {

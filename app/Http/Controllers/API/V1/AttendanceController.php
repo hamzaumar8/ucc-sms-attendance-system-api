@@ -5,8 +5,11 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\V1\Attendance\AttendanceResource;
+use App\Http\Resources\V1\Attendance\AttendanceCollection;
+use App\Http\Resources\V1\Attendance\AttendanceSingleCollection;
 use App\Models\Attendance;
 use App\Models\Semester;
+use App\Models\Module;
 use App\Models\LecturerModule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -37,7 +40,8 @@ class AttendanceController extends Controller
      */
     public function index()
     {
-        //
+        $attendances = Attendance::where('semester_id', $this->semester())->orderBy('id', 'DESC')->get();
+        return AttendanceResource::collection($attendances);
     }
 
     /**
@@ -65,8 +69,6 @@ class AttendanceController extends Controller
             DB::beginTransaction();
 
             $date = Carbon::parse($request->input('date'))->format('Y-m-d');
-
-
             $check = Attendance::where('semester_id',$this->semester())->where('module_id',$request->input('module_id'))->where('lecturer_id',$request->input('lecturer_id'))->where('date',$date)->first();
             if($check){
                 return response()->json([
@@ -86,6 +88,9 @@ class AttendanceController extends Controller
                 'status' => 'present',
             ]);
 
+
+            $module = Module::find($request->input('module_id'));
+            $attendance->students()->attach($module->students, ['semester_id' => $this->semester()]);
 
             DB::commit();
             return response()->json(['status' => 'success'])
@@ -110,7 +115,7 @@ class AttendanceController extends Controller
      */
     public function show(Attendance $attendance)
     {
-        //
+        return (new AttendanceResource($attendance->loadMissing(['attendance_student'])))->response()->setStatusCode(200);
     }
 
     /**
@@ -139,5 +144,7 @@ class AttendanceController extends Controller
     public function lecturers_attendances()
     {
         $lecturer_id = auth()->user()->lecturer->id;
+        $attendances = Attendance::where('lecturer_id', $lecturer_id)->where('semester_id', $this->semester())->with(['module.module_bank'])->orderBy('id', 'DESC')->get();
+        return  AttendanceResource::collection($attendances);
     }
 }

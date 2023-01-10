@@ -5,8 +5,8 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Http\Resources\V1\Module\ModuleResource;
+use Illuminate\Support\Facades\DB;
 use App\Models\Lecturer;
-use App\Models\LecturerModule;
 use App\Models\Level;
 use App\Models\Module;
 use App\Models\Semester;
@@ -82,6 +82,8 @@ class ModuleController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
+
             $check = Module::where('semester_id',$this->semester())->where('module_bank_id',$request->input('module'))->where('level_id',$request->input('level'))->first();
             if($check){
                 return response()->json([
@@ -112,9 +114,12 @@ class ModuleController extends Controller
             // module students attachment
             $module->students()->attach($module->level->students);
 
+            DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
         }catch(\Exception $e){
+            // Rollback & Return Error Message
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
                 'message'=>'An error occured while mounting module!!'
@@ -161,6 +166,7 @@ class ModuleController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
 
             $start_date = Carbon::parse($request->input('start_date'));
             $end_date = Carbon::parse($request->input('end_date'));
@@ -189,10 +195,13 @@ class ModuleController extends Controller
                 $module->students()->attach($module->level->students);
             }
 
+            DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
 
         }catch(\Exception $e){
+             // Rollback & Return Error Message
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
                 'message'=>'An error occured while updating module!!'
@@ -213,13 +222,18 @@ class ModuleController extends Controller
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
         try{
+            DB::beginTransaction();
 
             if($module->status == 'upcoming'){
                 $module->delete();
             }
+
+            DB::commit();
             return response()->json(null, 204);
 
         }catch(\Exception $e){
+             // Rollback & Return Error Message
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
                 'message'=>'An error occured while deleting module!!'
@@ -237,6 +251,8 @@ class ModuleController extends Controller
         }
 
         try{
+            DB::beginTransaction();
+
             $end_date = Carbon::parse(now());
 
             // update module info
@@ -258,10 +274,13 @@ class ModuleController extends Controller
             //     ]);
             // }
 
+            DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
 
         }catch(\Exception $e){
+             // Rollback & Return Error Message
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
                 'message'=>'An error occured while ending module!!'

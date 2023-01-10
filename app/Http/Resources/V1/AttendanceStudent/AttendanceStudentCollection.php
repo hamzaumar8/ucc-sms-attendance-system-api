@@ -14,15 +14,15 @@ class AttendanceStudentCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
-        return [
-            'data' => $this->collection,
-            'total' => [
-                'count' => $this->collection->count(),
-                'present' => $this->collection->where('status', 1)->count(),
-                'absent' => $this->collection->where('status', 0)->count(),
-            ],
-        ];
+        return parent::toArray($request);
+        // return [
+        //     'data' => $this->collection,
+        //     'total' => [
+        //         'count' => $this->collection->count(),
+        //         'present' => $this->collection->where('status', 1)->count(),
+        //         'absent' => $this->collection->where('status', 0)->count(),
+        //     ],
+        // ];
     }
 
     public function with($request)

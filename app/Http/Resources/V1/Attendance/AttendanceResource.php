@@ -4,6 +4,7 @@ namespace App\Http\Resources\V1\Attendance;
 
 use App\Http\Resources\V1\AttendanceStudent\AttendanceStudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
+use App\Http\Resources\V1\Module\ModuleResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
 
@@ -28,7 +29,10 @@ class AttendanceResource extends JsonResource
             "status" => $this->status,
             "semester_id" => $this->semester_id,
             "created_at" => Carbon::parse($this->created_at),
-            // "students" => new AttendanceStudentCollection($this->whenLoaded('students')),
+            "module" => ModuleResource::make($this->whenLoaded('module')),
+            "students" => new AttendanceStudentCollection($this->whenLoaded('attendance_student')),
+            'total'=> $this->total(),
+            'weekly' => $this->weekly(),
         ];
     }
 
