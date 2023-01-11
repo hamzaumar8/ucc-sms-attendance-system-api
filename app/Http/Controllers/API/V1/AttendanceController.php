@@ -115,7 +115,7 @@ class AttendanceController extends Controller
      */
     public function show(Attendance $attendance)
     {
-        return (new AttendanceResource($attendance->loadMissing(['attendance_student'])))->response()->setStatusCode(200);
+        return (new AttendanceResource($attendance->loadMissing(['attendance_student','module.module_bank', 'module.students','module.students'])))->response()->setStatusCode(200);
     }
 
     /**

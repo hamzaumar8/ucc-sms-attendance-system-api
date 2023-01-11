@@ -59,6 +59,7 @@ class Student extends Model
         return $this->belongsToMany(Module::class, 'module_student',  'student_id', 'module_id');
     }
 
+
     public function attendance()
     {
         $semester  = Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
