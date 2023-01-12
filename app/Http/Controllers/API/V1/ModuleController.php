@@ -122,6 +122,7 @@ class ModuleController extends Controller
             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while mounting module!!'
             ])->setStatusCode(500);
         }
@@ -204,6 +205,7 @@ class ModuleController extends Controller
             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while updating module!!'
             ])->setStatusCode(500);
         }
@@ -236,6 +238,7 @@ class ModuleController extends Controller
             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while deleting module!!'
             ])->setStatusCode(500);
         }
@@ -283,6 +286,7 @@ class ModuleController extends Controller
             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while ending module!!'
             ])->setStatusCode(500);
         }
@@ -302,16 +306,20 @@ class ModuleController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
 
             $students = Student::find($request->input('student'));
             $module->students()->attach($students);
 
+            DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
 
         }catch(\Exception $e){
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while add student to module!!'
             ])->setStatusCode(500);
         }

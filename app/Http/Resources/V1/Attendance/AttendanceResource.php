@@ -27,6 +27,7 @@ class AttendanceResource extends JsonResource
             "start_time" => $this->start_time,
             "end_time" => $this->end_time,
             "status" => $this->status,
+            "author" => $this->author,
             "semester_id" => $this->semester_id,
             "created_at" => Carbon::parse($this->created_at),
             "module" => ModuleResource::make($this->whenLoaded('module')),

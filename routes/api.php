@@ -64,6 +64,7 @@ Route::group(['prefix' => 'v1'], function () {
     // Attendance
     Route::apiResource('/attendances', AttendanceController::class);
     Route::get('/attendance/lecturer', [AttendanceController::class, 'lecturers_attendances']);
+    Route::put('/accept/attendance/{attendance}', [AttendanceController::class, 'accecpt']);
 
     // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');

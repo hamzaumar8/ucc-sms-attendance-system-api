@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Level\LevelCollection;
 use App\Http\Resources\V1\Level\LevelResource;
+use Illuminate\Support\Facades\DB;
 use App\Models\Level;
 use App\Models\Assessment;
 use App\Models\Semester;
@@ -91,6 +92,7 @@ class LevelController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
 
             $no_of_group = $request->input('no_of_group');
             $student_capacity = $level->students->count();
@@ -111,11 +113,14 @@ class LevelController extends Controller
             $level->groups = $no_of_group;
             $level->save();
 
+            DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
 
          } catch (\Exception $e) {
+             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while generation group!!'
             ])->setStatusCode(500);
         }
@@ -130,13 +135,18 @@ class LevelController extends Controller
     public function destroy(Level $level)
     {
         try{
+            DB::beginTransaction();
+
             $level->delete();
 
+            DB::commit();
             return response()->json(null, 204);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while deleting level!!'
             ])->setStatusCode(500);
         }
@@ -162,6 +172,8 @@ class LevelController extends Controller
         $accademicYear = $lastYear."-".$currentYear;
 
         try{
+            DB::beginTransaction();
+
             $semester_academic = Semester::where('academic_year', $accademicYear)->pluck('id')->toArray();
             $result = Result::whereIn('semester_id', $semester_academic)->pluck('id')->toArray();
             $assessment_failed_student = Assessment::whereIn('result_id', $result)->where('remarks','fail')->pluck('student_id')->toArray();
@@ -202,11 +214,14 @@ class LevelController extends Controller
             $semester->promotion_status = 'open';
             $semester->save();
 
+            DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(200);
 
         }catch (\Exception $e) {
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while runing promotions for student!!'
             ])->setStatusCode(500);
         }

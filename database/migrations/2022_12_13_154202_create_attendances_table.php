@@ -21,6 +21,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->enum('status', ['present', 'absent'])->default('present');
+            $table->enum('author', ['lecturer', 'rep'])->default('lecturer');
             $table->foreign('lecturer_id')->references('id')->on('lecturers')->onDelete('set null');
             $table->foreign('module_id')->references('id')->on('modules')->onDelete('set null');
             $table->timestamps();

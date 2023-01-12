@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use App\Http\Resources\V1\Student\StudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
 use App\Models\Student;
@@ -54,6 +55,7 @@ class StudentController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
 
             $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
 
@@ -70,7 +72,7 @@ class StudentController extends Controller
                 'name' => $name,
                 'email' => $request->input('email'),
                 'email_verified_at' => now(),
-                'password' => Hash::make(str_replace("/", "", $request->input('index_number'))),
+                'password' => Hash::make(strtolower(str_replace("/", "", $request->input('index_number')))),
             ]);
 
             $student = Student::create([
@@ -85,12 +87,14 @@ class StudentController extends Controller
                 'level_id' => $request->input('level'),
             ]);
 
-            //TODO: send email (credentials) to student
+            DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
 
         }catch(\Exception $e){
+             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while adding a student!!'
             ])->setStatusCode(500);
         }
@@ -131,6 +135,7 @@ class StudentController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
 
             $picture_url = null;
             if ($request->hasFile('picture')) {
@@ -163,11 +168,14 @@ class StudentController extends Controller
                 'email' => $request->input('email'),
             ]);
 
+            DB:commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
 
         }catch(\Exception $e){
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while updating a student details!!'
             ])->setStatusCode(500);
         }
@@ -182,6 +190,8 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         try{
+            DB::beginTransaction();
+
             if ($student->picture) {
                 $studentpicture = explode("/", $student->picture);
                 $picture = end($studentpicture);
@@ -193,11 +203,14 @@ class StudentController extends Controller
 
             $student->user->delete();
 
+            DB::commit();
             return response()->json(null, 204);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while deleting student!!'
             ])->setStatusCode(500);
         }
@@ -228,6 +241,7 @@ class StudentController extends Controller
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while importing data!!'
             ])->setStatusCode(500);
         }

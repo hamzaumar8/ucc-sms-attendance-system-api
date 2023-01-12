@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Semester;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -40,6 +41,8 @@ class SemesterController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
+
             $start_date = Carbon::parse($request->input('start_date'));
             $end_date = Carbon::parse($request->input('end_date'));
 
@@ -51,12 +54,15 @@ class SemesterController extends Controller
                 'end_date' => $end_date,
             ]);
 
+            DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
 
         }catch(\Exception $e){
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while setting semester!!'
             ])->setStatusCode(500);
         }
@@ -90,6 +96,7 @@ class SemesterController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
 
             $start_date = Carbon::parse($request->input('start_date'));
             $end_date = Carbon::parse($request->input('end_date'));
@@ -102,11 +109,15 @@ class SemesterController extends Controller
                 'end_date' => $end_date,
             ]);
 
+             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
+
         }catch(\Exception $e){
+             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while updation semester!!'
             ])->setStatusCode(500);
         }

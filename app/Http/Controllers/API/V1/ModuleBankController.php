@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\ModuleBank\ModuleBankCollection;
 use App\Http\Resources\V1\Student\StudentResource;
+use Illuminate\Support\Facades\DB;
 use App\Models\ModuleBank;
 use Illuminate\Http\Request;
 
@@ -40,17 +41,22 @@ class ModuleBankController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
+
             ModuleBank::create([
                 'title' => $request->input('title'),
                 'code' => strtoupper($request->input('code')),
                 'credit_hour' => $request->input('credit_hour'),
             ]);
 
+            DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
 
         }catch(\Exception $e){
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while adding a module!!'
             ])->setStatusCode(500);
         }
@@ -83,18 +89,22 @@ class ModuleBankController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
 
-        $moduleBank->update([
-            'title' => $request->input('title'),
-            'code' => strtoupper($request->input('code')),
-            'credit_hour' => $request->input('credit_hour'),
-        ]);
+            $moduleBank->update([
+                'title' => $request->input('title'),
+                'code' => strtoupper($request->input('code')),
+                'credit_hour' => $request->input('credit_hour'),
+            ]);
 
-        return response()->json(['status' => 'success'])->setStatusCode(201);
+            DB::commit();
+            return response()->json(['status' => 'success'])->setStatusCode(201);
 
         }catch(\Exception $e){
+             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while updating module!!'
             ])->setStatusCode(500);
         }
@@ -109,14 +119,20 @@ class ModuleBankController extends Controller
     public function destroy(ModuleBank $moduleBank)
     {
         try{
+            DB::beginTransaction();
+
             if($moduleBank->modules->count() === 0){
                 $moduleBank->delete();
             }
+
+             DB::commit();
             return response()->json(null, 204);
 
         }catch(\Exception $e){
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while deleting module!!'
             ])->setStatusCode(500);
         }

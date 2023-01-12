@@ -18,7 +18,7 @@ class AttendanceController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'accecpt']]);
     }
 
 
@@ -146,5 +146,40 @@ class AttendanceController extends Controller
         $lecturer_id = auth()->user()->lecturer->id;
         $attendances = Attendance::where('lecturer_id', $lecturer_id)->where('semester_id', $this->semester())->with(['module.module_bank'])->orderBy('id', 'DESC')->get();
         return  AttendanceResource::collection($attendances);
+    }
+
+
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Attendance  $attendance
+     * @return \Illuminate\Http\Response
+     */
+    public function accecpt(Request $request, Attendance $attendance)
+    {
+        $request->validate([
+            'id' => 'required|exists:attendances,id',
+        ]);
+
+        try{
+            DB::beginTransaction();
+
+            $attendance->update([
+                "author" => "lecturer"
+            ]);
+
+            DB::commit();
+            return response()->json(['status'=> 'success'])->setStatusCode(201);
+        }catch(\Exception $e){
+            // Rollback & Return Error Message
+            DB::rollBack();
+            \Log::error($e->getMessage());
+            return response()->json([
+                'error'=> $e->getMessage(),
+                'message'=>'An error occured while accepting attendance!!'
+            ])->setStatusCode(500);
+        }
     }
 }

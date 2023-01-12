@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Result\ResultCollection;
 use App\Http\Resources\V1\Result\ResultResource;
+use Illuminate\Support\Facades\DB;
 use App\Models\Result;
 use App\Models\Semester;
 use Carbon\Carbon;
@@ -90,6 +91,8 @@ class ResultController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
+
             $assessments = $result->assessments;
             foreach ($assessments as $key => $assessment) {
                 $score = $request->assessments[$key]['score'];
@@ -100,12 +103,15 @@ class ResultController extends Controller
             $result->status = $request->status;
             $result->save();
 
+             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
 
         }catch(\Exception $e){
+             DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while updating a results!!'
             ])->setStatusCode(500);
         }

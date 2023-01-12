@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Lecturer\LecturerCollection;
 use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Models\Lecturer;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -56,6 +57,7 @@ class LecturerController extends Controller
         ]);
 
         try{
+            DB::beginTransaction();
 
             $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
 
@@ -88,11 +90,14 @@ class LecturerController extends Controller
                 'picture' => $picture_url,
             ]);
 
-            //TODO: send email (credentials) to student
+            DB::commit();
+
             return response()->json(['status' => 'success'])->setStatusCode(201);
         }catch(\Exception $e){
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while adding lecturer!!'
             ])->setStatusCode(500);
         }
@@ -134,6 +139,7 @@ class LecturerController extends Controller
 
 
         try{
+            DB::beginTransaction();
 
             $picture_url = null;
             if ($request->hasFile('picture')) {
@@ -166,11 +172,14 @@ class LecturerController extends Controller
                 'email' => $request->input('email'),
             ]);
 
+            DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
 
         }catch(\Exception $e){
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while updating lecturer details!!'
             ])->setStatusCode(500);
         }
@@ -185,6 +194,8 @@ class LecturerController extends Controller
     public function destroy(Lecturer $lecturer)
     {
         try{
+            DB::beginTransaction();
+
             if ($lecturer->picture) {
                 $lecturerpicture = explode("/", $lecturer->picture);
                 $picture = end($lecturerpicture);
@@ -196,11 +207,14 @@ class LecturerController extends Controller
 
             $lecturer->user->delete();
 
+            DB::commit();
             return response()->json(null, 204);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while deleting lecturer!!'
             ])->setStatusCode(500);
         }
@@ -232,6 +246,7 @@ class LecturerController extends Controller
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
             return response()->json([
+                'error'=>$e->getMessage(),
                 'message'=>'An error occured while importing data!!'
             ])->setStatusCode(500);
         }
