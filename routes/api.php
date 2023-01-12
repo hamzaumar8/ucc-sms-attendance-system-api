@@ -10,6 +10,7 @@ use App\Http\Controllers\API\V1\ResultController;
 use App\Http\Controllers\API\V1\SemesterController;
 use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
+use App\Http\Controllers\API\V1\AttendanceLecturerController;
 use App\Http\Controllers\Auth\TokenAuthController;
 use App\Models\Assessment;
 use Illuminate\Http\Request;
@@ -39,6 +40,7 @@ Route::group(['prefix' => 'v1'], function () {
     // Students
     Route::apiResource('/students', StudentController::class);
     Route::get('/stud/backend', [StudentController::class, 'backend']);
+    Route::get('/stud_module/{module}/backend', [StudentController::class, 'module_backend']);
     Route::post('/import/students', [StudentController::class, 'import']);
 
     // Lecturers
@@ -63,8 +65,11 @@ Route::group(['prefix' => 'v1'], function () {
 
     // Attendance
     Route::apiResource('/attendances', AttendanceController::class);
-    Route::get('/attendance/lecturer', [AttendanceController::class, 'lecturers_attendances']);
     Route::put('/accept/attendance/{attendance}', [AttendanceController::class, 'accecpt']);
+
+    // Attendance Lecturer
+    Route::apiResource('/attendance_lecturer', AttendanceLecturerController::class);
+    Route::get('/attendance/lecturer', [AttendanceLecturerController::class, 'lecturers_attendances']);
 
     // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');

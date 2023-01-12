@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+use App\Models\Attendance;
 
-class Attendance_lecturer extends Model
+class AttendanceLecturer extends Model
 {
     use HasFactory;
 
@@ -27,6 +29,7 @@ class Attendance_lecturer extends Model
         return $this->hasMany(AttendanceStudent::class, 'attendance_id');
     }
 
+
     public function students()
     {
         return $this->belongsToMany(Student::class, 'attendance_student', 'attendance_id', 'student_id');
@@ -39,20 +42,46 @@ class Attendance_lecturer extends Model
 
     public function lecatt_count(){
 
-        $count = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->count();
+        $count = $this->where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->count();
         return $count;
     }
 
     public function lecatt_present(){
-        $count = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->where('status', 'present')->count();
+        $count = $this->where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->where('status', 'present')->count();
         return $count;
     }
 
     public function lecatt_absent(){
-        $count = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->where('status', 'absent')->count();
+        $count = $this->where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->where('status', 'absent')->count();
         return $count;
     }
 
+    public function studentAttendanceCount(){
+        $count = 0;
+        $dd = Attendance::where('date',$this->date)->where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->first();
+        if($dd){
+            $count =$dd->attendance_student->count();
+        }
+        return $count;
+    }
+
+    public function studentAttendancePresent(){
+        $count = 0;
+        $dd = Attendance::where('date',$this->date)->where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->first();
+        if($dd){
+            $count =$dd->attendance_student->where('status', 1)->count();
+        }
+        return $count;
+    }
+
+    public function studentAttendanceAbsent(){
+        $count = 0;
+        $dd = Attendance::where('date',$this->date)->where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->first();
+        if($dd){
+            $count =$dd->attendance_student->where('status', 0)->count();
+        }
+        return $count;
+    }
 
     public function total(){
        return [
@@ -60,16 +89,16 @@ class Attendance_lecturer extends Model
             'present' => $this->lecatt_present(),
             'absent' => $this->lecatt_absent(),
             'student'=>[
-                'count'=> $this->attendance_student->count(),
-                'present' => $this->attendance_student->where('status', 1)->count(),
-                'absent' => $this->attendance_student->where('status', 0)->count(),
+                'count'=> $this->studentAttendanceCount(),
+                'present' => $this->studentAttendancePresent(),
+                'absent' => $this->studentAttendanceAbsent(),
             ]
        ];
     }
 
     public function lecturer_weekly()
     {
-        $collection = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->get();
+        $collection = $this->where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->get();
 
         $groups = $collection->groupBy(function ($row) {
             return
@@ -94,7 +123,7 @@ class Attendance_lecturer extends Model
 
     public function student_weekly()
     {
-        $collection = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->get();
+        $collection = $this->where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->get();
 
         $groups = $collection->groupBy(function ($row) {
             return

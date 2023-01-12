@@ -4,6 +4,8 @@ namespace App\Http\Resources\V1\Module;
 
 use App\Http\Resources\V1\Attendance\AttendanceCollection;
 use App\Http\Resources\V1\Attendance\AttendanceResource;
+use App\Http\Resources\V1\AttendanceLecturer\AttendanceLecturerResource;
+use App\Http\Resources\V1\AttendanceLecturer\AttendanceLecturerCollection;
 use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Http\Resources\V1\Level\LevelResource;
 use App\Http\Resources\V1\ModuleBank\ModuleBankResource;
@@ -78,6 +80,7 @@ class ModuleResource extends JsonResource
             'lecturers' => LecturerResource::collection($this->whenLoaded('lecturers')),
             'attendance' => new AttendanceCollection($this->whenLoaded('attendances')),
             'students' => StudentResource::collection($this->whenLoaded('students')),
+            'att_lect' => $this->whenLoaded('attendances_lecturer'),
             'days' => [
                 'total' => $days,
                 'covered' => $days_covered,

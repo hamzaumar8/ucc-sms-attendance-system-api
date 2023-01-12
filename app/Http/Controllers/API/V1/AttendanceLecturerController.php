@@ -3,25 +3,24 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-use App\Http\Resources\V1\Attendance\AttendanceResource;
-use App\Http\Resources\V1\Attendance\AttendanceCollection;
-use App\Models\Attendance;
+use App\Http\Resources\V1\AttendanceLecturer\AttendanceLecturerResource;
+use App\Http\Resources\V1\AttendanceLecturer\AttendanceLecturerCollection;
+use App\Models\AttendanceLecturer;
 use App\Models\Semester;
-use App\Models\Module;
-use App\Models\LecturerModule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
-class AttendanceController extends Controller
+class AttendanceLecturerController extends Controller
 {
+
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'accecpt']]);
+        $this->middleware('auth:sanctum', ['only' => ['lecturers_attendances']]);
     }
 
 
-    public function semester()
+     public function semester()
     {
         $semester_id = null;
         $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
@@ -32,6 +31,7 @@ class AttendanceController extends Controller
     }
 
 
+
     /**
      * Display a listing of the resource.
      *
@@ -39,8 +39,8 @@ class AttendanceController extends Controller
      */
     public function index()
     {
-        $attendances = Attendance::where('semester_id', $this->semester())->orderBy('id', 'DESC')->get();
-        return AttendanceResource::collection($attendances);
+        $attendances = AttendanceLecturer::where('semester_id', $this->semester())->orderBy('id', 'DESC')->get();
+        return AttendanceLecturerResource::collection($attendances);
     }
 
     /**
@@ -68,7 +68,7 @@ class AttendanceController extends Controller
             DB::beginTransaction();
 
             $date = Carbon::parse($request->input('date'))->format('Y-m-d');
-            $check = Attendance::where('semester_id',$this->semester())->where('module_id',$request->input('module_id'))->where('lecturer_id',$request->input('lecturer_id'))->where('date',$date)->first();
+            $check = AttendanceLecturer::where('semester_id',$this->semester())->where('module_id',$request->input('module_id'))->where('lecturer_id',$request->input('lecturer_id'))->where('date',$date)->first();
             if($check){
                 return response()->json([
                     'errors'=>[
@@ -77,7 +77,7 @@ class AttendanceController extends Controller
                 ])->setStatusCode(422);
             }
 
-            $attendance = Attendance::create([
+            $attendance = AttendanceLecturer::create([
                 'lecturer_id' => $request->input('lecturer_id'),
                 'module_id' => $request->input('module_id'),
                 'semester_id' => $this->semester(),
@@ -86,10 +86,6 @@ class AttendanceController extends Controller
                 'end_time' => $request->input('end_time'),
                 'status' => 'present',
             ]);
-
-
-            $module = Module::find($request->input('module_id'));
-            $attendance->students()->attach($module->students, ['semester_id' => $this->semester()]);
 
             DB::commit();
             return response()->json(['status' => 'success'])
@@ -109,22 +105,22 @@ class AttendanceController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Attendance  $attendance
+     * @param  \App\Models\AttendanceLecturer  $attendanceLecturer
      * @return \Illuminate\Http\Response
      */
-    public function show(Attendance $attendance)
+    public function show(AttendanceLecturer $attendanceLecturer)
     {
-        return (new AttendanceResource($attendance->loadMissing(['attendance_student','module.module_bank', 'module.students','module.students'])))->response()->setStatusCode(200);
+       return (new AttendanceLecturerResource($attendanceLecturer->loadMissing(['attendance_student','module.module_bank', 'module.students','module.students'])))->response()->setStatusCode(200);
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Attendance  $attendance
+     * @param  \App\Models\AttendanceLecturer  $attendanceLecturer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Attendance $attendance)
+    public function update(Request $request, AttendanceLecturer $attendanceLecturer)
     {
         //
     }
@@ -132,47 +128,19 @@ class AttendanceController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Attendance  $attendance
+     * @param  \App\Models\AttendanceLecturer  $attendanceLecturer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Attendance $attendance)
+    public function destroy(AttendanceLecturer $attendanceLecturer)
     {
         //
     }
 
 
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Attendance  $attendance
-     * @return \Illuminate\Http\Response
-     */
-    public function accecpt(Request $request, Attendance $attendance)
+    public function lecturers_attendances()
     {
-        $request->validate([
-            'id' => 'required|exists:attendances,id',
-        ]);
-
-        try{
-            DB::beginTransaction();
-
-            $attendance->update([
-                "author" => "lecturer"
-            ]);
-
-            DB::commit();
-            return response()->json(['status'=> 'success'])->setStatusCode(201);
-        }catch(\Exception $e){
-            // Rollback & Return Error Message
-            DB::rollBack();
-            \Log::error($e->getMessage());
-            return response()->json([
-                'error'=> $e->getMessage(),
-                'message'=>'An error occured while accepting attendance!!'
-            ])->setStatusCode(500);
-        }
+        $lecturer_id = auth()->user()->lecturer->id;
+        $attendances = AttendanceLecturer::where('lecturer_id', $lecturer_id)->where('semester_id', $this->semester())->with(['module.module_bank'])->orderBy('id', 'DESC')->get();
+        return  AttendanceLecturerResource::collection($attendances);
     }
 }

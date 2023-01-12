@@ -136,7 +136,7 @@ class ModuleController extends Controller
      */
     public function show(Module $module)
     {
-        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'cordinator', 'course_rep', 'attendances.students', 'students'])))
+        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'cordinator', 'course_rep', 'attendances.students', 'students', 'attendances_lecturer'])))
             ->response()
             ->setStatusCode(200);
     }
@@ -301,7 +301,7 @@ class ModuleController extends Controller
         }
 
         $request->validate([
-            'id' => 'required|numeric|exists:module_banks,id',
+            'id' => 'required|numeric|exists:modules,id',
             'student' => 'required|array|min:1',
         ]);
 

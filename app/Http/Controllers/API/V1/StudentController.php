@@ -8,6 +8,7 @@ use App\Http\Resources\V1\Student\StudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
 use App\Models\Student;
 use App\Models\User;
+use App\Models\Module;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -226,6 +227,17 @@ class StudentController extends Controller
         }
 
         return $query->get();
+    }
+
+    public function module_backend(Request $request, Module $module)
+    {
+        $modulestudent = $module->students->pluck('id')->toArray();
+        $query = Student::query();
+        if ($s = $request->input('s')) {
+           $query->whereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("surname Like '%" . $s . "%'")->orWhereRaw("index_number Like '%" . $s . "%'");
+        }
+        return $query->whereNotIn('id',$modulestudent)->get();
+
     }
 
      public function import(Request $request){

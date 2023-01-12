@@ -13,6 +13,7 @@ class Attendance extends Model
     protected $fillable = [
         'semester_id',
         'lecturer_id',
+        'course_rep_id',
         'module_id',
         'date',
         'start_time',
@@ -39,17 +40,17 @@ class Attendance extends Model
 
     public function lecatt_count(){
 
-        $count = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->count();
+        $count = Attendance::where('module_id', $this->module_id)->where('course_rep_id', $this->course_rep_id)->where('semester_id', $this->semester_id)->count();
         return $count;
     }
 
     public function lecatt_present(){
-        $count = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->where('status', 'present')->count();
+        $count = Attendance::where('module_id', $this->module_id)->where('course_rep_id', $this->course_rep_id)->where('semester_id', $this->semester_id)->where('status', 'present')->count();
         return $count;
     }
 
     public function lecatt_absent(){
-        $count = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->where('status', 'absent')->count();
+        $count = Attendance::where('module_id', $this->module_id)->where('course_rep_id', $this->course_rep_id)->where('semester_id', $this->semester_id)->where('status', 'absent')->count();
         return $count;
     }
 
@@ -69,7 +70,7 @@ class Attendance extends Model
 
     public function lecturer_weekly()
     {
-        $collection = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->get();
+        $collection = Attendance::where('module_id', $this->module_id)->where('course_rep_id', $this->course_rep_id)->where('semester_id', $this->semester_id)->get();
 
         $groups = $collection->groupBy(function ($row) {
             return
@@ -94,7 +95,7 @@ class Attendance extends Model
 
     public function student_weekly()
     {
-        $collection = Attendance::where('module_id', $this->module_id)->where('lecturer_id', $this->lecturer_id)->where('semester_id', $this->semester_id)->get();
+        $collection = Attendance::where('module_id', $this->module_id)->where('course_rep_id', $this->course_rep_id)->where('semester_id', $this->semester_id)->get();
 
         $groups = $collection->groupBy(function ($row) {
             return
