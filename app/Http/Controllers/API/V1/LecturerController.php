@@ -5,7 +5,10 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Lecturer\LecturerCollection;
 use App\Http\Resources\V1\Lecturer\LecturerResource;
+use App\Http\Resources\V1\Module\ModuleResource;
+use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Models\Lecturer;
+use App\Models\Module;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Carbon\Carbon;
@@ -20,7 +23,7 @@ class LecturerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import', 'lecturers_modules']]);
     }
 
 
@@ -259,4 +262,11 @@ class LecturerController extends Controller
         return new LecturerCollection($lecturers);
     }
 
+
+    public function lecturers_modules()
+    {
+        $lecturerModules = auth()->user()->lecturer->modules->pluck('id')->toArray();
+        $modules = Module::whereIn('id', $lecturerModules)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        return new ModuleCollection($modules);
+    }
 }

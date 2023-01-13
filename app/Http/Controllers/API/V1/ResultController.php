@@ -16,7 +16,7 @@ class ResultController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'cordinating_module',]]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'cordinating_module', 'lecturers_results']]);
     }
 
     public function semester()
@@ -195,4 +195,11 @@ class ResultController extends Controller
         }
     }
 
+
+    public function lecturers_results()
+    {
+        $lecturerModules = auth()->user()->lecturer->modules->pluck('id')->toArray();
+        $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank'])->get();
+        return new ResultCollection($results);
+    }
 }

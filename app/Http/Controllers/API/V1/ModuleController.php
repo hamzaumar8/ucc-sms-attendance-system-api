@@ -330,4 +330,5 @@ class ModuleController extends Controller
             ])->setStatusCode(500);
         }
     }
+
 }
