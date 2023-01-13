@@ -111,7 +111,7 @@ class LecturerController extends Controller
      */
     public function show(Lecturer $lecturer)
     {
-        return (new LecturerResource($lecturer->loadMissing(['modules.module_bank'])))
+        return (new LecturerResource($lecturer->loadMissing(['modules.module_bank','user'])))
             ->response()
             ->setStatusCode(200);
     }
@@ -250,6 +250,13 @@ class LecturerController extends Controller
                 'message'=>'An error occured while importing data!!'
             ])->setStatusCode(500);
         }
+    }
+
+
+    public function all()
+    {
+        $lecturers = Lecturer::orderByDesc('id')->with(['modules.module_bank', 'user'])->get();
+        return new LecturerCollection($lecturers);
     }
 
 }

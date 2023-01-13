@@ -78,7 +78,7 @@ class StudentController extends Controller
 
             $student = Student::create([
                 'user_id' => $user->id,
-                'index_number' => $request->input('index_number'),
+                'index_number' => strtoupper($request->input('index_number')),
                 'first_name' => $request->input('first_name'),
                 'other_name' => $request->input('other_name'),
                 'surname' => $request->input('surname'),
@@ -155,7 +155,7 @@ class StudentController extends Controller
             }
 
             $student->update([
-                'index_number' => $request->input('index_number'),
+                'index_number' => strtoupper($request->input('index_number')),
                 'first_name' => $request->input('first_name'),
                 'other_name' => $request->input('other_name'),
                 'surname' => $request->input('surname'),

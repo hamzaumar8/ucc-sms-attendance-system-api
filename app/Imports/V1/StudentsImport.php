@@ -32,8 +32,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
             'email' => $row['email'],
             'name' => $name,
             'email_verified_at' => now(),
-            'role' => 'STF',
-            'password' => Hash::make($row['staff_id']),
+            'password' => Hash::make(strtolower(str_replace("/", "", $request->input('index_number')))),
         ]);
 
         $level_id = null;
@@ -43,7 +42,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
         }
         $student = new Student([
             'user_id' => $user->id,
-            'index_number' => $row['index_number'],
+            'index_number' => strtoupper($row['index_number']),
             'first_name' => $row['first_name'],
             'other_name' => $row['other_name'],
             'surname' => $row['surname'],

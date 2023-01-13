@@ -33,6 +33,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::apiResource('/results', ResultController::class);
     Route::get('cordinating/modules', [ResultController::class, 'cordinating_module']);
     Route::get('promotion/check', [ResultController::class, 'promotion_check']);
+    Route::get('update_status/result/{result}', [ResultController::class, 'update_status']);
 
     // // Assessment
     // Route::apiResource('/semester', Assessment::class);
@@ -47,6 +48,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::apiResource('/lecturers', LecturerController::class);
     Route::get('/lect/backend', [LecturerController::class, 'backend']);
     Route::post('/import/lecturers', [LecturerController::class, 'import']);
+    Route::get('/all/lecturers', [LecturerController::class, 'all']);
 
     // Modules Bank
     Route::apiResource('/module_banks', ModuleBankController::class);
@@ -56,6 +58,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::apiResource('/modules', ModuleController::class);
     Route::get('/end/module/{module}', [ModuleController::class, 'end_module']);
     Route::post('/add/student/{module}', [ModuleController::class, 'add_student']);
+    Route::get('/cordinating/modules/{lecturer}', [ModuleController::class, 'cordinating_modules']);
 
     // Levels
     Route::apiResource('/levels', LevelController::class);

@@ -103,7 +103,7 @@ class ResultController extends Controller
             $result->status = $request->status;
             $result->save();
 
-             DB::commit();
+            DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
 
@@ -157,4 +157,42 @@ class ResultController extends Controller
         }
         return response()->json(['data' => $data])->setStatusCode(200);
     }
+
+
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Result  $result
+     * @return \Illuminate\Http\Response
+     */
+    public function update_status(Result $result)
+    {
+
+        try{
+            DB::beginTransaction();
+
+            if($result->status === 'save'){
+                $result->status = 'submit';
+            }else{
+                $result->status = 'save';
+
+            }
+            $result->save();
+
+             DB::commit();
+            return response()->json(['status' => 'success'])
+                ->setStatusCode(201);
+
+        }catch(\Exception $e){
+             DB::rollBack();
+            \Log::error($e->getMessage());
+            return response()->json([
+                'error'=>$e->getMessage(),
+                'message'=>'An error occured while updating results status!!'
+            ])->setStatusCode(500);
+        }
+    }
+
 }

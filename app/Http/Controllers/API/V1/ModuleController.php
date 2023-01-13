@@ -58,6 +58,12 @@ class ModuleController extends Controller
         return new ModuleCollection($modules);
     }
 
+    public function cordinating_modules(Lecturer $lecturer)
+    {
+        $modules = Module::where('semester_id', $this->semester())->where('cordinator_id', $lecturer->id)->orderBy('id', 'DESC')->with(['module_bank'])->get();
+        return new ModuleCollection($modules);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
