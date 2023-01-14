@@ -34,10 +34,9 @@ class TokenAuthController extends Controller
             $userResource = (new UserResource($user->loadMissing('lecturer')));
         }
 
-        return response(json([
+        return response()->json([
             'user' => $userResource,
-            'token' =>$user->createToken($request->device_name)->plainTextToken]
-        ));
+            'token' =>$user->createToken($request->device_name)->plainTextToken]);
     }
 
     /**
