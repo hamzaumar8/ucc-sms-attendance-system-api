@@ -8,6 +8,7 @@ use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Http\Resources\V1\Module\ModuleResource;
 use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Models\Lecturer;
+use App\Models\Semester;
 use App\Models\Module;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
@@ -23,9 +24,18 @@ class LecturerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import', 'lecturers_modules']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import', 'lecturers_modules', 'cordinating_modules']]);
     }
 
+    public function semester()
+    {
+        $semester_id = null;
+        $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        if ($semester) {
+            $semester_id = $semester->id;
+        }
+        return  $semester_id;
+    }
 
     /**
      * Display a listing of the resource.
@@ -269,4 +279,13 @@ class LecturerController extends Controller
         $modules = Module::whereIn('id', $lecturerModules)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
         return new ModuleCollection($modules);
     }
+
+
+     public function cordinating_modules()
+    {
+        $cordinator_id = auth()->user()->lecturer->id;
+        $modules = Module::where('semester_id', $this->semester())->where('cordinator_id', $cordinator_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        return new ModuleCollection($modules);
+    }
+
 }
