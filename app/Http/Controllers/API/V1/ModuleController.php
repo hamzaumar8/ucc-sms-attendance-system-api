@@ -120,6 +120,13 @@ class ModuleController extends Controller
             // module students attachment
             $module->students()->attach($module->level->students);
 
+            // Course Rep
+            $courseRep = Student::find($request->input('course_rep'));
+            if($courseRep->user->role === 'USR'){
+                $courseRep->user->role = 'REP';
+                $courseRep->user->save();
+            }
+
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
@@ -200,6 +207,20 @@ class ModuleController extends Controller
             if ($prev_module->level_id != $module->level_id) {
                 $module->students()->detach($prev_module->level->students);
                 $module->students()->attach($module->level->students);
+            }
+
+            if ($prev_module->course_rep_id != $module->course_rep_id) {
+                $modules = Module::pluck('course_rep_id')->toArray();
+                $pastCourseRep = Student::find($prev_module->course_rep_id);
+                $courseRep = Student::find($module->course_rep_id);
+                if(!in_array($pastCourseRep->id,$modules)){
+                    $pastCourseRep->user->role = 'USR';
+                    $pastCourseRep->user->save();
+                }
+                if($courseRep->user->role === 'USR'){
+                    $courseRep->user->role = 'REP';
+                    $courseRep->user->save();
+                }
             }
 
             DB::commit();
