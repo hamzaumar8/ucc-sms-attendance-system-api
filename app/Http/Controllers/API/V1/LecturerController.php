@@ -289,11 +289,5 @@ class LecturerController extends Controller
     }
 
 
-     public function students_modules()
-    {
-        $studentModules = auth()->user()->student->modules->pluck('id')->toArray();
-        $modules = Module::whereIn('id', $studentModules)->where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
-        return new ModuleCollection($modules);
-    }
 
 }
