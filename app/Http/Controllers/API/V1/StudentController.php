@@ -258,4 +258,5 @@ class StudentController extends Controller
             ])->setStatusCode(500);
         }
     }
+
 }

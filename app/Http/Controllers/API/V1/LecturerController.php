@@ -276,7 +276,7 @@ class LecturerController extends Controller
     public function lecturers_modules()
     {
         $lecturerModules = auth()->user()->lecturer->modules->pluck('id')->toArray();
-        $modules = Module::whereIn('id', $lecturerModules)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        $modules = Module::whereIn('id', $lecturerModules)->where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
         return new ModuleCollection($modules);
     }
 
@@ -285,6 +285,14 @@ class LecturerController extends Controller
     {
         $cordinator_id = auth()->user()->lecturer->id;
         $modules = Module::where('semester_id', $this->semester())->where('cordinator_id', $cordinator_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        return new ModuleCollection($modules);
+    }
+
+
+     public function students_modules()
+    {
+        $studentModules = auth()->user()->student->modules->pluck('id')->toArray();
+        $modules = Module::whereIn('id', $studentModules)->where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
         return new ModuleCollection($modules);
     }
 

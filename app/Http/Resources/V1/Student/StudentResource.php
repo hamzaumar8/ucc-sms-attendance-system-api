@@ -47,8 +47,8 @@ class StudentResource extends JsonResource
                 'absent'=> $this->attendance_absent(),
                 'present_percentage'=> $this->attendance_present_percentage(),
                 'absent_percentage'=> $this->attendance_absent_percentage(),
-            ]
-
+            ],
+            'result' => $this->assesments,
         ];
     }
 

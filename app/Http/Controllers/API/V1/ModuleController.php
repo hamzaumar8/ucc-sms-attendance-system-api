@@ -22,7 +22,7 @@ class ModuleController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'end_module']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'end_module', 'student_modules']]);
     }
 
     public function status($start_date, $end_date)
@@ -350,6 +350,14 @@ class ModuleController extends Controller
                 'message'=>'An error occured while add student to module!!'
             ])->setStatusCode(500);
         }
+    }
+
+
+    public function student_modules()
+    {
+        $studentModules = auth()->user()->student->modules->pluck('id')->toArray();
+        $modules = Module::whereIn('id', $studentModules)->orderBy('id', 'DESC')->with(['module_bank'])->get();
+        return new ModuleCollection($modules);
     }
 
 }

@@ -202,4 +202,12 @@ class ResultController extends Controller
         $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank'])->get();
         return new ResultCollection($results);
     }
+
+
+    public function students_results()
+    {
+        $lecturerModules = auth()->user()->student->results->pluck('id')->toArray();
+        $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.module_bank'])->get();
+        return new ResultCollection($results);
+    }
 }

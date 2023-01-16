@@ -53,21 +53,24 @@ class Student extends Model
         return $this->belongsTo(Level::class, 'level_id');
     }
 
-
-    public function modules()
-    {
-        return $this->belongsToMany(Module::class, 'module_student',  'student_id', 'module_id');
-    }
-
-
-    public function attendance()
-    {
+    public function semester(){
         $semester  = Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
         $semester_id = null;
         if ($semester) {
             $semester_id = $semester->id;
         }
-        return $this->hasMany(AttendanceStudent::class, 'student_id')->where('semester_id', $semester_id);
+        return $semester_id;
+    }
+
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class, 'module_student',  'student_id', 'module_id')->where('semester_id', $this->semester());
+    }
+
+
+    public function attendance()
+    {
+        return $this->hasMany(AttendanceStudent::class, 'student_id')->where('semester_id', $this->semester());
     }
 
     public function attendance_present(){
@@ -91,8 +94,9 @@ class Student extends Model
     }
 
 
-    public function result()
+    public function results()
     {
-        return $this->belongsTo(Result::class, 'result_id');
+        return $this->belongsToMany(Result::class, 'assessments',  'student_id', 'result_id')->where('semester_id', $this->semester());
     }
+
 }
