@@ -77,6 +77,39 @@ class LevelController extends Controller
         //
     }
 
+
+    public function groupStudents($num_groups, $students) {
+        // Create an empty list called "groups."
+        $groups = array();
+        for ($i = 0; $i < $num_groups; $i++) {
+            $groups[$i] = array();
+        }
+
+        // Fetch the list of students from the Laravel database.
+        $num_students = count($students);
+
+        // Create a variable "students_per_group" equal to the number of students divided by the number of groups.
+        $students_per_group = floor($num_students / $num_groups);
+
+        // Create a variable "remainder" equal to the number of students modulo the number of groups.
+        $remainder = $num_students % $num_groups;
+
+        // Iterate through the list of students, adding them to the groups list
+        $student_index = 0;
+        for ($group_index = 0; $group_index < $num_groups; $group_index++) {
+            $students_to_add = ($group_index < $remainder) ? $students_per_group + 1 : $students_per_group;
+            for ($i = 0; $i < $students_to_add; $i++) {
+                $groups[$group_index][] = $students[$student_index];
+                $student_index++;
+            }
+        }
+
+        // Return the "groups" list as the result.
+        return $groups;
+    }
+
+
+
     /**
      * Update the specified resource in storage.
      *
@@ -95,16 +128,16 @@ class LevelController extends Controller
             DB::beginTransaction();
 
             $no_of_group = $request->input('no_of_group');
-            $student_capacity = $level->students->count();
-            $chunk = intdiv($student_capacity, $no_of_group);
+            $students = $level->students->shuffle();
 
-            if($no_of_group > $student_capacity ){
+
+            if($no_of_group > $level->students->count() ){
                 return response()->json(['message' => "Number of groups can't be greater then student capacity"])->setStatusCode(500);
             }
-            $students = $level->students->shuffle();
-            $chunks = $students->chunk($chunk);
-            foreach ($chunks as $key => $ck){
-                foreach($ck as $student){
+            $groups = $this->groupStudents($no_of_group, $students);
+
+            foreach ($groups as $key => $group){
+                foreach($group as $student){
                     $student->group_no = $key+1;
                     $student->save();
                 }
@@ -184,29 +217,28 @@ class LevelController extends Controller
                 $lev = null;
                 if($level->name == "Level 200"){
                     $lvs = Level::where('name', 'like', "Level 300")->first();
-                    $lev = $level->id;
+                    $lev = $lvs->id;
                 }elseif($level->name == "Level 300"){
                     $lvs = Level::where('name', 'like', "Level 400")->first();
-                    $lev = $level->id;
+                    $lev = $lvs->id;
                 }elseif($level->name == "Level 400"){
                     $lvs = Level::where('name', 'like', "Level 500")->first();
-                    $lev = $level->id;
+                    $lev = $lvs->id;
                 }elseif($level->name == "Level 500"){
                     $lvs = Level::where('name', 'like', "Level 600")->first();
-                    $lev = $level->id;
-                }elseif($level->name == "Level 600"){
-                    $lev = null;
+                    $lev = $lvs->id;
                 }elseif($level->name == "GEM 250"){
                     $lvs = Level::where('name', 'like', "GEM 300")->first();
-                    $lev = $level->id;
+                    $lev = $lvs->id;
                 }elseif($level->name == "GEM 300"){
                     $lvs = Level::where('name', 'like', "Level 400")->first();
-                    $lev = $level->id;
+                    $lev = $lvs->id;
                 }
 
                 foreach($level->students as $student){
                     if(!in_array($student->id, $assessment_failed_student)){
-                        $student->update(['level_id'=>$lev]);
+                        $student->level_id = $lev;
+                        $student->save();
                     }
                 }
             }
