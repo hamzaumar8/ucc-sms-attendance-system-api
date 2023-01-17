@@ -99,4 +99,6 @@ class Student extends Model
         return $this->belongsToMany(Result::class, 'assessments',  'student_id', 'result_id')->where('semester_id', $this->semester());
     }
 
+
+
 }

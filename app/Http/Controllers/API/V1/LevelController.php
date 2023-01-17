@@ -17,7 +17,7 @@ class LevelController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'delete', 'student_promotion', 'generate_group']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'student_promotion']]);
     }
 
     public function semester()
@@ -77,88 +77,6 @@ class LevelController extends Controller
         //
     }
 
-
-    public function groupStudents($num_groups, $students) {
-        // Create an empty list called "groups."
-        $groups = array();
-        for ($i = 0; $i < $num_groups; $i++) {
-            $groups[$i] = array();
-        }
-
-        // Fetch the list of students from the Laravel database.
-        $num_students = count($students);
-
-        // Create a variable "students_per_group" equal to the number of students divided by the number of groups.
-        $students_per_group = floor($num_students / $num_groups);
-
-        // Create a variable "remainder" equal to the number of students modulo the number of groups.
-        $remainder = $num_students % $num_groups;
-
-        // Iterate through the list of students, adding them to the groups list
-        $student_index = 0;
-        for ($group_index = 0; $group_index < $num_groups; $group_index++) {
-            $students_to_add = ($group_index < $remainder) ? $students_per_group + 1 : $students_per_group;
-            for ($i = 0; $i < $students_to_add; $i++) {
-                $groups[$group_index][] = $students[$student_index];
-                $student_index++;
-            }
-        }
-
-        // Return the "groups" list as the result.
-        return $groups;
-    }
-
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Level  $level
-     * @return \Illuminate\Http\Response
-     */
-    public function generate_group(Request $request, Level $level)
-    {
-         $request->validate([
-            'level' => 'required|numeric|exists:levels,id',
-            'no_of_group' => 'required|numeric|min:2',
-        ]);
-
-        try{
-            DB::beginTransaction();
-
-            $no_of_group = $request->input('no_of_group');
-            $students = $level->students->shuffle();
-
-
-            if($no_of_group > $level->students->count() ){
-                return response()->json(['message' => "Number of groups can't be greater then student capacity"])->setStatusCode(500);
-            }
-            $groups = $this->groupStudents($no_of_group, $students);
-
-            foreach ($groups as $key => $group){
-                foreach($group as $student){
-                    $student->group_no = $key+1;
-                    $student->save();
-                }
-            }
-
-            $level->groups = $no_of_group;
-            $level->save();
-
-            DB::commit();
-            return response()->json(['status' => 'success'])->setStatusCode(201);
-
-         } catch (\Exception $e) {
-             DB::rollBack();
-            \Log::error($e->getMessage());
-            return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while generation group!!'
-            ])->setStatusCode(500);
-        }
-    }
-
     /**
      * Remove the specified resource from storage.
      *
@@ -173,7 +91,7 @@ class LevelController extends Controller
             $level->delete();
 
             DB::commit();
-            return response()->json(null, 204);
+            return response()->noContent();
 
         } catch (\Exception $e) {
             DB::rollBack();

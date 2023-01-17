@@ -10,6 +10,7 @@ use App\Http\Controllers\API\V1\ResultController;
 use App\Http\Controllers\API\V1\SemesterController;
 use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
+use App\Http\Controllers\API\V1\GroupController;
 use App\Http\Controllers\API\V1\AttendanceLecturerController;
 use App\Http\Controllers\Auth\TokenAuthController;
 use App\Models\Assessment;
@@ -66,9 +67,11 @@ Route::group(['prefix' => 'v1'], function () {
 
     // Levels
     Route::apiResource('/levels', LevelController::class);
-    Route::put('generate/level/{level}', [LevelController::class, 'generate_group']);
     Route::get('/lev/backend', [LevelController::class, 'backend']);
     Route::put('student/level/promotion/{semester}', [LevelController::class, 'student_promotion']);
+
+    // Group
+    Route::apiResource('/groups', GroupController::class);
 
     // Attendance
     Route::apiResource('/attendances', AttendanceController::class);
