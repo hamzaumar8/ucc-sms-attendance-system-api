@@ -28,7 +28,7 @@ class TokenAuthController extends Controller
         }
 
 
-        if ($user->role === "USR") {
+        if ($user->role === "USR" || $user->role === "REP") {
             $userResource = (new UserResource($user->loadMissing('student')));
         } else {
             $userResource = (new UserResource($user->loadMissing('lecturer')));

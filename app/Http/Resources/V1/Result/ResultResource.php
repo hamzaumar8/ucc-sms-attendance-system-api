@@ -3,8 +3,10 @@
 namespace App\Http\Resources\V1\Result;
 
 use App\Http\Controllers\API\V1\ResultController;
-use App\Http\Resources\V1\Assesment\AssesmentResource;
+use App\Http\Resources\V1\Assessment\AssessmentResource;
 use App\Http\Resources\V1\Module\ModuleResource;
+use App\Http\Resources\V1\Semester\SemesterResource;
+use App\Http\Resources\V1\Student\StudentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
 
@@ -25,8 +27,16 @@ class ResultResource extends JsonResource
             'cordinator_id' => $this->cordinator_id,
             'status' => $this->status,
             'created_at' => Carbon::parse($this->created_at),
+            'score'=> $this->whenPivotLoaded('assessments', function(){
+                return $this->pivot->score;
+            }),
+            'remarks'=> $this->whenPivotLoaded('assessments', function(){
+                return $this->pivot->remarks;
+            }),
+            'semester' => SemesterResource::make($this->whenLoaded('semester')),
             'module' => ModuleResource::make($this->whenLoaded('module')),
-            'assessments' => AssesmentResource::collection($this->whenLoaded('assessments')),
+            'assessments' => AssessmentResource::collection($this->whenLoaded('assessments')),
+            'students' => StudentResource::collection($this->whenLoaded('students')),
         ];
     }
 

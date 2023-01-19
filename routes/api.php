@@ -12,6 +12,7 @@ use App\Http\Controllers\API\V1\StudentController;
 use App\Http\Controllers\API\V1\UserController;
 use App\Http\Controllers\API\V1\GroupController;
 use App\Http\Controllers\API\V1\AttendanceLecturerController;
+use App\Http\Controllers\API\V1\AssessmentController;
 use App\Http\Controllers\Auth\TokenAuthController;
 use App\Models\Assessment;
 use Illuminate\Http\Request;
@@ -37,14 +38,15 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/update_status/result/{result}', [ResultController::class, 'update_status']);
     Route::get('/lecturer/results', [ResultController::class, 'lecturers_results']);
 
-    // // Assessment
-    // Route::apiResource('/semester', Assessment::class);
+    // Assessment
+    Route::apiResource('/assessments', AssessmentController::class);
 
     // Students
     Route::apiResource('/students', StudentController::class);
     Route::get('/stud/backend', [StudentController::class, 'backend']);
     Route::get('/stud_module/{module}/backend', [StudentController::class, 'module_backend']);
     Route::post('/import/students', [StudentController::class, 'import']);
+    Route::get('/result/student', [StudentController::class, 'results']);
 
     // Lecturers
     Route::apiResource('/lecturers', LecturerController::class);
@@ -64,6 +66,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/add/student/{module}', [ModuleController::class, 'add_student']);
     Route::get('/cordinating/modules/{lecturer}', [ModuleController::class, 'cordinating_modules']);
     Route::get('/student/modules/', [ModuleController::class, 'student_modules']);
+    Route::get('/student/modules/', [ModuleController::class, 'student_modules']);
+    Route::get('/course_rep/modules', [ModuleController::class, 'course_rep_modules']);
 
     // Levels
     Route::apiResource('/levels', LevelController::class);
@@ -75,7 +79,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     // Attendance
     Route::apiResource('/attendances', AttendanceController::class);
-    Route::put('/accept/attendance/{attendance}', [AttendanceController::class, 'accecpt']);
+    Route::get('/course_rep/attendances', [AttendanceController::class, 'course_rep_attendances']);
 
     // Attendance Lecturer
     Route::apiResource('/attendance_lecturer', AttendanceLecturerController::class);

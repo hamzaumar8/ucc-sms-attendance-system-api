@@ -14,6 +14,7 @@ use App\Models\Result;
 use App\Models\Student;
 use App\Models\Assessment;
 use Carbon\Carbon;
+use App\Helpers\Helper;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -22,7 +23,7 @@ class ModuleController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'end_module', 'student_modules']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'end_module', 'student_modules', 'course_rep_modules']]);
     }
 
     public function status($start_date, $end_date)
@@ -54,13 +55,13 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        $modules = Module::where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        $modules = Module::where('semester_id', Helper::semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
         return new ModuleCollection($modules);
     }
 
     public function cordinating_modules(Lecturer $lecturer)
     {
-        $modules = Module::where('semester_id', $this->semester())->where('cordinator_id', $lecturer->id)->orderBy('id', 'DESC')->with(['module_bank'])->get();
+        $modules = Module::where('semester_id', Helper::semester())->where('cordinator_id', $lecturer->id)->orderBy('id', 'DESC')->with(['module_bank'])->get();
         return new ModuleCollection($modules);
     }
 
@@ -73,7 +74,7 @@ class ModuleController extends Controller
     public function store(Request $request)
     {
         // check if semester is set
-        if (!$this->semester()) {
+        if (!Helper::semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
 
@@ -90,7 +91,7 @@ class ModuleController extends Controller
         try{
             DB::beginTransaction();
 
-            $check = Module::where('semester_id',$this->semester())->where('module_bank_id',$request->input('module'))->where('level_id',$request->input('level'))->first();
+            $check = Module::where('semester_id',Helper::semester())->where('module_bank_id',$request->input('module'))->where('level_id',$request->input('level'))->first();
             if($check){
                 return response()->json([
                     'errors'=>[
@@ -103,7 +104,7 @@ class ModuleController extends Controller
 
             // create module
             $module = Module::create([
-                'semester_id' => $this->semester(),
+                'semester_id' => Helper::semester(),
                 'module_bank_id' => $request->input('module'),
                 'cordinator_id' => $request->input('cordinator'),
                 'course_rep_id' => $request->input('course_rep'),
@@ -164,7 +165,7 @@ class ModuleController extends Controller
     public function update(Request $request, Module $module)
     {
         // check if semester is set
-        if (!$this->semester()) {
+        if (!Helper::semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
         $prev_module = Module::find($request->id);
@@ -247,7 +248,7 @@ class ModuleController extends Controller
     public function destroy(Module $module)
     {
         // check if semester is set
-        if (!$this->semester()) {
+        if (!Helper::semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
         try{
@@ -276,7 +277,7 @@ class ModuleController extends Controller
      public function end_module(Module $module)
     {
         // check if semester is set
-        if (!$this->semester()) {
+        if (!Helper::semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
 
@@ -292,7 +293,7 @@ class ModuleController extends Controller
             ]);
 
             // $result = Result::firstOrCreate([
-            //     'semester_id' => $this->semester(),
+            //     'semester_id' => Helper::semester(),
             //     'module_id' => $module->id,
             //     'cordinator_id' => $module->cordinator_id,
             // ]);
@@ -323,7 +324,7 @@ class ModuleController extends Controller
     public function add_student(Request $request, Module $module)
     {
         // check if semester is set
-        if (!$this->semester()) {
+        if (!Helper::semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
 
@@ -360,4 +361,9 @@ class ModuleController extends Controller
         return new ModuleCollection($modules);
     }
 
+    public function course_rep_modules(){
+        $course_rep_id = auth()->user()->student->id;
+        $modules = Module::where('semester_id', Helper::semester())->where('course_rep_id', $course_rep_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'students'])->get();
+        return new ModuleCollection($modules);
+    }
 }

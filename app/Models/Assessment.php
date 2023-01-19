@@ -25,4 +25,9 @@ class Assessment extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
+
+     public function students()
+    {
+        return $this->belongsToMany(Result::class, 'assessments',  'result_id', 'student_id')->withPivot(['score','remarks']);
+    }
 }

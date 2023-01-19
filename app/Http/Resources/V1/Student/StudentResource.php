@@ -5,6 +5,7 @@ namespace App\Http\Resources\V1\Student;
 use App\Http\Resources\V1\Level\LevelResource;
 use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Http\Resources\V1\Module\ModuleResource;
+use App\Http\Resources\V1\Result\ResultResource;
 use App\Http\Resources\V1\AttendanceStudent\AttendanceStudentResource;
 use App\Http\Resources\V1\User\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -48,7 +49,7 @@ class StudentResource extends JsonResource
                 'present_percentage'=> $this->attendance_present_percentage(),
                 'absent_percentage'=> $this->attendance_absent_percentage(),
             ],
-            'result' => $this->assesments,
+            'results' => ResultResource::collection($this->whenLoaded('results')),
         ];
     }
 

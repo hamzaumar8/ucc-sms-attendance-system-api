@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Semester;
 use App\Models\AttendanceStudent;
+use App\Helpers\Helper;
 use Carbon\Carbon;
 
 class Student extends Model
@@ -53,24 +54,15 @@ class Student extends Model
         return $this->belongsTo(Level::class, 'level_id');
     }
 
-    public function semester(){
-        $semester  = Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
-        $semester_id = null;
-        if ($semester) {
-            $semester_id = $semester->id;
-        }
-        return $semester_id;
-    }
-
     public function modules()
     {
-        return $this->belongsToMany(Module::class, 'module_student',  'student_id', 'module_id')->where('semester_id', $this->semester());
+        return $this->belongsToMany(Module::class, 'module_student',  'student_id', 'module_id')->where('semester_id', Helper::semester());
     }
 
 
     public function attendance()
     {
-        return $this->hasMany(AttendanceStudent::class, 'student_id')->where('semester_id', $this->semester());
+        return $this->hasMany(AttendanceStudent::class, 'student_id')->where('semester_id', Helper::semester());
     }
 
     public function attendance_present(){
@@ -96,9 +88,7 @@ class Student extends Model
 
     public function results()
     {
-        return $this->belongsToMany(Result::class, 'assessments',  'student_id', 'result_id')->where('semester_id', $this->semester());
+        return $this->belongsToMany(Result::class, 'assessments',  'student_id', 'result_id')->withPivot(['score','remarks']);
     }
-
-
 
 }

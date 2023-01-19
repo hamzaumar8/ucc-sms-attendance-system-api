@@ -204,10 +204,11 @@ class ResultController extends Controller
     }
 
 
-    public function students_results()
-    {
-        $lecturerModules = auth()->user()->student->results->pluck('id')->toArray();
-        $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.module_bank'])->get();
-        return new ResultCollection($results);
-    }
+
+    // public function results()
+    // {
+    //     $student = auth()->user()->student->id;
+    //     return response()->json(['data'=>$student->with('results')])->setStatusCode(200);
+    // }
+
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Helpers\Helper;
 use Carbon\Carbon;
 
 class Attendance extends Model
@@ -19,7 +20,6 @@ class Attendance extends Model
         'start_time',
         'end_time',
         'status',
-        'author',
     ];
 
 
@@ -30,7 +30,7 @@ class Attendance extends Model
 
     public function students()
     {
-        return $this->belongsToMany(Student::class, 'attendance_student', 'attendance_id', 'student_id');
+        return $this->belongsToMany(Student::class, 'attendance_student', 'attendance_id', 'student_id')->where('semester_id',Helper::semester());
     }
 
     public function module()

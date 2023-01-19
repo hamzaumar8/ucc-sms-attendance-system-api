@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\V1\Assesment;
+namespace App\Http\Resources\V1\Assessment;
 
-use App\Http\Resources\V1\Student\StudentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\V1\Student\StudentResource;
 
-class AssesmentResource extends JsonResource
+class AssessmentResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,13 +15,13 @@ class AssesmentResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+       return [
             'id' => $this->id,
             'result_id' => $this->result_id,
             'student_id' => $this->student_id,
             'score' => $this->score,
             'remarks' => $this->remarks,
-            'student' => StudentResource::make($this->student),
+            'student' => new StudentResource($this->whenLoaded('student')),
         ];
     }
 

@@ -56,7 +56,7 @@ class LecturerImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
         return [
             'email' => 'required|string|email|max:255|unique:users,email',
             'staff_id' => 'required|max:20|unique:lecturers,staff_id',
-            'title' => 'required|string',
+            'title' => 'required|string|max:20',
             'first_name' => 'required|string|max:20',
             'other_name' => 'nullable|string|max:255',
             'surname' => 'required|string|max:20',

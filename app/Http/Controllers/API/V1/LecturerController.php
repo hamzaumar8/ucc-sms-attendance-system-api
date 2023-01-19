@@ -9,6 +9,7 @@ use App\Http\Resources\V1\Module\ModuleResource;
 use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Models\Lecturer;
 use App\Models\Semester;
+use App\Helpers\Helper;
 use App\Models\Module;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
@@ -25,16 +26,6 @@ class LecturerController extends Controller
     public function __construct()
     {
         $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import', 'lecturers_modules', 'cordinating_modules']]);
-    }
-
-    public function semester()
-    {
-        $semester_id = null;
-        $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
-        if ($semester) {
-            $semester_id = $semester->id;
-        }
-        return  $semester_id;
     }
 
     /**
@@ -60,7 +51,7 @@ class LecturerController extends Controller
         $this->validate($request, [
             'email' => 'required|string|email|max:255|unique:users,email',
             'staff_id' => 'required|max:20|unique:lecturers,staff_id',
-            'title' => 'required|string',
+            'title' => 'required|string|max:20',
             'first_name' => 'required|string|max:20',
             'other_name' => 'nullable|string|max:255',
             'surname' => 'required|string|max:20',
@@ -141,7 +132,7 @@ class LecturerController extends Controller
         $request->validate([
             'email' => 'required', 'string', 'email', 'max:255', 'unique:users,email,' . $lecturer->user->id,
             'staff_id' => 'required|max:20|unique:lecturers,staff_id,' . $lecturer->id,
-            'title' => 'required|string',
+            'title' => 'required|string|max:20',
             'first_name' => 'required|string|max:20',
             'other_name' => 'nullable|string|max:255',
             'surname' => 'required|string|max:20',
@@ -276,7 +267,7 @@ class LecturerController extends Controller
     public function lecturers_modules()
     {
         $lecturerModules = auth()->user()->lecturer->modules->pluck('id')->toArray();
-        $modules = Module::whereIn('id', $lecturerModules)->where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        $modules = Module::whereIn('id', $lecturerModules)->where('semester_id', Helper::semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
         return new ModuleCollection($modules);
     }
 
@@ -284,10 +275,9 @@ class LecturerController extends Controller
      public function cordinating_modules()
     {
         $cordinator_id = auth()->user()->lecturer->id;
-        $modules = Module::where('semester_id', $this->semester())->where('cordinator_id', $cordinator_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        $modules = Module::where('semester_id', Helper::semester())->where('cordinator_id', $cordinator_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
         return new ModuleCollection($modules);
     }
-
 
 
 }

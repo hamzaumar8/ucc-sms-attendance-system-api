@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('staff_id', 20)->unique();
-            $table->enum('title', ['Prof.', 'Dr.', 'Rev.', 'Mr.', 'Mrs.', 'Miss', 'Ms.'])->nullable();
+            $table->string('title', 20)->nullable();
             $table->string('first_name', 20);
             $table->string('other_name')->nullable();
             $table->string('surname', 20);
