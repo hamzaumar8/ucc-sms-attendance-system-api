@@ -150,7 +150,7 @@ class ModuleController extends Controller
      */
     public function show(Module $module)
     {
-        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'cordinator', 'course_rep', 'attendances.students', 'students', 'attendances_lecturer'])))
+        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'cordinator', 'course_rep', 'attendances.students', 'students', 'attendances_lecturer','attendances_course_rep'])))
             ->response()
             ->setStatusCode(200);
     }

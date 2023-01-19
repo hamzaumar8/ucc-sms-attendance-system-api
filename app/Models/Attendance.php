@@ -38,6 +38,11 @@ class Attendance extends Model
         return $this->belongsTo(Module::class, 'module_id');
     }
 
+    public function lecturer()
+    {
+        return $this->belongsTo(Lecturer::class, 'lecturer_id');
+    }
+
     public function lecatt_count(){
 
         $count = Attendance::where('module_id', $this->module_id)->where('course_rep_id', $this->course_rep_id)->where('semester_id', $this->semester_id)->count();

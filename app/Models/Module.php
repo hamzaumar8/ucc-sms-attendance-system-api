@@ -63,6 +63,12 @@ class Module extends Model
         return $this->hasMany(Attendance::class, 'module_id');
     }
 
+
+    public function attendances_course_rep()
+    {
+        return $this->hasMany(Attendance::class, 'module_id');
+    }
+
     public function attendances_lecturer()
     {
         return $this->hasMany(AttendanceLecturer::class, 'module_id');

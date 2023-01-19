@@ -4,6 +4,7 @@ namespace App\Http\Resources\V1\Module;
 
 use App\Http\Resources\V1\Attendance\AttendanceCollection;
 use App\Http\Resources\V1\Attendance\AttendanceResource;
+use App\Http\Resources\V1\Attendance\AttendanceSingle;
 use App\Http\Resources\V1\AttendanceLecturer\AttendanceLecturerResource;
 use App\Http\Resources\V1\AttendanceLecturer\AttendanceLecturerCollection;
 use App\Http\Resources\V1\Lecturer\LecturerResource;
@@ -78,8 +79,9 @@ class ModuleResource extends JsonResource
             'course_rep' => StudentResource::make($this->whenLoaded('course_rep')),
             'level' => LevelResource::make($this->whenLoaded('level')),
             'lecturers' => LecturerResource::collection($this->whenLoaded('lecturers')),
-            'attendance' => new AttendanceCollection($this->whenLoaded('attendances')),
             'students' => StudentResource::collection($this->whenLoaded('students')),
+            'attendance' => new AttendanceCollection($this->whenLoaded('attendances')),
+            'att_course_rep' => AttendanceSingle::collection($this->whenLoaded('attendances_course_rep')),
             'att_lect' => $this->whenLoaded('attendances_lecturer'),
             'days' => [
                 'total' => $days,
