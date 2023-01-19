@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\V1\Student\StudentCollection;
 use App\Http\Resources\V1\Student\StudentResource;
-use App\Http\Resources\V1\Result\ResultResource;
+use App\Http\Resources\V1\Result\ResultCollection;
+use App\Http\Resources\V1\Group\GroupCollection;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Module;
@@ -22,7 +23,7 @@ class StudentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import', 'results']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import', 'results', 'groups']]);
     }
 
     /**
@@ -268,6 +269,16 @@ class StudentController extends Controller
         if(!$student){
             return response()->json(['error' => 'Student not found'], 404);
         }
-       return ResultResource::collection($student->results)->collection->groupBy('semester_id');
+       return  (new ResultCollection($student->results))->collection->groupBy('semester_id');
+    }
+
+    public function groups()
+    {
+        $id = auth()->user()->student->id;
+        $student = Student::with(['groups'])->find($id);
+        if(!$student){
+            return response()->json(['error' => 'Student not found'], 404);
+        }
+        return new GroupCollection($student->groups);
     }
 }

@@ -47,6 +47,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/stud_module/{module}/backend', [StudentController::class, 'module_backend']);
     Route::post('/import/students', [StudentController::class, 'import']);
     Route::get('/result/student', [StudentController::class, 'results']);
+    Route::get('/group/student', [StudentController::class, 'groups']);
 
     // Lecturers
     Route::apiResource('/lecturers', LecturerController::class);

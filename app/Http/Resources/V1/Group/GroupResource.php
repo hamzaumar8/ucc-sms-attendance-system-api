@@ -23,6 +23,9 @@ class GroupResource extends JsonResource
             'groups' => $this->groups,
             'semester_id' => $this->semester_id,
             'level_id' => $this->level_id,
+            'group_no'=> $this->whenPivotLoaded('group_student', function(){
+                return $this->pivot->group_no;
+            }),
             'level'=> LevelResource::make($this->whenLoaded('level')),
             'students'=> StudentResource::collection($this->whenLoaded('students')),
         ];

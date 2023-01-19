@@ -91,4 +91,10 @@ class Student extends Model
         return $this->belongsToMany(Result::class, 'assessments',  'student_id', 'result_id')->withPivot(['score','remarks']);
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_student',  'student_id', 'group_id')->where('semester_id', Helper::semester())->withPivot(['group_no']);
+    }
+
+
 }
