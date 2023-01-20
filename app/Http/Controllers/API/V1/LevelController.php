@@ -127,7 +127,7 @@ class LevelController extends Controller
 
             $semester_academic = Semester::where('academic_year', $accademicYear)->pluck('id')->toArray();
             $result = Result::whereIn('semester_id', $semester_academic)->pluck('id')->toArray();
-            $assessment_failed_student = Assessment::whereIn('result_id', $result)->where('remarks','fail')->pluck('student_id')->toArray();
+            $assessment_failed_student = Assessment::whereIn('result_id', $result)->where('remarks','fail')->orWhere('remarks','ic')->pluck('student_id')->toArray();
 
             $levels = Level::with('students')->get();
 
