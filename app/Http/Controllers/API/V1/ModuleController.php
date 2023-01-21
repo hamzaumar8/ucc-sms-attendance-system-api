@@ -61,7 +61,7 @@ class ModuleController extends Controller
 
     public function cordinating_modules(Lecturer $lecturer)
     {
-        $modules = Module::where('semester_id', Helper::semester())->where('cordinator_id', $lecturer->id)->orderBy('id', 'DESC')->with(['module_bank'])->get();
+        $modules = Module::where('semester_id', Helper::semester())->where('cordinator_id', $lecturer->id)->orderBy('id', 'DESC')->with(['module_bank', 'level'])->get();
         return new ModuleCollection($modules);
     }
 

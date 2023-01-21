@@ -3,7 +3,7 @@
 namespace App\Http\Resources\V1\Assessment;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\V1\Student\StudentResource;
+use App\Http\Resources\V1\Student\StudentSingle;
 
 class AssessmentResource extends JsonResource
 {
@@ -21,7 +21,7 @@ class AssessmentResource extends JsonResource
             'student_id' => $this->student_id,
             'score' => $this->score,
             'remarks' => $this->remarks,
-            'student' => new StudentResource($this->whenLoaded('student')),
+            'student' => new StudentSingle($this->whenLoaded('student')),
         ];
     }
 

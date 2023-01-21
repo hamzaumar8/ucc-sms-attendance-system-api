@@ -35,7 +35,7 @@ class ResultController extends Controller
      */
     public function index()
     {
-        $results = Result::where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank']);
+        $results = Result::where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank', 'module.level']);
         return new ResultCollection($results->get());
     }
 
@@ -58,7 +58,7 @@ class ResultController extends Controller
      */
     public function show(Result $result)
     {
-        return (new ResultResource($result->loadMissing(['module.cordinator', 'module.module_bank', 'assessments'])))
+        return (new ResultResource($result->loadMissing(['module.cordinator', 'module.module_bank', 'assessments.student'])))
             ->response()
             ->setStatusCode(200);
     }
@@ -138,7 +138,7 @@ class ResultController extends Controller
     public function cordinating_module()
     {
         $lecturer_id = auth()->user()->lecturer->id;
-        $results = Result::where('semester_id', $this->semester())->where('cordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank']);
+        $results = Result::where('semester_id', $this->semester())->where('cordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank', 'module.level']);
         return new ResultCollection($results->get());
     }
 

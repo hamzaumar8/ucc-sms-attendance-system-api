@@ -10,6 +10,7 @@ use App\Http\Resources\V1\Result\ResultCollection;
 use App\Http\Resources\V1\Group\GroupCollection;
 use App\Models\Student;
 use App\Models\User;
+use App\Helpers\Helper;
 use App\Models\Module;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -60,13 +61,13 @@ class StudentController extends Controller
         try{
             DB::beginTransaction();
 
-            $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
+            $name = $request->other_name ? $request->input('first_name') . ' ' . $request->other_name . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
 
             $picture_url = null;
             if ($request->hasFile('picture')) {
                 $file = $request->file('picture');
                 $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-                $file->move(public_path('assets/img/students'), $file_name);
+                $file->move(Helper::imagePath('students'), $file_name);
                 $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;
             }
 
@@ -82,10 +83,10 @@ class StudentController extends Controller
                 'user_id' => $user->id,
                 'index_number' => strtoupper($request->input('index_number')),
                 'first_name' => $request->input('first_name'),
-                'other_name' => $request->input('other_name'),
+                'other_name' => $request->other_name,
                 'surname' => $request->input('surname'),
                 // 'gender' => $request->input('gender'),
-                'phone' => $request->input('phone'),
+                'phone' => $request->phone,
                 'picture' => $picture_url,
                 'level_id' => $request->input('level'),
             ]);
@@ -145,24 +146,24 @@ class StudentController extends Controller
                 if ($student->picture) {
                     $studentpicture = explode("/", $student->picture);
                     $picture = end($studentpicture);
-                    $exist = File::exists(public_path("assets/img/students/" . $picture));
+                    $exist = File::exists(Helper::imagePath('students/' . $picture));
                     if ($exist) {
-                        File::delete(public_path("assets/img/students/" . $picture));
+                        File::delete(Helper::imagePath('students/' . $picture));
                     }
                 }
                 $file = $request->file('picture');
                 $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-                $file->move(public_path('assets/img/lecturers'), $file_name);
-                $picture_url = URL::to('/') . '/assets/img/lecturers/' . $file_name;
+                $file->move(Helper::imagePath('students'), $file_name);
+                $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;
             }
 
             $student->update([
                 'index_number' => strtoupper($request->input('index_number')),
                 'first_name' => $request->input('first_name'),
-                'other_name' => $request->input('other_name'),
+                'other_name' => $request->other_name,
                 'surname' => $request->input('surname'),
                 // 'gender' => $request->input('gender'),
-                'phone' => $request->input('phone'),
+                'phone' => $request->phone,
                 'picture' => $picture_url,
                 'level_id' => $request->input('level'),
             ]);
@@ -171,7 +172,7 @@ class StudentController extends Controller
                 'email' => $request->input('email'),
             ]);
 
-            DB:commit();
+            DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
 
         }catch(\Exception $e){
@@ -198,9 +199,9 @@ class StudentController extends Controller
             if ($student->picture) {
                 $studentpicture = explode("/", $student->picture);
                 $picture = end($studentpicture);
-                $exist = File::exists(public_path("assets/img/students/" . $picture));
+                $exist = File::exists(Helper::imagePath('students/' . $picture));
                 if ($exist) {
-                    File::delete(public_path("assets/img/students/" . $picture));
+                    File::delete(Helper::imagePath('students/' . $picture));
                 }
             }
 

@@ -47,4 +47,13 @@ class Helper
         }
         return  $semester_id;
     }
+
+    public static function imagePath($folderName){
+        $path = base_path('assets/img/'.$folderName);
+        if (env('APP_ENV') == 'local') {
+           $path = public_path('assets/img/'.$folderName);
+        }
+        return $path;
+    }
+
 }

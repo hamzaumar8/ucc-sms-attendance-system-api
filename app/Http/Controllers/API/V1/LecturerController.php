@@ -63,13 +63,13 @@ class LecturerController extends Controller
         try{
             DB::beginTransaction();
 
-            $name = $request->input('other_name') ? $request->input('first_name') . ' ' . $request->input('other_name') . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
+            $name = $request->other_name ? $request->input('first_name') . ' ' . $request->other_name . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
 
             $picture_url = null;
             if ($request->hasFile('picture')) {
                 $file = $request->file('picture');
                 $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-                $file->move(public_path('assets/img/lecturers'), $file_name);
+                $file->move(Helper::imagePath('lecturers'), $file_name);
                 $picture_url = URL::to('/') . '/assets/img/lecturers/' . $file_name;
             }
 
@@ -87,10 +87,10 @@ class LecturerController extends Controller
                 'staff_id' => $request->input('staff_id'),
                 'title' => $request->input('title'),
                 'first_name' => $request->input('first_name'),
-                'other_name' => $request->input('other_name'),
+                'other_name' => $request->other_name,
                 'surname' => $request->input('surname'),
                 // 'gender' => $request->input('gender'),
-                'phone' => $request->input('phone'),
+                'phone' => $request->phone,
                 'picture' => $picture_url,
             ]);
 
@@ -115,7 +115,7 @@ class LecturerController extends Controller
      */
     public function show(Lecturer $lecturer)
     {
-        return (new LecturerResource($lecturer->loadMissing(['modules.module_bank','user'])))
+        return (new LecturerResource($lecturer->loadMissing(['modules.module_bank','modules.level','user'])))
             ->response()
             ->setStatusCode(200);
     }
@@ -150,14 +150,14 @@ class LecturerController extends Controller
                 if ($lecturer->picture) {
                     $lecturerpicture = explode("/", $lecturer->picture);
                     $picture = end($lecturerpicture);
-                    $exist = File::exists(public_path("assets/img/lecturers/" . $picture));
+                    $exist = File::exists(Helper::imagePath("lecturers/" . $picture));
                     if ($exist) {
-                        File::delete(public_path("assets/img/lecturers/" . $picture));
+                        File::delete(Helper::imagePath("lecturers/" . $picture));
                     }
                 }
                 $file = $request->file('picture');
                 $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-                $file->move(public_path('assets/img/lecturers'), $file_name);
+                $file->move(Helper::imagePath('lecturers'), $file_name);
                 $picture_url = URL::to('/') . '/assets/img/lecturers/' . $file_name;
             }
 
@@ -165,10 +165,10 @@ class LecturerController extends Controller
                 'staff_id' => $request->input('staff_id'),
                 'title' => $request->input('title'),
                 'first_name' => $request->input('first_name'),
-                'other_name' => $request->input('other_name'),
+                'other_name' => $request->other_name,
                 'surname' => $request->input('surname'),
                 // 'gender' => $request->input('gender'),
-                'phone' => $request->input('phone'),
+                'phone' => $request->phone,
                 'picture' => $picture_url,
             ]);
 
@@ -203,9 +203,9 @@ class LecturerController extends Controller
             if ($lecturer->picture) {
                 $lecturerpicture = explode("/", $lecturer->picture);
                 $picture = end($lecturerpicture);
-                $exist = File::exists(public_path("assets/img/lecturers/" . $picture));
+                $exist = File::exists(Helper::imagePath("lecturers/" . $picture));
                 if ($exist) {
-                    File::delete(public_path("assets/img/lecturers/" . $picture));
+                    File::delete(Helper::imagePath("lecturers/" . $picture));
                 }
             }
 
