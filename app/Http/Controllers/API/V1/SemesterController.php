@@ -46,6 +46,7 @@ class SemesterController extends Controller
             $start_date = Carbon::parse($request->input('start_date'));
             $end_date = Carbon::parse($request->input('end_date'));
 
+            // $promation
             // create module
             $semester = Semester::create([
                 'semester' => $request->input('semester_name'),

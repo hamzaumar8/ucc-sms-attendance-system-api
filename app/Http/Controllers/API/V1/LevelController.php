@@ -118,9 +118,11 @@ class LevelController extends Controller
     public function student_promotion(Request $request, Semester $semester)
     {
 
-        $currentYear = Carbon::now()->format('Y');
-        $lastYear = Carbon::now()->subYear()->format('Y');
-        $accademicYear = $lastYear."-".$currentYear;
+        // $currentYear = Carbon::now()->format('Y');
+        // $lastYear = Carbon::now()->subYear()->format('Y');
+        // $accademicYear = $lastYear."-".$currentYear;
+        // $sem = Semester::where('semester', 'second')->orderBy('id','DESC')->first();
+        $accademicYear = $semester->academic_year;
 
         try{
             DB::beginTransaction();

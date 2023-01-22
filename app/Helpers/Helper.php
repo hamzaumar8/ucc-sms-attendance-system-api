@@ -56,4 +56,19 @@ class Helper
         return $path;
     }
 
+
+    public static function remarks($score){
+        $score = (int)$score;
+        if ($score === 0 || $score === 0.00) {
+            $remark = 'ic';
+        } elseif ($score >= 79.5) {
+            $remark = 'honour';
+        } elseif ($score >= 49.5) {
+            $remark = 'pass';
+        } else {
+            $remark = 'fail';
+        }
+        return $remark;
+    }
+
 }

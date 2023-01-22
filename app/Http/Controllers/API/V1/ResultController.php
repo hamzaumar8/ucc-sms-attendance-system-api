@@ -8,6 +8,7 @@ use App\Http\Resources\V1\Result\ResultResource;
 use Illuminate\Support\Facades\DB;
 use App\Models\Result;
 use App\Models\Semester;
+use App\Helpers\Helper;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -19,15 +20,7 @@ class ResultController extends Controller
         $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'cordinating_module', 'lecturers_results']]);
     }
 
-    public function semester()
-    {
-        $semester_id = null;
-        $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
-        if ($semester) {
-            $semester_id = $semester->id;
-        }
-        return  $semester_id;
-    }
+
     /**
      * Display a listing of the resource.
      *
@@ -35,7 +28,7 @@ class ResultController extends Controller
      */
     public function index()
     {
-        $results = Result::where('semester_id', $this->semester())->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank', 'module.level']);
+        $results = Result::where('semester_id', Helper::semester())->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank', 'module.level']);
         return new ResultCollection($results->get());
     }
 
@@ -64,19 +57,7 @@ class ResultController extends Controller
     }
 
 
-    public function remarks($score){
-        $score = (int)$score;
-        if ($score === 0 || $score === 0.00) {
-            $remark = 'ic';
-        } elseif ($score >= 79.5) {
-            $remark = 'honour';
-        } elseif ($score >= 49.5) {
-            $remark = 'pass';
-        } else {
-            $remark = 'fail';
-        }
-        return $remark;
-    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -97,7 +78,7 @@ class ResultController extends Controller
             foreach ($assessments as $key => $assessment) {
                 $score = $request->assessments[$key]['score'];
                 $assessment->score = $score;
-                $assessment->remarks = $this->remarks($score);
+                $assessment->remarks = Helper::remarks($score);
                 $assessment->save();
             }
             $result->status = $request->status;
@@ -138,7 +119,7 @@ class ResultController extends Controller
     public function cordinating_module()
     {
         $lecturer_id = auth()->user()->lecturer->id;
-        $results = Result::where('semester_id', $this->semester())->where('cordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank', 'module.level']);
+        $results = Result::where('semester_id', Helper::semester())->where('cordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank', 'module.level']);
         return new ResultCollection($results->get());
     }
 
@@ -150,12 +131,22 @@ class ResultController extends Controller
      */
     public function promotion_check()
     {
-        $results = Result::where('semester_id', $this->semester())->pluck('status')->toArray();
+        $semester = Semester::orderBy('id','DESC')->first();
+        $semester_id = null;
+        if($semester){
+            $semester_id = $semester->id;
+        }
+        $results = Result::where('semester_id', $semester_id)->pluck('status')->toArray();
         $data = "unset";
-        if(!in_array('save',$results)){
+        if(!in_array('save',$results) && !in_array('submit',$results)){
             $data = "set";
         }
-        return response()->json(['data' => $data])->setStatusCode(200);
+        return response()->json([
+            'data' => [
+                'check' => $data,
+                'semester'=>$semester,
+            ],
+        ])->setStatusCode(200);
     }
 
 
@@ -173,10 +164,10 @@ class ResultController extends Controller
         try{
             DB::beginTransaction();
 
-            if($result->status === 'save'){
-                $result->status = 'submit';
-            }else{
+            if($result->status === 'publish'){
                 $result->status = 'save';
+            }else{
+                $result->status = 'publish';
 
             }
             $result->save();
