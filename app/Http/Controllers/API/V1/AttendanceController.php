@@ -56,15 +56,15 @@ class AttendanceController extends Controller
             'students' => 'required|array|min:1',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
             $course_rep_id = auth()->user()->student->id;
             $students = $request->input('students');
             $date = Carbon::parse($request->input('date'))->format('Y-m-d');
-            $check = Attendance::where('semester_id',Helper::semester())->where('module_id',$request->input('module_id'))->where('lecturer_id',$request->input('lecturer_id'))->where('date',$date)->first();
-            if($check){
+            $check = Attendance::where('semester_id', Helper::semester())->where('module_id', $request->input('module_id'))->where('lecturer_id', $request->input('lecturer_id'))->where('date', $date)->first();
+            if ($check) {
                 return response()->json([
-                    'errors'=>[
+                    'errors' => [
                         'msg' => "Attendance for this module has already been taken!"
                     ]
                 ])->setStatusCode(422);
@@ -92,14 +92,13 @@ class AttendanceController extends Controller
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             // Rollback & Return Error Message
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while checking in attendance!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while checking in attendance!!'
             ])->setStatusCode(500);
         }
     }
@@ -112,7 +111,7 @@ class AttendanceController extends Controller
      */
     public function show(Attendance $attendance)
     {
-        return (new AttendanceResource($attendance->loadMissing(['attendance_student','module.module_bank', 'module.students','module.students'])))->response()->setStatusCode(200);
+        return (new AttendanceResource($attendance->loadMissing(['attendance_student', 'module.module_bank', 'module.students', 'module.students'])))->response()->setStatusCode(200);
     }
 
     /**

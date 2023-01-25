@@ -20,7 +20,7 @@ class AttendanceLecturerController extends Controller
     }
 
 
-     public function semester()
+    public function semester()
     {
         $semester_id = null;
         $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
@@ -64,14 +64,14 @@ class AttendanceLecturerController extends Controller
             'end_time' => 'required',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $date = Carbon::parse($request->input('date'))->format('Y-m-d');
-            $check = AttendanceLecturer::where('semester_id',$this->semester())->where('module_id',$request->input('module_id'))->where('lecturer_id',$request->input('lecturer_id'))->where('date',$date)->first();
-            if($check){
+            $check = AttendanceLecturer::where('semester_id', $this->semester())->where('module_id', $request->input('module_id'))->where('lecturer_id', $request->input('lecturer_id'))->where('date', $date)->first();
+            if ($check) {
                 return response()->json([
-                    'errors'=>[
+                    'errors' => [
                         'msg' => "Attendance for this module has already been taken!"
                     ]
                 ])->setStatusCode(422);
@@ -90,14 +90,13 @@ class AttendanceLecturerController extends Controller
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             // Rollback & Return Error Message
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while checking in attendance!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while checking in attendance!!'
             ])->setStatusCode(500);
         }
     }
@@ -110,7 +109,7 @@ class AttendanceLecturerController extends Controller
      */
     public function show(AttendanceLecturer $attendanceLecturer)
     {
-       return (new AttendanceLecturerResource($attendanceLecturer->loadMissing(['attendance_student','module.module_bank', 'module.students','module.students'])))->response()->setStatusCode(200);
+        return (new AttendanceLecturerResource($attendanceLecturer->loadMissing(['attendance_student', 'module.module_bank', 'module.students', 'module.students'])))->response()->setStatusCode(200);
     }
 
     /**

@@ -40,7 +40,7 @@ class ModuleBankController extends Controller
             'credit_hour' => 'required|numeric',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             ModuleBank::create([
@@ -51,13 +51,12 @@ class ModuleBankController extends Controller
 
             DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while adding a module!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while adding a module!!'
             ])->setStatusCode(500);
         }
     }
@@ -88,7 +87,7 @@ class ModuleBankController extends Controller
             'credit_hour' => 'required|numeric',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $moduleBank->update([
@@ -99,13 +98,12 @@ class ModuleBankController extends Controller
 
             DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-        }catch(\Exception $e){
-             DB::rollBack();
-            \Log::error($e->getMessage());
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while updating module!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while updating module!!'
             ])->setStatusCode(500);
         }
     }
@@ -118,22 +116,21 @@ class ModuleBankController extends Controller
      */
     public function destroy(ModuleBank $moduleBank)
     {
-        try{
+        try {
             DB::beginTransaction();
 
-            if($moduleBank->modules->count() === 0){
+            if ($moduleBank->modules->count() === 0) {
                 $moduleBank->delete();
             }
 
-             DB::commit();
+            DB::commit();
             return response()->json(null, 204);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while deleting module!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while deleting module!!'
             ])->setStatusCode(500);
         }
     }

@@ -89,5 +89,4 @@ Route::group(['prefix' => 'v1'], function () {
     // LecturerModule
     Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');
     Route::get('/lecture/modules/{lecuturermodule}', [LecturerModuleController::class, 'show'])->name('lecture_module.show');
-
 });

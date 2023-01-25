@@ -29,7 +29,7 @@ class GroupController extends Controller
     public function index()
     {
         $semester_id = Helper::semester();
-        $groups = Group::where('semester_id',$semester_id)->with('level')->get();
+        $groups = Group::where('semester_id', $semester_id)->with('level')->get();
         return new GroupCollection($groups);
     }
 
@@ -41,13 +41,13 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-         $request->validate([
-            'name' => 'required|string|unique:groups,name,NULL,id,level_id,'.$request->level,
+        $request->validate([
+            'name' => 'required|string|unique:groups,name,NULL,id,level_id,' . $request->level,
             'level' => 'required|numeric|exists:levels,id',
             'no_of_group' => 'required|numeric|min:2',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $level = Level::findOrFail($request->input('level'));
@@ -55,7 +55,7 @@ class GroupController extends Controller
             $students = $level->students->shuffle();
 
             // check if number of group is greater than
-            if($no_of_group > $level->students->count() ){
+            if ($no_of_group > $level->students->count()) {
                 return response()->json(['message' => "Number of groups can't be greater then student capacity"])->setStatusCode(500);
             }
 
@@ -71,24 +71,23 @@ class GroupController extends Controller
             ]);
 
 
-            foreach ($groups as $key => $grp){
+            foreach ($groups as $key => $grp) {
                 // get all student Id from grp array
                 $ids = array_column($grp, 'id');
                 // module students attachment
-                $group->students()->attach($ids,[
-                    'group_no'=> $key+1,
+                $group->students()->attach($ids, [
+                    'group_no' => $key + 1,
                 ]);
             }
 
             DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-         } catch (\Exception $e) {
-             DB::rollBack();
-            \Log::error($e->getMessage());
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while generation group!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while generation group!!'
             ])->setStatusCode(500);
         }
     }
@@ -102,7 +101,7 @@ class GroupController extends Controller
     public function show(Group $group)
     {
         return (new GroupResource(
-            $group->loadMissing(['level','students'])
+            $group->loadMissing(['level', 'students'])
         ))->response()->setStatusCode(200);
     }
 
@@ -126,20 +125,19 @@ class GroupController extends Controller
      */
     public function destroy(Group $group)
     {
-        try{
+        try {
             DB::beginTransaction();
 
             $group->delete();
 
             DB::commit();
             return response()->noContent();
-
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while deleting level!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while deleting level!!'
             ])->setStatusCode(500);
         }
     }

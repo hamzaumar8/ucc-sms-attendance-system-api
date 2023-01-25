@@ -88,13 +88,13 @@ class ModuleController extends Controller
             'lecturer' => 'required|array|min:1',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
-            $check = Module::where('semester_id',Helper::semester())->where('module_bank_id',$request->input('module'))->where('level_id',$request->input('level'))->first();
-            if($check){
+            $check = Module::where('semester_id', Helper::semester())->where('module_bank_id', $request->input('module'))->where('level_id', $request->input('level'))->first();
+            if ($check) {
                 return response()->json([
-                    'errors'=>[
+                    'errors' => [
                         'msg' => "Module for level already exist!"
                     ]
                 ])->setStatusCode(422);
@@ -123,7 +123,7 @@ class ModuleController extends Controller
 
             // Course Rep
             $courseRep = Student::find($request->input('course_rep'));
-            if($courseRep->user->role === 'USR'){
+            if ($courseRep->user->role === 'USR') {
                 $courseRep->user->role = 'REP';
                 $courseRep->user->save();
             }
@@ -131,13 +131,13 @@ class ModuleController extends Controller
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             // Rollback & Return Error Message
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while mounting module!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while mounting module!!'
             ])->setStatusCode(500);
         }
     }
@@ -150,7 +150,7 @@ class ModuleController extends Controller
      */
     public function show(Module $module)
     {
-        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'cordinator', 'course_rep', 'attendances.students', 'students', 'attendances_lecturer','attendances_course_rep'])))
+        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'cordinator', 'course_rep', 'attendances.students', 'students', 'attendances_lecturer', 'attendances_course_rep'])))
             ->response()
             ->setStatusCode(200);
     }
@@ -180,7 +180,7 @@ class ModuleController extends Controller
             'lecturer' => 'required|array|min:1',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $start_date = Carbon::parse($request->input('start_date'));
@@ -214,11 +214,11 @@ class ModuleController extends Controller
                 $modules = Module::pluck('course_rep_id')->toArray();
                 $pastCourseRep = Student::find($prev_module->course_rep_id);
                 $courseRep = Student::find($module->course_rep_id);
-                if(!in_array($pastCourseRep->id,$modules)){
+                if (!in_array($pastCourseRep->id, $modules)) {
                     $pastCourseRep->user->role = 'USR';
                     $pastCourseRep->user->save();
                 }
-                if($courseRep->user->role === 'USR'){
+                if ($courseRep->user->role === 'USR') {
                     $courseRep->user->role = 'REP';
                     $courseRep->user->save();
                 }
@@ -227,14 +227,13 @@ class ModuleController extends Controller
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
-
-        }catch(\Exception $e){
-             // Rollback & Return Error Message
+        } catch (\Exception $e) {
+            // Rollback & Return Error Message
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while updating module!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while updating module!!'
             ])->setStatusCode(500);
         }
     }
@@ -251,37 +250,36 @@ class ModuleController extends Controller
         if (!Helper::semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
-        try{
+        try {
             DB::beginTransaction();
 
-            if($module->status == 'upcoming'){
+            if ($module->status == 'upcoming') {
                 $module->delete();
             }
 
             DB::commit();
             return response()->json(null, 204);
-
-        }catch(\Exception $e){
-             // Rollback & Return Error Message
+        } catch (\Exception $e) {
+            // Rollback & Return Error Message
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while deleting module!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while deleting module!!'
             ])->setStatusCode(500);
         }
     }
 
 
 
-     public function end_module(Module $module)
+    public function end_module(Module $module)
     {
         // check if semester is set
         if (!Helper::semester()) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
 
-        try{
+        try {
             DB::beginTransaction();
 
             $end_date = Carbon::parse(now());
@@ -308,14 +306,13 @@ class ModuleController extends Controller
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
-
-        }catch(\Exception $e){
-             // Rollback & Return Error Message
+        } catch (\Exception $e) {
+            // Rollback & Return Error Message
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while ending module!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while ending module!!'
             ])->setStatusCode(500);
         }
     }
@@ -333,7 +330,7 @@ class ModuleController extends Controller
             'student' => 'required|array|min:1',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $students = Student::find($request->input('student'));
@@ -342,13 +339,12 @@ class ModuleController extends Controller
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while add student to module!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while add student to module!!'
             ])->setStatusCode(500);
         }
     }
@@ -361,7 +357,8 @@ class ModuleController extends Controller
         return new ModuleCollection($modules);
     }
 
-    public function course_rep_modules(){
+    public function course_rep_modules()
+    {
         $course_rep_id = auth()->user()->student->id;
         $modules = Module::where('semester_id', Helper::semester())->where('course_rep_id', $course_rep_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'students'])->get();
         return new ModuleCollection($modules);

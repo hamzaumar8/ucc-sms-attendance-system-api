@@ -40,7 +40,7 @@ class SemesterController extends Controller
             'end_date' => 'required|date',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $start_date = Carbon::parse($request->input('start_date'));
@@ -58,13 +58,12 @@ class SemesterController extends Controller
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while setting semester!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while setting semester!!'
             ])->setStatusCode(500);
         }
     }
@@ -96,7 +95,7 @@ class SemesterController extends Controller
             'end_date' => 'required|date',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $start_date = Carbon::parse($request->input('start_date'));
@@ -110,19 +109,17 @@ class SemesterController extends Controller
                 'end_date' => $end_date,
             ]);
 
-             DB::commit();
+            DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-        }catch(\Exception $e){
-             DB::rollBack();
-            \Log::error($e->getMessage());
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while updation semester!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while updation semester!!'
             ])->setStatusCode(500);
         }
-
     }
 
     /**

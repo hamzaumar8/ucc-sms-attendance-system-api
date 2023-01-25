@@ -85,20 +85,19 @@ class LevelController extends Controller
      */
     public function destroy(Level $level)
     {
-        try{
+        try {
             DB::beginTransaction();
 
             $level->delete();
 
             DB::commit();
             return response()->noContent();
-
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while deleting level!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while deleting level!!'
             ])->setStatusCode(500);
         }
     }
@@ -124,39 +123,39 @@ class LevelController extends Controller
         // $sem = Semester::where('semester', 'second')->orderBy('id','DESC')->first();
         $accademicYear = $semester->academic_year;
 
-        try{
+        try {
             DB::beginTransaction();
 
             $semester_academic = Semester::where('academic_year', $accademicYear)->pluck('id')->toArray();
             $result = Result::whereIn('semester_id', $semester_academic)->pluck('id')->toArray();
-            $assessment_failed_student = Assessment::whereIn('result_id', $result)->where('remarks','fail')->orWhere('remarks','ic')->pluck('student_id')->toArray();
+            $assessment_failed_student = Assessment::whereIn('result_id', $result)->where('remarks', 'fail')->orWhere('remarks', 'ic')->pluck('student_id')->toArray();
 
             $levels = Level::with('students')->get();
 
-            foreach($levels as $level){
+            foreach ($levels as $level) {
                 $lev = null;
-                if($level->name == "Level 200"){
+                if ($level->name == "Level 200") {
                     $lvs = Level::where('name', 'like', "Level 300")->first();
                     $lev = $lvs->id;
-                }elseif($level->name == "Level 300"){
+                } elseif ($level->name == "Level 300") {
                     $lvs = Level::where('name', 'like', "Level 400")->first();
                     $lev = $lvs->id;
-                }elseif($level->name == "Level 400"){
+                } elseif ($level->name == "Level 400") {
                     $lvs = Level::where('name', 'like', "Level 500")->first();
                     $lev = $lvs->id;
-                }elseif($level->name == "Level 500"){
+                } elseif ($level->name == "Level 500") {
                     $lvs = Level::where('name', 'like', "Level 600")->first();
                     $lev = $lvs->id;
-                }elseif($level->name == "GEM 250"){
+                } elseif ($level->name == "GEM 250") {
                     $lvs = Level::where('name', 'like', "GEM 300")->first();
                     $lev = $lvs->id;
-                }elseif($level->name == "GEM 300"){
+                } elseif ($level->name == "GEM 300") {
                     $lvs = Level::where('name', 'like', "Level 400")->first();
                     $lev = $lvs->id;
                 }
 
-                foreach($level->students as $student){
-                    if(!in_array($student->id, $assessment_failed_student)){
+                foreach ($level->students as $student) {
+                    if (!in_array($student->id, $assessment_failed_student)) {
                         $student->level_id = $lev;
                         $student->save();
                     }
@@ -168,13 +167,12 @@ class LevelController extends Controller
 
             DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(200);
-
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while runing promotions for student!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while runing promotions for student!!'
             ])->setStatusCode(500);
         }
     }

@@ -60,7 +60,7 @@ class LecturerController extends Controller
             'picture' => 'nullable|file',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $name = $request->other_name ? $request->input('first_name') . ' ' . $request->other_name . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
@@ -97,12 +97,12 @@ class LecturerController extends Controller
             DB::commit();
 
             return response()->json(['status' => 'success'])->setStatusCode(201);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while adding lecturer!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while adding lecturer!!'
             ])->setStatusCode(500);
         }
     }
@@ -115,7 +115,7 @@ class LecturerController extends Controller
      */
     public function show(Lecturer $lecturer)
     {
-        return (new LecturerResource($lecturer->loadMissing(['modules.module_bank','modules.level','user'])))
+        return (new LecturerResource($lecturer->loadMissing(['modules.module_bank', 'modules.level', 'user'])))
             ->response()
             ->setStatusCode(200);
     }
@@ -142,7 +142,7 @@ class LecturerController extends Controller
         ]);
 
 
-        try{
+        try {
             DB::beginTransaction();
 
             $picture_url = null;
@@ -178,13 +178,12 @@ class LecturerController extends Controller
 
             DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while updating lecturer details!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while updating lecturer details!!'
             ])->setStatusCode(500);
         }
     }
@@ -197,7 +196,7 @@ class LecturerController extends Controller
      */
     public function destroy(Lecturer $lecturer)
     {
-        try{
+        try {
             DB::beginTransaction();
 
             if ($lecturer->picture) {
@@ -213,16 +212,14 @@ class LecturerController extends Controller
 
             DB::commit();
             return response()->json(null, 204);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while deleting lecturer!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while deleting lecturer!!'
             ])->setStatusCode(500);
         }
-
     }
 
 
@@ -238,7 +235,8 @@ class LecturerController extends Controller
     }
 
 
-    public function import(Request $request){
+    public function import(Request $request)
+    {
 
         $request->validate([
             'file' => 'required|mimes:csv,txt',
@@ -248,10 +246,10 @@ class LecturerController extends Controller
             Excel::import(new LecturerImport, request()->file('file'));
             return response()->json(['status' => 'success'])->setStatusCode(201);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while importing data!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while importing data!!'
             ])->setStatusCode(500);
         }
     }
@@ -272,12 +270,10 @@ class LecturerController extends Controller
     }
 
 
-     public function cordinating_modules()
+    public function cordinating_modules()
     {
         $cordinator_id = auth()->user()->lecturer->id;
         $modules = Module::where('semester_id', Helper::semester())->where('cordinator_id', $cordinator_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
         return new ModuleCollection($modules);
     }
-
-
 }

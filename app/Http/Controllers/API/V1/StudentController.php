@@ -58,7 +58,7 @@ class StudentController extends Controller
             'level' => 'required|numeric|exists:levels,id',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $name = $request->other_name ? $request->input('first_name') . ' ' . $request->other_name . ' ' . $request->input('surname') : $request->input('first_name') . ' ' . $request->input('surname');
@@ -93,13 +93,12 @@ class StudentController extends Controller
 
             DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-        }catch(\Exception $e){
-             DB::rollBack();
-            \Log::error($e->getMessage());
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while adding a student!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while adding a student!!'
             ])->setStatusCode(500);
         }
     }
@@ -138,7 +137,7 @@ class StudentController extends Controller
             'level' => 'required|numeric|exists:levels,id',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $picture_url = null;
@@ -174,13 +173,12 @@ class StudentController extends Controller
 
             DB::commit();
             return response()->json(['status' => 'success'])->setStatusCode(201);
-
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while updating a student details!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while updating a student details!!'
             ])->setStatusCode(500);
         }
     }
@@ -193,7 +191,7 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        try{
+        try {
             DB::beginTransaction();
 
             if ($student->picture) {
@@ -209,13 +207,12 @@ class StudentController extends Controller
 
             DB::commit();
             return response()->json(null, 204);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while deleting student!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while deleting student!!'
             ])->setStatusCode(500);
         }
     }
@@ -237,13 +234,13 @@ class StudentController extends Controller
         $modulestudent = $module->students->pluck('id')->toArray();
         $query = Student::query();
         if ($s = $request->input('s')) {
-           $query->whereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("surname Like '%" . $s . "%'")->orWhereRaw("index_number Like '%" . $s . "%'");
+            $query->whereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("surname Like '%" . $s . "%'")->orWhereRaw("index_number Like '%" . $s . "%'");
         }
-        return $query->whereNotIn('id',$modulestudent)->get();
-
+        return $query->whereNotIn('id', $modulestudent)->get();
     }
 
-     public function import(Request $request){
+    public function import(Request $request)
+    {
 
         $request->validate([
             'file' => 'required|mimes:csv,txt',
@@ -254,10 +251,10 @@ class StudentController extends Controller
             Excel::import(new StudentsImport, request()->file('file'));
             return response()->json(['status' => 'success'])->setStatusCode(201);
         } catch (\Exception $e) {
-            \Log::error($e->getMessage());
+
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while importing data!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while importing data!!'
             ])->setStatusCode(500);
         }
     }
@@ -267,17 +264,17 @@ class StudentController extends Controller
     {
         $id = auth()->user()->student->id;
         $student = Student::with(['results', 'results.module.module_bank', 'results.semester'])->find($id);
-        if(!$student){
+        if (!$student) {
             return response()->json(['error' => 'Student not found'], 404);
         }
-       return  (new ResultCollection($student->results))->collection->groupBy('semester_id');
+        return (new ResultCollection($student->results))->collection->groupBy('semester_id');
     }
 
     public function groups()
     {
         $id = auth()->user()->student->id;
         $student = Student::with(['groups'])->find($id);
-        if(!$student){
+        if (!$student) {
             return response()->json(['error' => 'Student not found'], 404);
         }
         return new GroupCollection($student->groups);

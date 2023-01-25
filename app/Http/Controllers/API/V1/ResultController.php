@@ -67,11 +67,11 @@ class ResultController extends Controller
      */
     public function update(Request $request, Result $result)
     {
-         $this->validate($request, [
+        $this->validate($request, [
             'assessments.*.score' => 'required|numeric|between:0,100',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
 
             $assessments = $result->assessments;
@@ -87,13 +87,12 @@ class ResultController extends Controller
             DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-        }catch(\Exception $e){
-             DB::rollBack();
-            \Log::error($e->getMessage());
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while updating a results!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while updating a results!!'
             ])->setStatusCode(500);
         }
     }
@@ -131,20 +130,20 @@ class ResultController extends Controller
      */
     public function promotion_check()
     {
-        $semester = Semester::orderBy('id','DESC')->first();
+        $semester = Semester::orderBy('id', 'DESC')->first();
         $semester_id = null;
-        if($semester){
+        if ($semester) {
             $semester_id = $semester->id;
         }
         $results = Result::where('semester_id', $semester_id)->pluck('status')->toArray();
         $data = "unset";
-        if(!in_array('save',$results) && !in_array('submit',$results)){
+        if (!in_array('save', $results) && !in_array('submit', $results)) {
             $data = "set";
         }
         return response()->json([
             'data' => [
                 'check' => $data,
-                'semester'=>$semester,
+                'semester' => $semester,
             ],
         ])->setStatusCode(200);
     }
@@ -161,27 +160,25 @@ class ResultController extends Controller
     public function update_status(Result $result)
     {
 
-        try{
+        try {
             DB::beginTransaction();
 
-            if($result->status === 'publish'){
+            if ($result->status === 'publish') {
                 $result->status = 'save';
-            }else{
+            } else {
                 $result->status = 'publish';
-
             }
             $result->save();
 
-             DB::commit();
+            DB::commit();
             return response()->json(['status' => 'success'])
                 ->setStatusCode(201);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-        }catch(\Exception $e){
-             DB::rollBack();
-            \Log::error($e->getMessage());
             return response()->json([
-                'error'=>$e->getMessage(),
-                'message'=>'An error occured while updating results status!!'
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while updating results status!!'
             ])->setStatusCode(500);
         }
     }
@@ -193,13 +190,4 @@ class ResultController extends Controller
         $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank'])->get();
         return new ResultCollection($results);
     }
-
-
-
-    // public function results()
-    // {
-    //     $student = auth()->user()->student->id;
-    //     return response()->json(['data'=>$student->with('results')])->setStatusCode(200);
-    // }
-
 }
