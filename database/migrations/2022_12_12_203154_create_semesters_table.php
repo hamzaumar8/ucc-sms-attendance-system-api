@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->enum('promotion_status', ['open', 'close'])->default('close');
+            $table->text('timetable');
             $table->timestamps();
         });
     }

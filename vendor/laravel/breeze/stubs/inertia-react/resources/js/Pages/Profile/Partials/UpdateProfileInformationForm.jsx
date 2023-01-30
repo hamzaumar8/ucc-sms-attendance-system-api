@@ -2,7 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Link, useForm, usePage } from '@inertiajs/inertia-react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { Transition } from '@headlessui/react';
 
 export default function UpdateProfileInformation({ mustVerifyEmail, status, className }) {
@@ -39,8 +39,8 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                         value={data.name}
                         handleChange={(e) => setData('name', e.target.value)}
                         required
-                        autofocus
-                        autocomplete="name"
+                        isFocused
+                        autoComplete="name"
                     />
 
                     <InputError className="mt-2" message={errors.name} />
@@ -56,7 +56,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                         value={data.email}
                         handleChange={(e) => setData('email', e.target.value)}
                         required
-                        autocomplete="email"
+                        autoComplete="email"
                     />
 
                     <InputError className="mt-2" message={errors.email} />

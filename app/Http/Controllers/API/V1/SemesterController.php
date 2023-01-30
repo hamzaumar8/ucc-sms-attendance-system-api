@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use APP\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\Semester\SemesterResource;
 use App\Models\Semester;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\URL;
 
 class SemesterController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'timetable']]);
     }
 
     /**
@@ -22,7 +26,8 @@ class SemesterController extends Controller
      */
     public function index()
     {
-        return Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        $semester = Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
+        return (new SemesterResource($semester))->response()->setStatusCode(200);
     }
 
     /**
@@ -131,5 +136,53 @@ class SemesterController extends Controller
     public function destroy(Semester $semester)
     {
         //
+    }
+
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function timetable(Request $request, Semester $semester)
+    {
+        $request->validate([
+            'timetable' => 'required|file',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $timetable_url = null;
+            if ($request->hasFile('picture')) {
+                if ($semester->timetable) {
+                    $semester_timetable = explode("/", $semester->timetable);
+                    $timetable = end($semester_timetable);
+                    $exist = File::exists(Helper::imagePath('semesters/' . $timetable));
+                    if ($exist) {
+                        File::delete(Helper::imagePath('semesters/' . $timetable));
+                    }
+                }
+                $file = $request->file('timetable');
+                $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
+                $file->move(Helper::imagePath('semesters'), $file_name);
+                $timetable_url = URL::to('/') . '/assets/img/semesters/timetable' . $file_name;
+            }
+
+            $semester->update([
+                'timetable' => $timetable_url,
+            ]);
+
+            DB::commit();
+            return response()->json(['status' => 'success'])->setStatusCode(201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'An error occured while setting timetable!!'
+            ])->setStatusCode(500);
+        }
     }
 }

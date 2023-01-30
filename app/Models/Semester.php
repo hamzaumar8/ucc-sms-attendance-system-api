@@ -14,6 +14,7 @@ class Semester extends Model
         'academic_year',
         'start_date',
         'end_date',
-        'assessment_status',
+        'promotion_status',
+        'timetable',
     ];
 }

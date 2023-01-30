@@ -5,7 +5,7 @@ import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/inertia-react';
+import { useForm } from '@inertiajs/react';
 
 export default function DeleteUserForm({ className }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
@@ -59,7 +59,7 @@ export default function DeleteUserForm({ className }) {
             <Modal show={confirmingUserDeletion} onClose={closeModal}>
                 <form onSubmit={deleteUser} className="p-6">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                        Are you sure your want to delete your account?
+                        Are you sure you want to delete your account?
                     </h2>
 
                     <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">

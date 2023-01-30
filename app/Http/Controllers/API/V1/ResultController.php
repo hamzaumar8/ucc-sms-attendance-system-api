@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Result;
 use App\Models\Semester;
 use App\Helpers\Helper;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ResultController extends Controller

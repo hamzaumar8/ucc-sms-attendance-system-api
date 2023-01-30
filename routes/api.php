@@ -14,12 +14,10 @@ use App\Http\Controllers\API\V1\GroupController;
 use App\Http\Controllers\API\V1\AttendanceLecturerController;
 use App\Http\Controllers\API\V1\AssessmentController;
 use App\Http\Controllers\Auth\TokenAuthController;
-use App\Models\Assessment;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
-Route::middleware(['auth:sanctum', 'check-semester'])->get('/v1/user', UserController::class);
+// Route::middleware(['auth:sanctum', 'check-semester'])->get('/v1/user', UserController::class);
 
 // Token Logout
 Route::post('/auth/token', [TokenAuthController::class, 'store']);
@@ -27,9 +25,12 @@ Route::post('/auth/logout', [TokenAuthController::class, 'destroy'])->middleware
 
 
 Route::group(['prefix' => 'v1'], function () {
+
+    Route::middleware(['auth:sanctum', 'check-semester'])->get('/user', UserController::class);
+
     // Semester
     Route::apiResource('/semester', SemesterController::class);
-
+    Route::get('/timetable/semester', [SemesterController::class, 'timetable']);
 
     // Result
     Route::apiResource('/results', ResultController::class);
