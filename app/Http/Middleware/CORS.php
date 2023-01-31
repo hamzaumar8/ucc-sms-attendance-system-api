@@ -21,13 +21,15 @@ class CORS
         //     'Access-Control-Allow-Methods: POST, GET, OPTIONS, PATCH, PUT, DELETE '
         // );
         // header('Access-Control-Allow-Headers: Content-Type, X-Auth-Token, Origin, Authorization, Accept, charset,boundary,Content-Length');
-        // // header('Access-Control-Allow-Origin: *');
+        // header('Access-Control-Allow-Origin: ' . env('FRONTEND_URL', 'http://localhost:3000'));
 
         // return $next($request);
 
         $headers = [
             'Access-Control-Allow-Methods' => 'POST, GET, OPTIONS, PATCH, PUT, DELETE',
-            'Access-Control-Allow-Headers' => 'Content-Type, X-Auth-Token, Origin'
+            'Access-Control-Allow-Headers' => '*',
+            // 'Access-Control-Allow-Headers' => 'Content-Type, X-Auth-Token, Origin, Authorization',
+            'Access-Control-Allow-Origin' => env('FRONTEND_URL', 'http://localhost:3000'),
         ];
         if ($request->getMethod() === "OPTIONS") {
             // The client-side application can set only headers allowed in Access-Control-Allow-Headers

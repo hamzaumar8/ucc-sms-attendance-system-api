@@ -9,6 +9,7 @@ use App\Models\Semester;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
 
@@ -16,7 +17,7 @@ class SemesterController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'timetable']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'timetable',]]);
     }
 
     /**
@@ -155,19 +156,19 @@ class SemesterController extends Controller
             DB::beginTransaction();
 
             $timetable_url = null;
-            if ($request->hasFile('picture')) {
+            if ($request->hasFile('timetable')) {
                 if ($semester->timetable) {
                     $semester_timetable = explode("/", $semester->timetable);
                     $timetable = end($semester_timetable);
-                    $exist = File::exists(Helper::imagePath('semesters/' . $timetable));
+                    $exist = File::exists(Helper::pdfPath('semesters/' . $timetable));
                     if ($exist) {
-                        File::delete(Helper::imagePath('semesters/' . $timetable));
+                        File::delete(Helper::pdfPath('semesters/' . $timetable));
                     }
                 }
                 $file = $request->file('timetable');
-                $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-                $file->move(Helper::imagePath('semesters'), $file_name);
-                $timetable_url = URL::to('/') . '/assets/img/semesters/timetable' . $file_name;
+                $file_name = 'timetable-' . Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
+                $file->move(Helper::pdfPath('semesters'), $file_name);
+                $timetable_url = URL::to('/') . '/assets/pdf/semesters/' . $file_name;
             }
 
             $semester->update([
@@ -184,5 +185,15 @@ class SemesterController extends Controller
                 'message' => 'An error occured while setting timetable!!'
             ])->setStatusCode(500);
         }
+    }
+
+
+    public function display_timetable(Semester $semester)
+    {
+        $semester_timetable = explode("/", $semester->timetable);
+        $timetable = end($semester_timetable);
+        return Response::make(file_get_contents(Helper::pdfPath('semesters/' . $timetable)), 200, [
+            'content-type' => 'application/pdf',
+        ]);
     }
 }

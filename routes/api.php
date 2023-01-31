@@ -30,7 +30,8 @@ Route::group(['prefix' => 'v1'], function () {
 
     // Semester
     Route::apiResource('/semester', SemesterController::class);
-    Route::get('/timetable/semester', [SemesterController::class, 'timetable']);
+    Route::put('/timetable/semester/{semester}', [SemesterController::class, 'timetable']);
+    Route::get('/timetable/display/{semester}', [SemesterController::class, 'display_timetable']);
 
     // Result
     Route::apiResource('/results', ResultController::class);

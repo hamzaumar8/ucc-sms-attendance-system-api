@@ -8,7 +8,8 @@ use Carbon\Carbon;
 class Helper
 {
 
-    public static function groupStudents($num_groups, $students) {
+    public static function groupStudents($num_groups, $students)
+    {
         // Create an empty list called "groups."
         $groups = array();
         for ($i = 0; $i < $num_groups; $i++) {
@@ -48,16 +49,27 @@ class Helper
         return  $semester_id;
     }
 
-    public static function imagePath($folderName){
-        $path = base_path('assets/img/'.$folderName);
+    public static function imagePath($folderName)
+    {
+        $path = base_path('assets/img/' . $folderName);
         if (env('APP_ENV') == 'local') {
-           $path = public_path('assets/img/'.$folderName);
+            $path = public_path('assets/img/' . $folderName);
+        }
+        return $path;
+    }
+
+    public static function pdfPath($folderName)
+    {
+        $path = base_path('assets/pdf/' . $folderName);
+        if (env('APP_ENV') == 'local') {
+            $path = public_path('assets/pdf/' . $folderName);
         }
         return $path;
     }
 
 
-    public static function remarks($score){
+    public static function remarks($score)
+    {
         $score = (int)$score;
         if ($score === 0 || $score === 0.00) {
             $remark = 'ic';
@@ -70,5 +82,4 @@ class Helper
         }
         return $remark;
     }
-
 }
