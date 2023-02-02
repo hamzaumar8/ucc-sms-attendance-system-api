@@ -98,7 +98,7 @@ class StudentController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while adding a student!!'
+                'message' => 'An error occurred while adding a student!!'
             ])->setStatusCode(500);
         }
     }
@@ -178,7 +178,7 @@ class StudentController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while updating a student details!!'
+                'message' => 'An error occurred while updating a student details!!'
             ])->setStatusCode(500);
         }
     }
@@ -212,7 +212,7 @@ class StudentController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while deleting student!!'
+                'message' => 'An error occurred while deleting student!!'
             ])->setStatusCode(500);
         }
     }
@@ -254,7 +254,7 @@ class StudentController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while importing data!!'
+                'message' => 'An error occurred while importing data!!'
             ])->setStatusCode(500);
         }
     }

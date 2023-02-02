@@ -97,7 +97,7 @@ class LevelController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while deleting level!!'
+                'message' => 'An error occurred while deleting level!!'
             ])->setStatusCode(500);
         }
     }
@@ -172,7 +172,7 @@ class LevelController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while runing promotions for student!!'
+                'message' => 'An error occurred while runing promotions for student!!'
             ])->setStatusCode(500);
         }
     }

@@ -102,7 +102,7 @@ class LecturerController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while adding lecturer!!'
+                'message' => 'An error occurred while adding lecturer!!'
             ])->setStatusCode(500);
         }
     }
@@ -183,7 +183,7 @@ class LecturerController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while updating lecturer details!!'
+                'message' => 'An error occurred while updating lecturer details!!'
             ])->setStatusCode(500);
         }
     }
@@ -217,7 +217,7 @@ class LecturerController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while deleting lecturer!!'
+                'message' => 'An error occurred while deleting lecturer!!'
             ])->setStatusCode(500);
         }
     }
@@ -249,7 +249,7 @@ class LecturerController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while importing data!!'
+                'message' => 'An error occurred while importing data!!'
             ])->setStatusCode(500);
         }
     }

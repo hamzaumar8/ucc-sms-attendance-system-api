@@ -69,7 +69,6 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/add/student/{module}', [ModuleController::class, 'add_student']);
     Route::get('/cordinating/modules/{lecturer}', [ModuleController::class, 'cordinating_modules']);
     Route::get('/student/modules/', [ModuleController::class, 'student_modules']);
-    Route::get('/student/modules/', [ModuleController::class, 'student_modules']);
     Route::get('/course_rep/modules', [ModuleController::class, 'course_rep_modules']);
 
     // Levels

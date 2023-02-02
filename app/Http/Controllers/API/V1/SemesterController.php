@@ -69,7 +69,7 @@ class SemesterController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while setting semester!!'
+                'message' => 'An error occurred while setting semester!!'
             ])->setStatusCode(500);
         }
     }
@@ -123,7 +123,7 @@ class SemesterController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while updation semester!!'
+                'message' => 'An error occurred while updation semester!!'
             ])->setStatusCode(500);
         }
     }
@@ -182,7 +182,7 @@ class SemesterController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while setting timetable!!'
+                'message' => 'An error occurred while setting timetable!!'
             ])->setStatusCode(500);
         }
     }
@@ -190,10 +190,15 @@ class SemesterController extends Controller
 
     public function display_timetable(Semester $semester)
     {
-        $semester_timetable = explode("/", $semester->timetable);
-        $timetable = end($semester_timetable);
-        return Response::make(file_get_contents(Helper::pdfPath('semesters/' . $timetable)), 200, [
-            'content-type' => 'application/pdf',
-        ]);
+        if ($semester->timetable) {
+            $semester_timetable = explode("/", $semester->timetable);
+            $timetable = end($semester_timetable);
+            return Response::make(file_get_contents(Helper::pdfPath('semesters/' . $timetable)), 200, [
+                'content-type' => 'application/pdf',
+            ]);
+        }
+        return response()->json([
+            'error' => 'timetable is null'
+        ])->setStatusCode(500);
     }
 }

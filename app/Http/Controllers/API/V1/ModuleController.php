@@ -137,7 +137,7 @@ class ModuleController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while mounting module!!'
+                'message' => 'An error occurred while mounting module!!'
             ])->setStatusCode(500);
         }
     }
@@ -233,7 +233,7 @@ class ModuleController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while updating module!!'
+                'message' => 'An error occurred while updating module!!'
             ])->setStatusCode(500);
         }
     }
@@ -265,7 +265,7 @@ class ModuleController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while deleting module!!'
+                'message' => 'An error occurred while deleting module!!'
             ])->setStatusCode(500);
         }
     }
@@ -312,7 +312,7 @@ class ModuleController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while ending module!!'
+                'message' => 'An error occurred while ending module!!'
             ])->setStatusCode(500);
         }
     }
@@ -344,7 +344,7 @@ class ModuleController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while add student to module!!'
+                'message' => 'An error occurred while add student to module!!'
             ])->setStatusCode(500);
         }
     }

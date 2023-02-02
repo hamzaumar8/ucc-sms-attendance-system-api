@@ -98,7 +98,7 @@ class AttendanceController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while checking in attendance!!'
+                'message' => 'An error occurred while checking in attendance!!'
             ])->setStatusCode(500);
         }
     }

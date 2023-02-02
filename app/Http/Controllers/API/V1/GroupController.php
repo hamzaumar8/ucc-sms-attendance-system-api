@@ -87,7 +87,7 @@ class GroupController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while generation group!!'
+                'message' => 'An error occurred while generation group!!'
             ])->setStatusCode(500);
         }
     }
@@ -137,7 +137,7 @@ class GroupController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while deleting level!!'
+                'message' => 'An error occurred while deleting level!!'
             ])->setStatusCode(500);
         }
     }

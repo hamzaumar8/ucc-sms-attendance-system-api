@@ -91,7 +91,7 @@ class ResultController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while updating a results!!'
+                'message' => 'An error occurred while updating a results!!'
             ])->setStatusCode(500);
         }
     }
@@ -177,7 +177,7 @@ class ResultController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while updating results status!!'
+                'message' => 'An error occurred while updating results status!!'
             ])->setStatusCode(500);
         }
     }

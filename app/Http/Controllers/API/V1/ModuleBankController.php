@@ -23,7 +23,7 @@ class ModuleBankController extends Controller
      */
     public function index()
     {
-        return new ModuleBankCollection(ModuleBank::orderByDesc('id')->paginate(15));
+        return new ModuleBankCollection(ModuleBank::orderByDesc('id')->get());
     }
 
     /**
@@ -56,7 +56,7 @@ class ModuleBankController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while adding a module!!'
+                'message' => 'An error occurred while adding a module!!'
             ])->setStatusCode(500);
         }
     }
@@ -103,7 +103,7 @@ class ModuleBankController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while updating module!!'
+                'message' => 'An error occurred while updating module!!'
             ])->setStatusCode(500);
         }
     }
@@ -130,7 +130,7 @@ class ModuleBankController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occured while deleting module!!'
+                'message' => 'An error occurred while deleting module!!'
             ])->setStatusCode(500);
         }
     }
