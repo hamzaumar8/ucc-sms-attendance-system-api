@@ -32,7 +32,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'email' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string'],
+            'password' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -56,7 +56,7 @@ class LoginRequest extends FormRequest
         // }
 
         $user = User::where('email', $this->email)
-            ->orWhere('username', $this->email)
+            ->orWhere('username', strtoupper($this->email))
             ->first();
 
         if (!$user || !Hash::check($this->password, $user->password)) {
