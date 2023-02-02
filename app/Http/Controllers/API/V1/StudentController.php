@@ -75,11 +75,12 @@ class StudentController extends Controller
             $user = User::create([
                 'name' => $name,
                 'email' => $request->input('email'),
+                'username' => strtoupper($request->input('index_number')),
                 'email_verified_at' => now(),
                 'password' => Hash::make(strtolower(str_replace("/", "", $request->input('index_number')))),
             ]);
 
-            $student = Student::create([
+            Student::create([
                 'user_id' => $user->id,
                 'index_number' => strtoupper($request->input('index_number')),
                 'first_name' => $request->input('first_name'),
@@ -143,8 +144,8 @@ class StudentController extends Controller
             $picture_url = null;
             if ($request->hasFile('picture')) {
                 if ($student->picture) {
-                    $studentpicture = explode("/", $student->picture);
-                    $picture = end($studentpicture);
+                    $student_picture = explode("/", $student->picture);
+                    $picture = end($student_picture);
                     $exist = File::exists(Helper::imagePath('students/' . $picture));
                     if ($exist) {
                         File::delete(Helper::imagePath('students/' . $picture));
@@ -169,6 +170,7 @@ class StudentController extends Controller
 
             $student->user->update([
                 'email' => $request->input('email'),
+                'username' => strtoupper($request->input('index_number')),
             ]);
 
             DB::commit();
@@ -195,8 +197,8 @@ class StudentController extends Controller
             DB::beginTransaction();
 
             if ($student->picture) {
-                $studentpicture = explode("/", $student->picture);
-                $picture = end($studentpicture);
+                $student_picture = explode("/", $student->picture);
+                $picture = end($student_picture);
                 $exist = File::exists(Helper::imagePath('students/' . $picture));
                 if ($exist) {
                     File::delete(Helper::imagePath('students/' . $picture));
@@ -231,12 +233,12 @@ class StudentController extends Controller
 
     public function module_backend(Request $request, Module $module)
     {
-        $modulestudent = $module->students->pluck('id')->toArray();
+        $module_student = $module->students->pluck('id')->toArray();
         $query = Student::query();
         if ($s = $request->input('s')) {
             $query->whereRaw("first_name Like '%" . $s . "%'")->orWhereRaw("other_name Like '%" . $s . "%'")->orWhereRaw("surname Like '%" . $s . "%'")->orWhereRaw("index_number Like '%" . $s . "%'");
         }
-        return $query->whereNotIn('id', $modulestudent)->get();
+        return $query->whereNotIn('id', $module_student)->get();
     }
 
     public function import(Request $request)

@@ -2,6 +2,7 @@
 
 namespace App\Imports\V1;
 
+use App\Models\Level;
 use App\Models\User;
 use App\Models\Student;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -20,24 +21,25 @@ class StudentsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
     // , , SkipsEmptyRows,
     use SkipsFailures, SkipsErrors;
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @param array $row
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function model(array $row)
     {
         $name = $row['other_name'] ? $row['first_name'] . ' ' . $row['other_name'] . ' ' . $row['surname'] : $row['first_name'] . ' ' . $row['surname'];
 
         $user =   User::create([
             'email' => $row['email'],
+            'username' => strtoupper($row['index_number']),
             'name' => $name,
             'email_verified_at' => now(),
-            'password' => Hash::make(strtolower(str_replace("/", "", $request->input('index_number')))),
+            'password' => Hash::make(strtolower(str_replace("/", "", $row['index_number']))),
         ]);
 
         $level_id = null;
-        $level = Level::where('name', 'like',"%{$row['level']}%")->first();
-        if($level){
+        $level = Level::where('name', 'like', "%{$row['level']}%")->first();
+        if ($level) {
             $level_id = $level->id;
         }
         $student = new Student([

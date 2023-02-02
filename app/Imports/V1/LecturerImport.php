@@ -22,16 +22,17 @@ class LecturerImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
     // , , SkipsEmptyRows,
     use SkipsFailures, SkipsErrors;
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @param array $row
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function model(array $row)
     {
         $name = $row['other_name'] ? $row['first_name'] . ' ' . $row['other_name'] . ' ' . $row['surname'] : $row['first_name'] . ' ' . $row['surname'];
 
         $user =   User::create([
             'email' => $row['email'],
+            'username' => $row['staff_id'],
             'name' => $name,
             'email_verified_at' => now(),
             'role' => 'STF',

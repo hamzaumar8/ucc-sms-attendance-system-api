@@ -77,6 +77,7 @@ class LecturerController extends Controller
             $user = User::create([
                 'name' => $name,
                 'email' => $request->input('email'),
+                'username' => $request->input('staff_id'),
                 'email_verified_at' => now(),
                 'role' => 'STF',
                 'password' => Hash::make($request->input('staff_id')),
@@ -148,8 +149,8 @@ class LecturerController extends Controller
             $picture_url = null;
             if ($request->hasFile('picture')) {
                 if ($lecturer->picture) {
-                    $lecturerpicture = explode("/", $lecturer->picture);
-                    $picture = end($lecturerpicture);
+                    $lecturer_picture = explode("/", $lecturer->picture);
+                    $picture = end($lecturer_picture);
                     $exist = File::exists(Helper::imagePath("lecturers/" . $picture));
                     if ($exist) {
                         File::delete(Helper::imagePath("lecturers/" . $picture));
@@ -174,6 +175,7 @@ class LecturerController extends Controller
 
             $lecturer->user->update([
                 'email' => $request->input('email'),
+                'username' => $request->input('staff_id'),
             ]);
 
             DB::commit();
@@ -200,8 +202,8 @@ class LecturerController extends Controller
             DB::beginTransaction();
 
             if ($lecturer->picture) {
-                $lecturerpicture = explode("/", $lecturer->picture);
-                $picture = end($lecturerpicture);
+                $lecturer_picture = explode("/", $lecturer->picture);
+                $picture = end($lecturer_picture);
                 $exist = File::exists(Helper::imagePath("lecturers/" . $picture));
                 if ($exist) {
                     File::delete(Helper::imagePath("lecturers/" . $picture));
