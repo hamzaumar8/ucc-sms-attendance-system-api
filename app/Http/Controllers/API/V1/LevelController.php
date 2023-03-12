@@ -172,7 +172,7 @@ class LevelController extends Controller
 
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'An error occurred while runing promotions for student!!'
+                'message' => 'An error occurred while running promotions for student!!'
             ])->setStatusCode(500);
         }
     }

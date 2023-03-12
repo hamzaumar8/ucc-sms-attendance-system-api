@@ -23,7 +23,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
 
         // custom-cors
-        \App\Http\Middleware\CORS::class,
+        // \App\Http\Middleware\CORS::class,
     ];
 
     /**
@@ -68,6 +68,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
 
-        'CORS' => \App\Http\Middleware\CORS::class,
+        // 'CORS' => \App\Http\Middleware\CORS::class,
     ];
 }

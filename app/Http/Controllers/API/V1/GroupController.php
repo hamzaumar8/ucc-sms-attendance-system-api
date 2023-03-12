@@ -29,7 +29,7 @@ class GroupController extends Controller
     public function index()
     {
         $semester_id = Helper::semester();
-        $groups = Group::where('semester_id', $semester_id)->with('level')->get();
+        $groups = Group::where('semester_id', $semester_id)->orderByDesc('id')->with('level')->get();
         return new GroupCollection($groups);
     }
 

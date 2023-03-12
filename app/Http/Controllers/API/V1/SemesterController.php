@@ -28,7 +28,10 @@ class SemesterController extends Controller
     public function index()
     {
         $semester = Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
-        return (new SemesterResource($semester))->response()->setStatusCode(200);
+        if ($semester != null) {
+            return (new SemesterResource($semester))->response()->setStatusCode(200);
+        }
+        return response()->json(['data' => null]);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Exports\V1\ResultExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Result\ResultCollection;
 use App\Http\Resources\V1\Result\ResultResource;
@@ -9,14 +10,18 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Result;
 use App\Models\Semester;
 use App\Helpers\Helper;
+use App\Imports\V1\ResultImport;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ResultController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'cordinating_module', 'lecturers_results']]);
+        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'cordinating_module', 'lecturers_results', 'import']]);
     }
 
 
@@ -188,5 +193,42 @@ class ResultController extends Controller
         $lecturerModules = auth()->user()->lecturer->modules->pluck('id')->toArray();
         $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank'])->get();
         return new ResultCollection($results);
+    }
+
+
+    public function export(Result $result)
+    {
+        $result = $result->loadMissing(['module.module_bank', 'assessments.student']);
+
+        $filename = $result->module->module_bank->title . " Results Sheet.csv";
+
+        return Excel::download(new ResultExport($result->assessments), $filename, \Maatwebsite\Excel\Excel::CSV, ['Content-Type' => 'text/csv']);
+
+        return $result;
+    }
+
+
+    public function import(Request $request, Result $result)
+    {
+        $request->validate([
+            'file' => 'required|mimes:csv,txt',
+        ]);
+
+        $result = $result->loadMissing(['module.module_bank', 'assessments.student']);
+
+        // return response()->json([
+        //     $result->assessments
+        // ])->setStatusCode(500);
+
+        try {
+            Excel::import(new ResultImport($result->assessments), request()->file('file'));
+
+            return response()->json(['status' => 'success'])->setStatusCode(201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'An error occurred while importing data!!'
+            ])->setStatusCode(500);
+        }
     }
 }

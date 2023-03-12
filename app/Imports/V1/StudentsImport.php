@@ -39,7 +39,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
 
         $level_id = null;
         $level = Level::where('name', 'like', "%{$row['level']}%")->first();
-        if ($level) {
+        if ($level) {-
             $level_id = $level->id;
         }
         $student = new Student([

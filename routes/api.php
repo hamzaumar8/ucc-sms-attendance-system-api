@@ -39,6 +39,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/promotion/check', [ResultController::class, 'promotion_check']);
     Route::get('/update_status/result/{result}', [ResultController::class, 'update_status']);
     Route::get('/lecturer/results', [ResultController::class, 'lecturers_results']);
+    Route::get('/export/results/{result}', [ResultController::class, 'export']);
+    Route::post('/import/results/{result}', [ResultController::class, 'import']);
 
     // Assessment
     Route::apiResource('/assessments', AssessmentController::class);
