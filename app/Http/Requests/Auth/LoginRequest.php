@@ -2,9 +2,12 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -27,8 +30,10 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'email' => 'required_without:username|string|max:255',
+            'username' => 'required_without:email|string|max:255',
+            'password' => 'required|string|max:255',
+            'device_name' => 'required|string|max:255',
         ];
     }
 
@@ -37,19 +42,33 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate(): void
+    public function authenticate()
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $user = User::where('email', $this->input('email'))
+            ->orWhere('username', strtoupper($this->input('username')))
+            ->first();
 
+        if (!$user || !Hash::check($this->input('password'), $user->password)) {
+            RateLimiter::hit($this->throttleKey());
+            Log::warning('Authentication failed for user', ['email' => $this->input('email'), 'username' => $this->input('username')]);
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        $token = $user->createToken($this->input('device_name'))->plainTextToken;
+
+        Log::info('User authenticated successfully', ['user_id' => $user->id, 'device_name' => $this->input('device_name')]);
+
+        return [
+            'user' => $user,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ];
     }
 
     /**
@@ -80,6 +99,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('email')) . '|' . $this->ip());
     }
 }
