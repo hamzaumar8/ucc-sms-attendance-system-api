@@ -3,23 +3,29 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\API\V1\Module\ModuleCollection;
-use App\Http\Resources\API\V1\Module\ModuleResource;
+use App\Http\Resources\V1\Module\ModuleCollection;
+use App\Http\Resources\V1\Module\ModuleResource;
 use Illuminate\Support\Facades\DB;
 use App\Models\Lecturer;
 use App\Models\Module;
-use App\Models\Semester;
 use App\Models\Student;
 use Carbon\Carbon;
-use App\Helpers\Helper;
+use App\Traits\SemesterTrait;
 use Exception;
 use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
+    use SemesterTrait;
+
+    protected $semesterId;
+
+    /**
+     * ModuleController constructor.
+     */
     public function __construct()
     {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'end_module', 'student_modules', 'course_rep_modules']]);
+        $this->semesterId = $this->getCurrentSemesterId();
     }
 
     private function status($start_date, $end_date)
@@ -35,29 +41,40 @@ class ModuleController extends Controller
         return $status;
     }
 
-    public function semester()
-    {
-        $semester_id = null;
-        $semester =  Semester::whereDate('start_date', '<=', Carbon::now()->format('Y-m-d'))->whereDate('end_date', '>=', Carbon::now()->format('Y-m-d'))->first();
-        if ($semester) {
-            $semester_id = $semester->id;
-        }
-        return  $semester_id;
-    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $modules = Module::where('semester_id', Helper::semester())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'coordinator', 'course_rep', 'attendances'])->get();
+        // $includeRelationships = $request->query('include_relationships', false);
+
+        $modules = Module::where('semester_id', $this->semesterId)
+            ->orderBy('id', 'DESC')
+            ->with([
+                'module_bank',
+                'lecturers',
+                'level',
+                'cordinator',
+                'course_rep',
+                'attendances'
+            ])
+            ->get();
+
+        // if ($includeRelationships) {
+        // }
+
         return new ModuleCollection($modules);
     }
 
     public function cordinating_modules(Lecturer $lecturer)
     {
-        $modules = Module::where('semester_id', Helper::semester())->where('cordinator_id', $lecturer->id)->orderBy('id', 'DESC')->with(['module_bank', 'level'])->get();
+        $modules = Module::where('semester_id', $this->semesterId)
+            ->where('cordinator_id', $lecturer->id)
+            ->orderBy('id', 'DESC')
+            ->with(['module_bank', 'level'])
+            ->get();
         return new ModuleCollection($modules);
     }
 
@@ -70,7 +87,7 @@ class ModuleController extends Controller
     public function store(Request $request)
     {
         // check if semester is set
-        if (!Helper::semester()) {
+        if (!$this->semesterId) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
 
@@ -87,7 +104,7 @@ class ModuleController extends Controller
         try {
             DB::beginTransaction();
 
-            $check = Module::where('semester_id', Helper::semester())->where('module_bank_id', $request->input('module'))->where('level_id', $request->input('level'))->first();
+            $check = Module::where('semester_id', $this->semesterId)->where('module_bank_id', $request->input('module'))->where('level_id', $request->input('level'))->first();
             if ($check) {
                 return response()->json([
                     'errors' => [
@@ -100,7 +117,7 @@ class ModuleController extends Controller
 
             // create module
             $module = Module::create([
-                'semester_id' => Helper::semester(),
+                'semester_id' => $this->semesterId,
                 'module_bank_id' => $request->input('module'),
                 'cordinator_id' => $request->input('cordinator'),
                 'course_rep_id' => $request->input('course_rep'),
@@ -161,7 +178,7 @@ class ModuleController extends Controller
     public function update(Request $request, Module $module)
     {
         // check if semester is set
-        if (!Helper::semester()) {
+        if (!$this->semesterId) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
         $prev_module = Module::find($request->id);
@@ -243,7 +260,7 @@ class ModuleController extends Controller
     public function destroy(Module $module)
     {
         // check if semester is set
-        if (!Helper::semester()) {
+        if (!$this->semesterId) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
         try {
@@ -271,7 +288,7 @@ class ModuleController extends Controller
     public function end_module(Module $module)
     {
         // check if semester is set
-        if (!Helper::semester()) {
+        if (!$this->semesterId) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
 
@@ -287,7 +304,7 @@ class ModuleController extends Controller
             ]);
 
             // $result = Result::firstOrCreate([
-            //     'semester_id' => Helper::semester(),
+            //     'semester_id' => $this->semesterId,
             //     'module_id' => $module->id,
             //     'cordinator_id' => $module->cordinator_id,
             // ]);
@@ -317,7 +334,7 @@ class ModuleController extends Controller
     public function add_student(Request $request, Module $module)
     {
         // check if semester is set
-        if (!Helper::semester()) {
+        if (!$this->semesterId) {
             return response()->json(['message' => "set-semester"])->setStatusCode(403);
         }
 
@@ -348,15 +365,15 @@ class ModuleController extends Controller
 
     public function student_modules()
     {
-        $studentModules = auth()->user()->student->modules->pluck('id')->toArray();
+        $studentModules = auth()->user->student->modules->pluck('id')->toArray();
         $modules = Module::whereIn('id', $studentModules)->orderBy('id', 'DESC')->with(['module_bank'])->get();
         return new ModuleCollection($modules);
     }
 
     public function course_rep_modules()
     {
-        $course_rep_id = auth()->user()->student->id;
-        $modules = Module::where('semester_id', Helper::semester())->where('course_rep_id', $course_rep_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'students'])->get();
+        $course_rep_id = auth()->user->student->id;
+        $modules = Module::where('semester_id', $this->semesterId)->where('course_rep_id', $course_rep_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'students'])->get();
         return new ModuleCollection($modules);
     }
 }

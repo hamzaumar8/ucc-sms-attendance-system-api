@@ -2,8 +2,12 @@
 
 namespace App\Http\Resources\V1\Student;
 
-use App\Http\Resources\API\V1\Level\LevelResource;
-use App\Http\Resources\API\V1\User\UserResource;
+use App\Http\Resources\V1\AttendanceStudent\AttendanceStudentResource;
+use App\Http\Resources\V1\Group\GroupResource;
+use App\Http\Resources\V1\Level\LevelResource;
+use App\Http\Resources\V1\Module\ModuleResource;
+use App\Http\Resources\V1\Result\ResultResource;
+use App\Http\Resources\V1\User\UserResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -32,19 +36,13 @@ class StudentResource extends JsonResource
             // eager loading
             'user' => UserResource::make($this->whenLoaded('user')),
             'level' => LevelResource::make($this->whenLoaded('level')),
-            // 'modules' => ModuleResource::collection(
-            //     $this->whenLoaded('modules')
-            // ),
-            // 'attendance' => AttendanceStudentResource::collection($this->whenLoaded('attendance')),
-            // 'attendance_stats' => [
-            //     'total' => $this->attendance_total(),
-            //     'present' => $this->attendance_present(),
-            //     'absent' => $this->attendance_absent(),
-            //     'present_percentage' => $this->attendance_present_percentage(),
-            //     'absent_percentage' => $this->attendance_absent_percentage(),
-            // ],
-            // 'results' => ResultResource::collection($this->whenLoaded('results')),
-            // 'groups' => GroupResource::collection($this->whenLoaded('results')),
+            'modules' => ModuleResource::collection(
+                $this->whenLoaded('modules')
+            ),
+            'attendance' => AttendanceStudentResource::collection($this->whenLoaded('attendance')),
+            'attendance_stats' => $this->attendance_stats(),
+            'results' => ResultResource::collection($this->whenLoaded('results')),
+            'groups' => GroupResource::collection($this->whenLoaded('results')),
         ];
     }
 
@@ -59,5 +57,16 @@ class StudentResource extends JsonResource
     {
         $response->header('Accept', 'application/json');
         // $response->header('Version', '1.0.0');
+    }
+
+    private function attendance_stats()
+    {
+        return [
+            'total' => $this->attendance_total(),
+            'present' => $this->attendance_present(),
+            'absent' => $this->attendance_absent(),
+            'present_percentage' => $this->attendance_present_percentage(),
+            'absent_percentage' => $this->attendance_absent_percentage(),
+        ];
     }
 }

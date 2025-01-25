@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Semester;
 use App\Models\AttendanceStudent;
 use App\Helpers\Helper;
+use App\Traits\SemesterTrait;
 use Carbon\Carbon;
 
 class Student extends Model
 {
-    use HasFactory;
+    use HasFactory, SemesterTrait;
 
     protected $fillable = [
         'user_id',
@@ -56,45 +57,48 @@ class Student extends Model
 
     public function modules()
     {
-        return $this->belongsToMany(Module::class, 'module_student',  'student_id', 'module_id')->where('semester_id', Helper::semester());
+        return $this->belongsToMany(Module::class, 'module_student',  'student_id', 'module_id')->where('semester_id', $this->getCurrentSemesterId());
     }
 
 
     public function attendance()
     {
-        return $this->hasMany(AttendanceStudent::class, 'student_id')->where('semester_id', Helper::semester());
+        return $this->hasMany(AttendanceStudent::class, 'student_id')->where('semester_id', $this->getCurrentSemesterId());
     }
 
-    public function attendance_present(){
+    public function attendance_present()
+    {
         return  $this->attendance->where('status', 1)->count();
     }
-    public function attendance_absent(){
+    public function attendance_absent()
+    {
         return  $this->attendance->where('status', 0)->count();
     }
-    public function attendance_total(){
+    public function attendance_total()
+    {
         return  $this->attendance->count();
     }
-    public function attendance_present_percentage(){
+    public function attendance_present_percentage()
+    {
         $count = $this->attendance->count();
-        $present =$this->attendance_present();
+        $present = $this->attendance_present();
         return round($present / ($count > 0 ? $count : 1) * 100);
     }
-    public function attendance_absent_percentage(){
-       $count = $this->attendance->count();
-        $absent =$this->attendance_absent();
+    public function attendance_absent_percentage()
+    {
+        $count = $this->attendance->count();
+        $absent = $this->attendance_absent();
         return round($absent / ($count > 0 ? $count : 1) * 100);
     }
 
 
     public function results()
     {
-        return $this->belongsToMany(Result::class, 'assessments',  'student_id', 'result_id')->withPivot(['score','remarks']);
+        return $this->belongsToMany(Result::class, 'assessments',  'student_id', 'result_id')->withPivot(['score', 'remarks']);
     }
 
     public function groups()
     {
-        return $this->belongsToMany(Group::class, 'group_student',  'student_id', 'group_id')->where('semester_id', Helper::semester())->withPivot(['group_no']);
+        return $this->belongsToMany(Group::class, 'group_student',  'student_id', 'group_id')->where('semester_id', $this->getCurrentSemesterId())->withPivot(['group_no']);
     }
-
-
 }

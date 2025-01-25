@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1\Lecturer;
 
+use App\Http\Resources\V1\Module\ModuleResource;
 use App\Http\Resources\V1\User\UserResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class LecturerResource extends JsonResource
             'picture' => $this->picture_url(),
             'created_at' => Carbon::parse($this->created_at),
             'user' => UserResource::make($this->whenLoaded('user')),
-            // 'modules' => ModuleResource::collection($this->whenLoaded('modules')),
+            'modules' => ModuleResource::collection($this->whenLoaded('modules')),
         ];
     }
 

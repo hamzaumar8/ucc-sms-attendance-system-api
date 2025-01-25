@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\Result\ResultCollection;
 use Illuminate\Support\Facades\DB;
-use App\Http\Resources\API\V1\Student\StudentCollection;
-use App\Http\Resources\API\V1\Student\StudentResource;
-use App\Http\Resources\API\V1\Result\ResultCollection;
-use App\Http\Resources\API\V1\Group\GroupCollection;
+use App\Http\Resources\V1\Student\StudentCollection;
+use App\Http\Resources\V1\Student\StudentResource;
+use App\Http\Resources\V1\Group\GroupCollection;
 use App\Models\Student;
 use App\Models\User;
-use App\Helpers\Helper;
 use App\Models\Module;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -18,16 +17,14 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use App\Imports\V1\StudentsImport;
+use App\Traits\UtilsTrait;
 use Exception;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:sanctum', ['only' => ['store', 'update', 'destroy', 'import', 'results', 'groups']]);
-    }
+    use UtilsTrait;
 
     /**
      * Display a listing of the resource.
@@ -53,7 +50,7 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'email' => 'required|string|email|max:255|unique:users,email',
             'index_number' => 'required|max:20|unique:students,index_number',
             'first_name' => 'required|string|max:20',
@@ -73,7 +70,7 @@ class StudentController extends Controller
             if ($request->hasFile('picture')) {
                 $file = $request->file('picture');
                 $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-                $file->move(Helper::imagePath('students'), $file_name);
+                $file->move($this->imagePath('students'), $file_name);
                 $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;
             }
 
@@ -136,7 +133,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        $this->validate($request, [
+        $request->validate([
             'email' => 'required|string|email|max:255|unique:users,email,' . $student->user->id,
             'index_number' => 'required|max:20|unique:students,index_number,' . $student->id,
             'first_name' => 'required|string|max:20',
@@ -155,14 +152,14 @@ class StudentController extends Controller
                 if ($student->picture) {
                     $student_picture = explode("/", $student->picture);
                     $picture = end($student_picture);
-                    $exist = File::exists(Helper::imagePath('students/' . $picture));
+                    $exist = File::exists($this->imagePath('students/' . $picture));
                     if ($exist) {
-                        File::delete(Helper::imagePath('students/' . $picture));
+                        File::delete($this->imagePath('students/' . $picture));
                     }
                 }
                 $file = $request->file('picture');
                 $file_name = Carbon::now()->timestamp . "." . $file->getClientOriginalExtension();
-                $file->move(Helper::imagePath('students'), $file_name);
+                $file->move($this->imagePath('students'), $file_name);
                 $picture_url = URL::to('/') . '/assets/img/students/' . $file_name;
             }
 
@@ -214,9 +211,9 @@ class StudentController extends Controller
             if ($student->picture) {
                 $student_picture = explode("/", $student->picture);
                 $picture = end($student_picture);
-                $exist = File::exists(Helper::imagePath('students/' . $picture));
+                $exist = File::exists($this->imagePath('students/' . $picture));
                 if ($exist) {
-                    File::delete(Helper::imagePath('students/' . $picture));
+                    File::delete($this->imagePath('students/' . $picture));
                 }
             }
 
@@ -293,8 +290,8 @@ class StudentController extends Controller
         ]);
 
         try {
-            Excel::import(new StudentsImport, request()->file('file'));
-            return response()->json(['status' => 'success'])->setStatusCode(201);
+            // Excel::import(new StudentsImport, request()->file('file'));
+            // return response()->json(['status' => 'success'])->setStatusCode(201);
         } catch (Exception $e) {
             Log::error('Error importing students: ' . $e->getMessage());
             return response()->json([
@@ -312,7 +309,7 @@ class StudentController extends Controller
     public function results()
     {
         try {
-            $id = auth()->user()->student->id;
+            $id = auth()->user->student->id;
             $student = Student::with(['results', 'results.module.module_bank', 'results.semester'])->find($id);
             if (!$student) {
                 return response()->json(['error' => 'Student not found'], 404);
@@ -332,7 +329,7 @@ class StudentController extends Controller
     public function groups()
     {
         try {
-            $id = auth()->user()->student->id;
+            $id = auth()->user->student->id;
             $student = Student::with(['groups'])->find($id);
             if (!$student) {
                 return response()->json(['error' => 'Student not found'], 404);

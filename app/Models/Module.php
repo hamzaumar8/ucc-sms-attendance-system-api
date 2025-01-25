@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Module extends Model
 {
@@ -72,5 +74,123 @@ class Module extends Model
     public function attendances_lecturer()
     {
         return $this->hasMany(AttendanceLecturer::class, 'module_id');
+    }
+
+
+
+
+    /**
+     * Get the total number of days for the module.
+     *
+     * @return int
+     */
+    public function getTotalDaysAttribute()
+    {
+        $startDate = Carbon::parse($this->start_date);
+        $endDate = Carbon::parse($this->end_date);
+
+        return (int)($startDate->diffInDays($endDate));
+    }
+
+    /**
+     * Get the number of days covered so far.
+     *
+     * @return int
+     */
+    public function getDaysCoveredAttribute()
+    {
+        $startDate = Carbon::parse($this->start_date);
+        $endDate = Carbon::parse($this->end_date);
+        $now = Carbon::now();
+
+        if (Carbon::now()->between($startDate, $endDate)) {
+            $days_covered = (int)($startDate->diffInDays(Carbon::now()));
+        } elseif ($now->gt($endDate)) {
+            $days_covered = $this->total_days;
+        } else {
+            $days_covered = 0;
+        }
+
+        return $days_covered;
+    }
+
+    /**
+     * Get the number of days remaining.
+     *
+     * @return int
+     */
+    public function getDaysRemainingAttribute()
+    {
+        return (int) $this->total_days - $this->days_covered;
+    }
+
+    /**
+     * Get the percentage of days covered.
+     *
+     * @return int
+     */
+    public function getCoveredPercentageAttribute()
+    {
+        return round(($this->days_covered / ($this->total_days > 0 ? $this->total_days : 1)) * 100);
+    }
+
+    /**
+     * Update the module's status based on the current date.
+     *
+     * @return void
+     */
+    public function updateStatusBasedOnDate()
+    {
+        $startDate = Carbon::parse($this->start_date);
+        $endDate = Carbon::parse($this->end_date);
+        $now = Carbon::now();
+
+        if (Carbon::now()->between($startDate, $endDate)) {
+            $this->updateStatus('active');
+        } elseif ($now->gt($endDate)) {
+            $this->updateStatus('inactive');
+        } else {
+            $this->updateStatus('upcoming');
+        }
+    }
+
+    /**
+     * Update the module's status if necessary.
+     *
+     * @param string $newStatus
+     * @return void
+     */
+    protected function updateStatus(string $newStatus)
+    {
+        if ($this->status !== $newStatus) {
+            $this->update(['status' => $newStatus]);
+
+            if ($newStatus === 'inactive') {
+                $this->generateResultsAndAssessments();
+            }
+        }
+    }
+
+    /**
+     * Generate results and assessments for inactive modules.
+     *
+     * @return void
+     */
+    protected function generateResultsAndAssessments()
+    {
+        if ($this->status !== 'inactive') {
+            $result = Result::firstOrCreate([
+                'semester_id' => $this->semester_id,
+                'module_id' => $this->id,
+                'cordinator_id' => $this->cordinator_id,
+            ]);
+
+            foreach ($this->students as $student) {
+                Assessment::firstOrCreate([
+                    'result_id' => $result->id,
+                    'student_id' => $student->id,
+                ]);
+            }
+        }
     }
 }
