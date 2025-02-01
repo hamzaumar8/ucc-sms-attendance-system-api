@@ -4,8 +4,8 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Exports\V1\ResultExport;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\API\V1\Result\ResultCollection;
-use App\Http\Resources\API\V1\Result\ResultResource;
+use App\Http\Resources\V1\Result\ResultCollection;
+use App\Http\Resources\V1\Result\ResultResource;
 use Illuminate\Support\Facades\DB;
 use App\Models\Result;
 use App\Models\Semester;
@@ -71,7 +71,7 @@ class ResultController extends Controller
      */
     public function update(Request $request, Result $result)
     {
-        $this->validate($request, [
+        $request->validate([
             'assessments.*.score' => 'required|numeric|between:0,100',
         ]);
 
@@ -121,7 +121,7 @@ class ResultController extends Controller
      */
     public function cordinating_module()
     {
-        $lecturer_id = auth()->user()->lecturer->id;
+        $lecturer_id = auth()->user->lecturer->id;
         $results = Result::where('semester_id', $this->semesterId)->where('cordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank', 'module.level']);
         return new ResultCollection($results->get());
     }
@@ -190,7 +190,7 @@ class ResultController extends Controller
 
     public function lecturers_results()
     {
-        $lecturerModules = auth()->user()->lecturer->modules->pluck('id')->toArray();
+        $lecturerModules = auth()->user->lecturer->modules->pluck('id')->toArray();
         $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank'])->get();
         return new ResultCollection($results);
     }

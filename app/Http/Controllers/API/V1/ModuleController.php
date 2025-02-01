@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\Module\ModuleCollection;
 use App\Http\Resources\V1\Module\ModuleResource;
+use App\Models\Assessment;
 use Illuminate\Support\Facades\DB;
 use App\Models\Lecturer;
 use App\Models\Module;
+use App\Models\Result;
 use App\Models\Student;
 use Carbon\Carbon;
 use App\Traits\SemesterTrait;
@@ -300,21 +302,21 @@ class ModuleController extends Controller
             // update module info
             $module->update([
                 'end_date' => $end_date,
-                // 'status' => "inactive",
+                'status' => "inactive",
             ]);
 
-            // $result = Result::firstOrCreate([
-            //     'semester_id' => $this->semesterId,
-            //     'module_id' => $module->id,
-            //     'cordinator_id' => $module->cordinator_id,
-            // ]);
+            $result = Result::firstOrCreate([
+                'semester_id' => $this->semesterId,
+                'module_id' => $module->id,
+                'cordinator_id' => $module->cordinator_id,
+            ]);
 
-            // foreach($this->students as $student){
-            //     Assessment::firstOrCreate([
-            //         'result_id' => $result->id,
-            //         'student_id' => $student->id,
-            //     ]);
-            // }
+            foreach ($module->students as $student) {
+                Assessment::firstOrCreate([
+                    'result_id' => $result->id,
+                    'student_id' => $student->id,
+                ]);
+            }
 
             DB::commit();
             return response()->json(['status' => 'success'])
