@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,6 +16,7 @@ class StudentSeeder extends Seeder
      */
     public function run()
     {
-        Student::factory()->count(10)->create(['user_id' => 1]);
+        User::factory()->count(10)->create();
+        Student::factory()->count(10)->create();
     }
 }

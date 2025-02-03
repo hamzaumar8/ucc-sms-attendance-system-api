@@ -58,7 +58,7 @@ class ModuleController extends Controller
                 'module_bank',
                 'lecturers',
                 'level',
-                'cordinator',
+                'coordinator',
                 'course_rep',
                 'attendances'
             ])
@@ -70,10 +70,10 @@ class ModuleController extends Controller
         return new ModuleCollection($modules);
     }
 
-    public function cordinating_modules(Lecturer $lecturer)
+    public function coordinating_modules(Lecturer $lecturer)
     {
         $modules = Module::where('semester_id', $this->semesterId)
-            ->where('cordinator_id', $lecturer->id)
+            ->where('coordinator_id', $lecturer->id)
             ->orderBy('id', 'DESC')
             ->with(['module_bank', 'level'])
             ->get();
@@ -95,7 +95,7 @@ class ModuleController extends Controller
 
         $request->validate([
             'module' => 'required|exists:module_banks,id',
-            'cordinator' => 'required|exists:lecturers,id',
+            'coordinator' => 'required|exists:lecturers,id',
             'course_rep' => 'required|exists:students,id',
             'level' => 'required|exists:levels,id',
             'start_date' => 'required|date',
@@ -121,7 +121,7 @@ class ModuleController extends Controller
             $module = Module::create([
                 'semester_id' => $this->semesterId,
                 'module_bank_id' => $request->input('module'),
-                'cordinator_id' => $request->input('cordinator'),
+                'coordinator_id' => $request->input('coordinator'),
                 'course_rep_id' => $request->input('course_rep'),
                 'level_id' => $request->input('level'),
                 'start_date' => $start_date,
@@ -136,11 +136,16 @@ class ModuleController extends Controller
             // module students attachment
             $module->students()->attach($module->level->students);
 
-            // Course Rep
-            $courseRep = Student::find($request->input('course_rep'));
-            if ($courseRep->user->role === 'USR') {
-                $courseRep->user->role = 'REP';
-                $courseRep->user->save();
+            // Find the course rep or fail if not found
+            $courseRep = Student::findOrFail($request->input('course_rep'));
+
+            // Check if the course rep has a user associated
+            if ($courseRep->user) {
+                // Check if the user has the 'student' role
+                if ($courseRep->user->hasRole('student')) {
+                    // Assign the 'course-rep' role
+                    $courseRep->user->assignRole('course-rep');
+                }
             }
 
             DB::commit();
@@ -165,7 +170,7 @@ class ModuleController extends Controller
      */
     public function show(Module $module)
     {
-        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'cordinator', 'course_rep', 'attendances.students', 'students', 'attendances_lecturer', 'attendances_course_rep'])))
+        return (new ModuleResource($module->loadMissing(['lecturers', 'module_bank', 'level', 'coordinator', 'course_rep', 'attendances.students', 'students', 'attendances_lecturer', 'attendances_course_rep'])))
             ->response()
             ->setStatusCode(200);
     }
@@ -187,7 +192,7 @@ class ModuleController extends Controller
 
         $request->validate([
             'module' => 'required|numeric|exists:module_banks,id',
-            'cordinator' => 'required|numeric|exists:lecturers,id',
+            'coordinator' => 'required|numeric|exists:lecturers,id',
             'course_rep' => 'required|numeric|exists:students,id',
             'level' => 'required|numeric|exists:levels,id',
             'start_date' => 'required|date',
@@ -204,7 +209,7 @@ class ModuleController extends Controller
             // update module info
             $module->update([
                 'module_bank_id' => $request->input('module'),
-                'cordinator_id' => $request->input('cordinator'),
+                'coordinator_id' => $request->input('coordinator'),
                 'course_rep_id' => $request->input('course_rep'),
                 'level_id' => $request->input('level'),
                 'start_date' => $start_date,
@@ -230,12 +235,10 @@ class ModuleController extends Controller
                 $pastCourseRep = Student::find($prev_module->course_rep_id);
                 $courseRep = Student::find($module->course_rep_id);
                 if (!in_array($pastCourseRep->id, $modules)) {
-                    $pastCourseRep->user->role = 'USR';
-                    $pastCourseRep->user->save();
+                    $pastCourseRep->user->assignRole('student');
                 }
-                if ($courseRep->user->role === 'USR') {
-                    $courseRep->user->role = 'REP';
-                    $courseRep->user->save();
+                if ($courseRep->user->hasRole('student')) {
+                    $courseRep->user->assignRole('course-rep');
                 }
             }
 
@@ -308,7 +311,7 @@ class ModuleController extends Controller
             $result = Result::firstOrCreate([
                 'semester_id' => $this->semesterId,
                 'module_id' => $module->id,
-                'cordinator_id' => $module->cordinator_id,
+                'coordinator_id' => $module->coordinator_id,
             ]);
 
             foreach ($module->students as $student) {
@@ -367,14 +370,14 @@ class ModuleController extends Controller
 
     public function student_modules()
     {
-        $studentModules = auth()->user->student->modules->pluck('id')->toArray();
+        $studentModules = auth()->user()->student->modules->pluck('id')->toArray();
         $modules = Module::whereIn('id', $studentModules)->orderBy('id', 'DESC')->with(['module_bank'])->get();
         return new ModuleCollection($modules);
     }
 
     public function course_rep_modules()
     {
-        $course_rep_id = auth()->user->student->id;
+        $course_rep_id = auth()->user()->student->id;
         $modules = Module::where('semester_id', $this->semesterId)->where('course_rep_id', $course_rep_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'students'])->get();
         return new ModuleCollection($modules);
     }

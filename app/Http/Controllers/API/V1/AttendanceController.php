@@ -59,7 +59,7 @@ class AttendanceController extends Controller
 
         try {
             DB::beginTransaction();
-            $course_rep_id = auth()->user->student->id;
+            $course_rep_id = auth()->user()->student->id;
             $students = $request->input('students');
             $date = Carbon::parse($request->input('date'))->format('Y-m-d');
             $check = Attendance::where('semester_id', $this->semesterId)->where('module_id', $request->input('module_id'))->where('lecturer_id', $request->input('lecturer_id'))->where('date', $date)->first();
@@ -140,7 +140,7 @@ class AttendanceController extends Controller
 
     public function course_rep_attendances()
     {
-        $course_rep_id = auth()->user->student->id;
+        $course_rep_id = auth()->user()->student->id;
         $attendances = Attendance::where('course_rep_id', $course_rep_id)->where('semester_id', $this->semesterId)->with(['module.module_bank'])->orderBy('id', 'DESC')->get();
         return  AttendanceResource::collection($attendances);
     }

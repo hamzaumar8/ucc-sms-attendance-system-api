@@ -24,7 +24,7 @@ class ResultResource extends JsonResource
             'id' => $this->id,
             'semester_id' => $this->semester_id,
             'module_id' => $this->module_id,
-            'cordinator_id' => $this->cordinator_id,
+            'coordinator_id' => $this->coordinator_id,
             'status' => $this->status,
             'created_at' => Carbon::parse($this->created_at),
             'score' => $this->whenPivotLoaded('assessments', function () {

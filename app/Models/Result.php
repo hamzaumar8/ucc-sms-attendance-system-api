@@ -10,12 +10,15 @@ class Result extends Model
     use HasFactory;
 
     protected $fillable = [
-        'semester_id', 'module_id', 'cordinator_id', 'status',
+        'semester_id',
+        'module_id',
+        'coordinator_id',
+        'status',
     ];
 
-    public function cordinator()
+    public function coordinator()
     {
-        return $this->belongsTo(Lecturer::class, 'cordinator_id');
+        return $this->belongsTo(Lecturer::class, 'coordinator_id');
     }
 
     public function semester()

@@ -14,7 +14,7 @@ class Module extends Model
     protected $fillable = [
         'semester_id',
         'module_bank_id',
-        'cordinator_id',
+        'coordinator_id',
         'course_rep_id',
         'level_id',
         'start_date',
@@ -22,9 +22,9 @@ class Module extends Model
         'status',
     ];
 
-    public function cordinator()
+    public function coordinator()
     {
-        return $this->belongsTo(Lecturer::class, 'cordinator_id');
+        return $this->belongsTo(Lecturer::class, 'coordinator_id');
     }
 
     public function semester()
@@ -182,7 +182,7 @@ class Module extends Model
             $result = Result::firstOrCreate([
                 'semester_id' => $this->semester_id,
                 'module_id' => $this->id,
-                'cordinator_id' => $this->cordinator_id,
+                'coordinator_id' => $this->coordinator_id,
             ]);
 
             foreach ($this->students as $student) {

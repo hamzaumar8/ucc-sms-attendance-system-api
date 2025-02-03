@@ -4,8 +4,6 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lecturer;
-use App\Models\Semester;
-use App\Helpers\Helper;
 use App\Http\Resources\V1\Lecturer\LecturerCollection;
 use App\Http\Resources\V1\Lecturer\LecturerResource;
 use App\Http\Resources\V1\Module\ModuleCollection;
@@ -25,6 +23,13 @@ use Maatwebsite\Excel\Facades\Excel;
 class LecturerController extends Controller
 {
     use UtilsTrait, SemesterTrait;
+
+    private $semesterId;
+
+    public function __construct()
+    {
+        $this->semesterId = $this->getCurrentSemesterId();
+    }
 
     /**
      * Display a listing of the resource.
@@ -46,7 +51,7 @@ class LecturerController extends Controller
     public function store(Request $request)
     {
 
-        $this->validate($request, [
+        $request->validate([
             'email' => 'required|string|email|max:255|unique:users,email',
             'staff_id' => 'required|max:20|unique:lecturers,staff_id',
             'title' => 'required|string|max:20',
@@ -133,7 +138,7 @@ class LecturerController extends Controller
             'string',
             'email',
             'max:255',
-            'unique:users,email,' . $lecturer->user->id,
+            'unique:users,email,' . $lecturer->user()->id,
             'staff_id' => 'required|max:20|unique:lecturers,staff_id,' . $lecturer->id,
             'title' => 'required|string|max:20',
             'first_name' => 'required|string|max:20',
@@ -175,7 +180,7 @@ class LecturerController extends Controller
                 'picture' => $picture_url,
             ]);
 
-            $lecturer->user->update([
+            $lecturer->user()->update([
                 'email' => $request->input('email'),
                 'username' => $request->input('staff_id'),
             ]);
@@ -212,7 +217,7 @@ class LecturerController extends Controller
                 }
             }
 
-            $lecturer->user->delete();
+            $lecturer->user()->delete();
 
             DB::commit();
             return response()->json(null, 204);
@@ -269,15 +274,23 @@ class LecturerController extends Controller
     public function lecturers_modules()
     {
         $lecturerModules = auth()->user()->lecturer->modules->pluck('id')->toArray();
-        $modules = Module::whereIn('id', $lecturerModules)->where('semester_id', $this->getCurrentSemesterId())->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        $modules = Module::whereIn('id', $lecturerModules)
+            ->where('semester_id', $this->semesterId)
+            ->orderBy('id', 'DESC')
+            ->with(['module_bank', 'lecturers', 'level', 'coordinator', 'course_rep', 'attendances'])
+            ->get();
         return new ModuleCollection($modules);
     }
 
 
-    public function cordinating_modules()
+    public function coordinating_modules()
     {
-        $cordinator_id = auth()->user()->lecturer->id;
-        $modules = Module::where('semester_id', $this->getCurrentSemesterId())->where('cordinator_id', $cordinator_id)->orderBy('id', 'DESC')->with(['module_bank', 'lecturers', 'level', 'cordinator', 'course_rep', 'attendances'])->get();
+        $coordinator_id = auth()->user()->lecturer->id;
+        $modules = Module::where('semester_id', $this->semesterId)
+            ->where('coordinator_id', $coordinator_id)
+            ->orderBy('id', 'DESC')
+            ->with(['module_bank', 'lecturers', 'level', 'coordinator', 'course_rep', 'attendances'])
+            ->get();
         return new ModuleCollection($modules);
     }
 }

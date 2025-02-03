@@ -32,7 +32,7 @@ class ResultController extends Controller
      */
     public function index()
     {
-        $results = Result::where('semester_id', $this->semesterId)->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank', 'module.level']);
+        $results = Result::where('semester_id', $this->semesterId)->orderBy('id', 'DESC')->with(['module.coordinator', 'module.module_bank', 'module.level']);
         return new ResultCollection($results->get());
     }
 
@@ -55,7 +55,7 @@ class ResultController extends Controller
      */
     public function show(Result $result)
     {
-        return (new ResultResource($result->loadMissing(['module.cordinator', 'module.module_bank', 'assessments.student'])))
+        return (new ResultResource($result->loadMissing(['module.coordinator', 'module.module_bank', 'assessments.student'])))
             ->response()
             ->setStatusCode(200);
     }
@@ -114,20 +114,24 @@ class ResultController extends Controller
 
 
     /**
-     * Cordinating Module the specified resource from storage.
+     * Coordinating Module the specified resource from storage.
      *
      * @param  \App\Models\Module  $module
      * @return \Illuminate\Http\Response
      */
-    public function cordinating_module()
+    public function coordinating_module()
     {
-        $lecturer_id = auth()->user->lecturer->id;
-        $results = Result::where('semester_id', $this->semesterId)->where('cordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank', 'module.level']);
+        $user = auth()->user();
+        if (!$user->lecturer) {
+            return response()->json(['error' => 'User does not have a lecturer relationship'], 400);
+        }
+        $lecturer_id = $user->lecturer->id;
+        $results = Result::where('semester_id', $this->semesterId)->where('coordinator_id', $lecturer_id)->orderBy('id', 'DESC')->with(['module.module_bank', 'module.level']);
         return new ResultCollection($results->get());
     }
 
     /**
-     * Cordinating Module the specified resource from storage.
+     * Coordinating Module the specified resource from storage.
      *
      * @param  \App\Models\Module  $module
      * @return \Illuminate\Http\Response
@@ -190,8 +194,8 @@ class ResultController extends Controller
 
     public function lecturers_results()
     {
-        $lecturerModules = auth()->user->lecturer->modules->pluck('id')->toArray();
-        $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.cordinator', 'module.module_bank'])->get();
+        $lecturerModules = auth()->user()->lecturer->modules->pluck('id')->toArray();
+        $results = Result::whereIn('module_id', $lecturerModules)->orderBy('id', 'DESC')->with(['module.coordinator', 'module.module_bank'])->get();
         return new ResultCollection($results);
     }
 

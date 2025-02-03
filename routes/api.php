@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\API\V1\AssessmentController;
+use App\Http\Controllers\API\V1\AttendanceController;
+use App\Http\Controllers\API\V1\AttendanceLecturerController;
+use App\Http\Controllers\API\V1\GroupController;
 use App\Http\Controllers\API\V1\LecturerController;
+use App\Http\Controllers\API\V1\LecturerModuleController;
 use App\Http\Controllers\API\V1\LevelController;
 use App\Http\Controllers\API\V1\ModuleBankController;
 use App\Http\Controllers\API\V1\ModuleController;
@@ -22,7 +27,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(
 
         // Result
         Route::apiResource('/results', ResultController::class);
-        Route::get('/cordinating/modules/results', [ResultController::class, 'cordinating_module']);
+        Route::get('/coordinating/modules/results', [ResultController::class, 'coordinating_module']);
         Route::get('/promotion/check', [ResultController::class, 'promotion_check']);
         Route::get('/update_status/result/{result}', [ResultController::class, 'update_status']);
         Route::get('/lecturer/results', [ResultController::class, 'lecturers_results']);
@@ -30,7 +35,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(
         Route::post('/import/results/{result}', [ResultController::class, 'import']);
 
         // Assessment
-        // Route::apiResource('/assessments', AssessmentController::class);
+        Route::apiResource('/assessments', AssessmentController::class);
 
         // Students
         Route::apiResource('/students', StudentController::class);
@@ -46,7 +51,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(
         Route::post('/import/lecturers', [LecturerController::class, 'import']);
         Route::get('/all/lecturers', [LecturerController::class, 'all']);
         Route::get('/lecturer/modules', [LecturerController::class, 'lecturers_modules']);
-        Route::get('/cordinating/modules/lecturer', [LecturerController::class, 'cordinating_modules']);
+        Route::get('/coordinating/modules/lecturer', [LecturerController::class, 'coordinating_modules']);
 
         // Modules Bank
         Route::apiResource('/module_banks', ModuleBankController::class);
@@ -56,7 +61,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(
         Route::apiResource('/modules', ModuleController::class);
         Route::get('/end/module/{module}', [ModuleController::class, 'end_module']);
         Route::post('/add/student/{module}', [ModuleController::class, 'add_student']);
-        Route::get('/cordinating/modules/{lecturer}', [ModuleController::class, 'cordinating_modules']);
+        Route::get('/coordinating/modules/{lecturer}', [ModuleController::class, 'coordinating_modules']);
         Route::get('/student/modules/', [ModuleController::class, 'student_modules']);
         Route::get('/course_rep/modules', [ModuleController::class, 'course_rep_modules']);
 
@@ -65,19 +70,19 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(
         Route::get('/lev/backend', [LevelController::class, 'backend']);
         Route::put('student/level/promotion/{semester}', [LevelController::class, 'student_promotion']);
 
-        // // Group
-        // Route::apiResource('/groups', GroupController::class);
+        // Group
+        Route::apiResource('/groups', GroupController::class);
 
-        // // Attendance
-        // Route::apiResource('/attendances', AttendanceController::class);
-        // Route::get('/course_rep/attendances', [AttendanceController::class, 'course_rep_attendances']);
+        // Attendance
+        Route::apiResource('/attendances', AttendanceController::class);
+        Route::get('/course_rep/attendances', [AttendanceController::class, 'course_rep_attendances']);
 
-        // // Attendance Lecturer
-        // Route::apiResource('/attendance_lecturer', AttendanceLecturerController::class);
-        // Route::get('/attendance/lecturer', [AttendanceLecturerController::class, 'lecturers_attendances']);
+        // Attendance Lecturer
+        Route::apiResource('/attendance_lecturer', AttendanceLecturerController::class);
+        Route::get('/attendance/lecturer', [AttendanceLecturerController::class, 'lecturers_attendances']);
 
-        // // LecturerModule
-        // Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');
-        // Route::get('/lecture/modules/{lecuturermodule}', [LecturerModuleController::class, 'show'])->name('lecture_module.show');
+        // LecturerModule
+        Route::get('/lecture/modules', [LecturerModuleController::class, 'index'])->name('lecture_module.index');
+        Route::get('/lecture/modules/{lecturerModule}', [LecturerModuleController::class, 'show'])->name('lecture_module.show');
     }
 );

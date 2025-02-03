@@ -19,7 +19,11 @@ class LecturerFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => $attribute['user_id'] ?? User::factory(),
+            'user_id' => User::whereDoesntHave('student')
+                            ->whereDoesntHave('lecturer')
+                            ->inRandomOrder()
+                            ->first()
+                            ->id,
             'staff_id' => $this->faker->unique()->numberBetween(12345, 99999),
             'title' => 'Dr.',
             'first_name' => $this->faker->firstName(),

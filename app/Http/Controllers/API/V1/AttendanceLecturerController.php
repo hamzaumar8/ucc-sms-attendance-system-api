@@ -128,7 +128,7 @@ class AttendanceLecturerController extends Controller
 
     public function lecturers_attendances()
     {
-        $lecturer_id = auth()->user->lecturer->id;
+        $lecturer_id = auth()->user()->lecturer->id;
         $attendances = AttendanceLecturer::where('lecturer_id', $lecturer_id)->where('semester_id', $this->semesterId)->with(['module.module_bank', 'module.level'])->orderBy('id', 'DESC')->get();
         return  AttendanceLecturerResource::collection($attendances);
     }

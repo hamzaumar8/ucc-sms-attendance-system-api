@@ -29,9 +29,9 @@ class Lecturer extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function cordinator_modules()
+    public function coordinator_modules()
     {
-        return $this->hasMany(Module::class, 'cordinator_id');
+        return $this->hasMany(Module::class, 'coordinator_id');
     }
 
     public function modules()
@@ -58,6 +58,4 @@ class Lecturer extends Model
     {
         return $this->picture ? $this->picture : asset('assets/img/lecturers/default.png');
     }
-
-
 }

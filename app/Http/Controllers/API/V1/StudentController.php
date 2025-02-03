@@ -134,7 +134,7 @@ class StudentController extends Controller
     public function update(Request $request, Student $student)
     {
         $request->validate([
-            'email' => 'required|string|email|max:255|unique:users,email,' . $student->user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $student->user()->id,
             'index_number' => 'required|max:20|unique:students,index_number,' . $student->id,
             'first_name' => 'required|string|max:20',
             'other_name' => 'nullable|string|max:255',
@@ -173,7 +173,7 @@ class StudentController extends Controller
                 'level_id' => $request->input('level'),
             ]);
 
-            $student->user->update([
+            $student->user()->update([
                 'email' => $request->input('email'),
                 'username' => strtoupper($request->input('index_number')),
             ]);
@@ -218,7 +218,7 @@ class StudentController extends Controller
             }
 
             // Delete the associated user
-            $student->user->delete();
+            $student->user()->delete();
 
             DB::commit();
             Log::info('Student deleted successfully: ' . $student->id);
@@ -309,7 +309,7 @@ class StudentController extends Controller
     public function results()
     {
         try {
-            $id = auth()->user->student->id;
+            $id = auth()->user()->student->id;
             $student = Student::with(['results', 'results.module.module_bank', 'results.semester'])->find($id);
             if (!$student) {
                 return response()->json(['error' => 'Student not found'], 404);
@@ -329,7 +329,7 @@ class StudentController extends Controller
     public function groups()
     {
         try {
-            $id = auth()->user->student->id;
+            $id = auth()->user()->student->id;
             $student = Student::with(['groups'])->find($id);
             if (!$student) {
                 return response()->json(['error' => 'Student not found'], 404);

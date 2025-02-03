@@ -25,12 +25,12 @@ class LecturerModuleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\LecturerModule  $lecuturermodule
+     * @param  \App\Models\LecturerModule  $lecturerModule
      * @return \Illuminate\Http\Response
      */
-    public function show(LecturerModule $lecuturermodule)
+    public function show(LecturerModule $lecturerModule)
     {
-        return (new LecturerModuleResource($lecuturermodule))
+        return (new LecturerModuleResource($lecturerModule))
             ->response()
             ->setStatusCode(200);
     }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('semester_id')->nullable();
             $table->unsignedBigInteger('module_bank_id')->nullable();
-            $table->unsignedBigInteger('cordinator_id')->nullable();
+            $table->unsignedBigInteger('coordinator_id')->nullable();
             $table->unsignedBigInteger('course_rep_id')->nullable();
             $table->unsignedBigInteger('level_id')->nullable();
             $table->date('start_date');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->enum('status', ['active', 'upcoming', 'inactive'])->default('upcoming');
             $table->foreign('semester_id')->references('id')->on('semesters')->onDelete('set null');
             $table->foreign('module_bank_id')->references('id')->on('module_banks')->onDelete('set null');
-            $table->foreign('cordinator_id')->references('id')->on('lecturers')->onDelete('set null');
+            $table->foreign('coordinator_id')->references('id')->on('lecturers')->onDelete('set null');
             $table->foreign('course_rep_id')->references('id')->on('students')->onDelete('set null');
             $table->foreign('level_id')->references('id')->on('levels')->onDelete('set null');
             $table->timestamps();
