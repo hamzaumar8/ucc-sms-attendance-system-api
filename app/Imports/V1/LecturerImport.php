@@ -31,9 +31,11 @@ class LecturerImport implements ToModel, WithHeadingRow, WithChunkReading, WithV
             'username' => $row['staff_id'],
             'name' => $name,
             'email_verified_at' => now(),
-            'role' => 'STF',
             'password' => Hash::make($row['staff_id']),
         ]);
+
+        //Assign a lecturer role
+        $user->assignRole('lecturer');
 
         $lecturer = new Lecturer([
             'user_id' => $user->id,

@@ -83,6 +83,9 @@ class StudentController extends Controller
                 'password' => Hash::make(strtolower(str_replace("/", "", $request->input('index_number')))),
             ]);
 
+            // Assign a student role
+            $user->assignRole('student');
+
             Student::create([
                 'user_id' => $user->id,
                 'index_number' => strtoupper($request->input('index_number')),

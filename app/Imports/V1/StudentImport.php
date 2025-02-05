@@ -35,11 +35,15 @@ class StudentImport implements ToModel, WithHeadingRow, WithChunkReading, WithVa
             'password' => Hash::make(strtolower(str_replace("/", "", $row['index_number']))),
         ]);
 
+        //Assign a student role
+        $user->assignRole('student');
+
         $level_id = null;
         $level = Level::where('name', 'like', "%{$row['level']}%")->first();
         if ($level) {
-            -$level_id = $level->id;
+            $level_id = $level->id;
         }
+
         $student = new Student([
             'user_id' => $user->id,
             'index_number' => strtoupper($row['index_number']),

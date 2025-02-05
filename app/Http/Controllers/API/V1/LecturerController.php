@@ -82,9 +82,11 @@ class LecturerController extends Controller
                 'email' => $request->input('email'),
                 'username' => $request->input('staff_id'),
                 'email_verified_at' => now(),
-                'role' => 'STF',
                 'password' => Hash::make($request->input('staff_id')),
             ]);
+
+            //Assign a student role
+            $user->assignRole('lecturer');
 
             Lecturer::create([
                 'user_id' => $user->id,

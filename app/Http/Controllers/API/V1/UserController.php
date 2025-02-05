@@ -17,12 +17,17 @@ class UserController extends Controller
      */
     public function __invoke()
     {
-        $user = User::find(auth()->user()->id);
-        // $this->getRoleNames()->first()
-        // new UserResource($request->user()
-        // if ($user->role === "USR" || $user->role === "REP") {
-        //     return (new UserResource($user->loadMissing('student')))->response()->setStatusCode(200);
-        // } else {
-        return (new UserResource($user->loadMissing(['lecturer', 'student'])))->response()->setStatusCode(200);
+        $user = auth()->user();
+        $role = $user->getFirstRoleName();
+        if ($role === 'admin') {
+            $loadMissing = ['lecturer', 'student'];
+        } elseif ($role === 'lecturer') {
+            $loadMissing = ['lecturer'];
+        } elseif ($role === 'student') {
+            $loadMissing = ['student'];
+        } else {
+            $loadMissing = [];
+        }
+        return (new UserResource($user->loadMissing($loadMissing)))->response()->setStatusCode(200);
     }
 }
